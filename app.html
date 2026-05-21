@@ -124,12 +124,12 @@
                             <label><input type="checkbox" id="solicitud" value="X"> 3. Solicitud</label>
                             <label><input type="checkbox" id="apego" value="X"> 4. Apego</label>
                         </div>
-
-                        <div class="form-group">
-                            <label>5. Fecha de Solicitud</label>
-                            <input type="date" id="fecha_solicitud">
+                        <label>5. Fecha de Solicitud</label>
+                        <input type="date" id="fecha_solicitud" class="date-input">
                         </div>
-                        
+
+                            <div class="form-group">
+                 
                         <div class="form-group">
                             <label>7. Circuito</label>
                             <select id="circuito" onchange="alCambiarCircuito()">
@@ -180,10 +180,11 @@
                             <input type="text" id="ubicacion_del_trabajo">
                         </div>
 
-                        <div class="form-group">
-                            <label>14. Fecha de Interrupción</label>
-                            <input type="date" id="fecha_interrupcion" onchange="calcularDia()">
-                        </div>
+
+                                    <label>14. Fecha de Interrupción</label>
+    <input type="date" id="fecha_interrupcion" class="date-input" onchange="calcularDia()">
+</div>
+       
 
                         <div class="form-group">
                             <label>15. Día de la Semana</label>
