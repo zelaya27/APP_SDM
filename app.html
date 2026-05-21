@@ -372,7 +372,10 @@
         }
 
         function alCambiarCircuito() {
-            const circSeleccionado = document.getElementById('circuito').value;
+            const selectCircuito = document.getElementById('circuito');
+            // Limpiamos el nombre del circuito seleccionado (sin espacios extra y en mayúsculas)
+            const circSeleccionado = selectCircuito.value ? selectCircuito.value.toString().trim().toUpperCase() : "";
+            
             document.getElementById('subestacion').value = "";
             
             const selInterruptor = document.getElementById('interruptor_de_circuito');
@@ -384,28 +387,34 @@
             if(!circSeleccionado) return;
 
             // Autocompletar la Subestación leyendo de la hoja "circuitos"
-            const filaCirc = baseCircuitos.find(f => f[6] === circSeleccionado);
+            const filaCirc = baseCircuitos.find(f => f[6] && f[6].toString().trim().toUpperCase() === circSeleccionado);
             if(filaCirc) document.getElementById('subestacion').value = filaCirc[4];
 
             // Filtrar Equipos basados en la hoja "equipos"
-            baseEquipos.forEach(fila => {
-                // CORRECCIÓN DE ÍNDICES SEGÚN TU HOJA DE EQUIPOS
-                const circEquipo = fila[5] ? fila[5].toString().trim() : ""; // Columna F (Índice 5)
-                const tipoEquipo = fila[6] ? fila[6].toString().trim().toUpperCase() : ""; // Columna G (Índice 6)
-                const nombreEquipo = fila[12] ? fila[12].toString().trim() : ""; // Columna M (Índice 12)
+            // Empezamos en 1 para saltarnos los encabezados de la fila 1
+            for (let i = 1; i < baseEquipos.length; i++) {
+                const fila = baseEquipos[i];
+                
+                // Asegurarnos de que la fila tenga datos suficientes para llegar a la Columna M (índice 12)
+                if (fila && fila.length >= 12) {
+                    const circEquipo = fila[5] ? fila[5].toString().trim().toUpperCase() : ""; // Columna F (CIRCUITO)
+                    const tipoEquipo = fila[6] ? fila[6].toString().trim().toUpperCase() : ""; // Columna G (TIPO_EQUIPO)
+                    const nombreEquipo = fila[12] ? fila[12].toString().trim() : ""; // Columna M (NOMBRE_SOLICITUD)
 
-                if (circEquipo === circSeleccionado && nombreEquipo !== "") {
-                    let opt = document.createElement('option');
-                    opt.value = nombreEquipo;
-                    opt.text = nombreEquipo;
-                    
-                    if (tipoEquipo === "INTERRUPTOR") {
-                        selInterruptor.appendChild(opt);
-                    } else if (tipoEquipo === "RESTAURADOR") {
-                        selRestaurador.appendChild(opt);
+                    // Verificamos si el circuito de la hoja "equipos" coincide con el seleccionado
+                    if (circEquipo === circSeleccionado && nombreEquipo !== "") {
+                        let opt = document.createElement('option');
+                        opt.value = nombreEquipo;
+                        opt.text = nombreEquipo;
+                        
+                        if (tipoEquipo === "INTERRUPTOR") {
+                            selInterruptor.appendChild(opt);
+                        } else if (tipoEquipo === "RESTAURADOR") {
+                            selRestaurador.appendChild(opt);
+                        }
                     }
                 }
-            });
+            }
         }
 
         // FUNCIÓN EXTRA: Hacer que Solicitud y Apego sean mutuamente excluyentes
