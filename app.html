@@ -17,11 +17,41 @@
             --border-color: #2c3e50;
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
-        header { background-color: var(--card-color); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
-        header img { height: 50px; }
-        .user-info { font-size: 14px; color: var(--muted-text); text-align: right; }
-        .btn-logout { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 15px; }
+        
+        /* HEADER CORREGIDO */
+        header { 
+            background-color: var(--card-color); 
+            padding: 15px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        /* Contenedor blanco para el logo oscuro */
+        .logo-box {
+            background-color: #ffffff;
+            padding: 6px 16px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .logo-box img { height: 45px; display: block; }
+        
+        .header-right { display: flex; align-items: center; }
+        .user-info { font-size: 14px; color: var(--muted-text); text-align: right; line-height: 1.4; }
+        .user-name { font-weight: bold; color: #ffffff; font-size: 15px; }
+        .user-sector-badge { background: #1a2e3f; padding: 2px 6px; border-radius: 4px; border: 1px solid #2c3e50; color: #3498db; font-weight: bold; }
+        
+        .btn-logout { background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 20px; transition: background 0.3s; }
+        .btn-logout:hover { background: #c0392b; }
+        
         .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        
+        /* Barra de info extra arriba del formulario */
+        .info-bar { background: #1a2e3f; padding: 12px 20px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid var(--accent-color); font-size: 14px; display: flex; justify-content: space-between; }
+
         .card { background-color: var(--card-color); border-radius: 8px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         h2 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
         .stepper { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
@@ -50,17 +80,24 @@
 </head>
 <body>
     <header>
-        <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo">
-        <div style="display: flex; align-items: center;">
+        <div class="logo-box">
+            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo">
+        </div>
+        <div class="header-right">
             <div class="user-info">
-                <span id="lbl-usuario" style="font-weight: bold; color: white;">Usuario</span><br>
-                Sector: <span id="lbl-sector">Sector</span>
+                <span id="lbl-usuario" class="user-name">Cargando...</span><br>
+                Sector: <span id="lbl-sector" class="user-sector-badge">...</span>
             </div>
-            <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
+            <button class="btn-logout" id="btn-logout-top" onclick="cerrarSesion()">Salir</button>
         </div>
     </header>
 
     <div class="container">
+        <div class="info-bar">
+            <div><i class="fa-solid fa-user"></i> Operador: <b id="bar-usuario" style="color:#ffffff;">-</b></div>
+            <div><i class="fa-solid fa-layer-group"></i> Sector Asignado: <b id="bar-sector" style="color:#3498db;">-</b></div>
+        </div>
+
         <div class="card">
             <h2>Formato de Solicitud de Despeje</h2>
             
@@ -72,7 +109,6 @@
             </div>
 
             <form id="mainForm">
-                
                 <div class="form-step active" id="step1">
                     <div class="form-grid">
                         <div class="form-group">
@@ -174,28 +210,28 @@
                 <div class="form-step" id="step2">
                     <div class="form-grid">
                         <div class="form-group full-width"><label>19. Trabajo a Realizar</label><textarea id="trabajo_a_realizar"></textarea></div>
-                        <div class="form-group"><label>20. Responsable</label><input type="text" id="responsable"></div>
-                        <div class="form-group"><label>21. Sustituto</label><input type="text" id="sustituto"></div>
+                        <div class="form-group"><label>20. Responsable</label><input type="text" id="responsable"></input></div>
+                        <div class="form-group"><label>21. Sustituto</label><input type="text" id="sustituto"></input></div>
                         <div class="form-group full-width"><label>22. Zonas Afectadas</label><textarea id="zonas_afectadas"></textarea></div>
-                        <div class="form-group full-width"><label>23. Área Afectada</label><input type="text" id="area_afectada"></div>
-                        <div class="form-group"><label>24. Nombre del Despeje</label><input type="text" id="nombre_despeje"></div>
-                        <div class="form-group"><label>25. Apegos Enlaces</label><input type="text" id="apegos_enlaces"></div>
-                        <div class="form-group"><label>26. Apego Despeje</label><input type="text" id="apego_despeje"></div>
+                        <div class="form-group full-width"><label>23. Área Afectada</label><input type="text" id="area_afectada"></input></div>
+                        <div class="form-group"><label>24. Nombre del Despeje</label><input type="text" id="nombre_despeje"></input></div>
+                        <div class="form-group"><label>25. Apegos Enlaces</label><input type="text" id="apegos_enlaces"></input></div>
+                        <div class="form-group"><label>26. Apego Despeje</label><input type="text" id="apego_despeje"></input></div>
                     </div>
                 </div>
 
                 <div class="form-step" id="step3">
                     <div class="form-grid">
-                        <div class="form-group"><label>27. Manto. Programado</label><input type="text" id="manto_programado"></div>
-                        <div class="form-group"><label>28. Manto. Emergencia</label><input type="text" id="manto_emergencia"></div>
-                        <div class="form-group"><label>29. Manto. Eq. Medición</label><input type="text" id="manto_eq_medicion"></div>
-                        <div class="form-group"><label>30. Proyecto Expansión</label><input type="text" id="proyecto_expansion"></div>
-                        <div class="form-group"><label>31. Manto. Otros</label><input type="text" id="manto_otros"></div>
-                        <div class="form-group"><label>32. ODT Programada</label><input type="text" id="odt_programada"></div>
-                        <div class="form-group"><label>33. ODT Emergencia</label><input type="text" id="odt_emergencia"></div>
-                        <div class="form-group"><label>34. ODT OS</label><input type="text" id="odt_os"></div>
-                        <div class="form-group"><label>35. Código Proyecto</label><input type="text" id="codigo_proyecto"></div>
-                        <div class="form-group"><label>36. ODT Otros</label><input type="text" id="odt_otros"></div>
+                        <div class="form-group"><label>27. Manto. Programado</label><input type="text" id="manto_programado"></input></div>
+                        <div class="form-group"><label>28. Manto. Emergencia</label><input type="text" id="manto_emergencia"></input></div>
+                        <div class="form-group"><label>29. Manto. Eq. Medición</label><input type="text" id="manto_eq_medicion"></input></div>
+                        <div class="form-group"><label>30. Proyecto Expansión</label><input type="text" id="proyecto_expansion"></input></div>
+                        <div class="form-group"><label>31. Manto. Otros</label><input type="text" id="manto_otros"></input></div>
+                        <div class="form-group"><label>32. ODT Programada</label><input type="text" id="odt_programada"></input></div>
+                        <div class="form-group"><label>33. ODT Emergencia</label><input type="text" id="odt_emergencia"></input></div>
+                        <div class="form-group"><label>34. ODT OS</label><input type="text" id="odt_os"></input></div>
+                        <div class="form-group"><label>35. Código Proyecto</label><input type="text" id="codigo_proyecto"></input></div>
+                        <div class="form-group"><label>36. ODT Otros</label><input type="text" id="odt_otros"></input></div>
                     </div>
                 </div>
 
@@ -203,9 +239,9 @@
                     <div class="form-grid">
                         <div class="form-group full-width"><label>37. Justificación</label><textarea id="justificacion"></textarea></div>
                         <div class="form-group full-width"><label>38. Observaciones</label><textarea id="observaciones"></textarea></div>
-                        <div class="form-group"><label>39. Solicitado Por</label><input type="text" id="solicitado_por" readonly style="background: #2c3e50;"></div>
-                        <div class="form-group"><label>40. Cargo del Solicitante</label><input type="text" id="cargo_del_solicitante"></div>
-                        <div class="form-group"><label>41. Aprobado Por</label><input type="text" id="aprobado_por"></div>
+                        <div class="form-group"><label>39. Solicitado Por</label><input type="text" id="solicitado_por" readonly style="background: #2c3e50;"></input></div>
+                        <div class="form-group"><label>40. Cargo del Solicitante</label><input type="text" id="cargo_del_solicitante"></input></div>
+                        <div class="form-group"><label>41. Aprobado Por</label><input type="text" id="aprobado_por"></input></div>
                     </div>
                 </div>
 
@@ -219,20 +255,32 @@
     </div>
 
     <script>
+        // FUNCIÓN CERRAR SESIÓN AISLADA (Para garantizar que funcione pase lo que pase)
+        function cerrarSesion() {
+            sessionStorage.clear();
+            window.location.href = "index.html";
+        }
+
         const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwOB545QGuv5SAV0wTzY0Qps5uhJe7amsIRCVXN-3gUj7HozCIGzSqeC3OszXaXqTKR/exec';
 
         let baseCircuitos = [];
         let baseEquipos = [];
 
-        // Cargar datos de la sesión del login
+        // Cargar datos de la sesión del login de forma segura al cargar el DOM
         const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
 
+        // Inyectar textos en los lbl y barras de estado superiores
         document.getElementById('lbl-usuario').innerText = usuarioSesion;
         document.getElementById('lbl-sector').innerText = sectorSesion;
-        document.getElementById('solicitado_por').value = usuarioSesion;
+        document.getElementById('bar-usuario').innerText = usuarioSesion;
+        document.getElementById('bar-sector').innerText = sectorSesion;
 
-        // INICIALIZACIÓN
+        if (document.getElementById('solicitado_por')) {
+            document.getElementById('solicitado_por').value = usuarioSesion;
+        }
+
+        // INICIALIZACIÓN DE LA APLICACIÓN
         window.onload = async function() {
             generarIDUnico(); 
             await descargarDatosGoogleSheets(); 
@@ -259,7 +307,7 @@
             }
         }
 
-        // LÓGICAS DE LOS CAMPOS 1-18
+        // LÓGICAS AUTOMÁTICAS (Campos 1-18)
         function generarIDUnico() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let id = '';
@@ -292,89 +340,36 @@
             }
         }
 
-   async function descargarDatosGoogleSheets() {
-    const btnSubmit = document.getElementById('btnSubmit');
-    const selectCircuito = document.getElementById('circuito');
-    
-    // 1. REVISAMOS SI LOS DATOS YA ESTÁN EN LA MEMORIA DEL NAVEGADOR
-    const cacheCircuitos = sessionStorage.getItem('cacheCircuitos');
-    const cacheEquipos = sessionStorage.getItem('cacheEquipos');
-
-    if (cacheCircuitos && cacheEquipos) {
-        console.log("Cargando datos súper rápido desde la memoria caché...");
-        baseCircuitos = JSON.parse(cacheCircuitos);
-        baseEquipos = JSON.parse(cacheEquipos);
-        poblarListaCircuitos();
-        return; // Detenemos la función aquí para no hacer esperar al usuario
-    }
-
-    // 2. SI NO ESTÁN EN MEMORIA, LOS DESCARGAMOS DE GOOGLE SHEETS
-    try {
-        console.log("Descargando datos desde Google Sheets por primera vez...");
-        selectCircuito.innerHTML = '<option value="">Descargando base de datos (por favor espere)...</option>';
-        
-        const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
-        const data = await res.json();
-        
-        baseCircuitos = data.circuitos;
-        baseEquipos = data.equipos;
-
-        // 3. GUARDAMOS EN MEMORIA PARA LA PRÓXIMA VEZ
-        sessionStorage.setItem('cacheCircuitos', JSON.stringify(baseCircuitos));
-        sessionStorage.setItem('cacheEquipos', JSON.stringify(baseEquipos));
-
-        poblarListaCircuitos(); 
-    } catch(e) {
-        console.error("Error cargando base de datos:", e);
-        selectCircuito.innerHTML = '<option value="">Error de conexión de red</option>';
-    }
-}
-
-       function poblarListaCircuitos() {
-    const selectCircuito = document.getElementById('circuito');
-    selectCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
-    
-    // 1. Obtenemos el sector del usuario y lo limpiamos (mayúsculas y sin espacios)
-    let miSector = sessionStorage.getItem("sector");
-    if (!miSector) {
-        selectCircuito.innerHTML = '<option value="">Error: Usuario sin sector</option>';
-        return;
-    }
-    miSector = miSector.toString().trim().toUpperCase();
-
-    if (!baseCircuitos || baseCircuitos.length <= 1) {
-        selectCircuito.innerHTML = '<option value="">Error leyendo la hoja "circuitos"</option>';
-        return;
-    }
-
-    let circuitosEncontrados = 0;
-
-    // 2. Recorremos la hoja desde i = 1 (para ignorar la fila de encabezados)
-    for (let i = 1; i < baseCircuitos.length; i++) {
-        const fila = baseCircuitos[i];
-        
-        // Aseguramos que la fila tenga suficientes datos
-        if(fila.length > 6) {
-            // fila[3] = SECTOR | fila[6] = CIRCUITO
-            const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : ""; 
-            const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
-
-            // 3. Comparamos los sectores limpios
-            if (sectorHoja === miSector && nombreCircuito !== "") {
-                let opt = document.createElement('option');
-                opt.value = nombreCircuito;
-                opt.text = nombreCircuito;
-                selectCircuito.appendChild(opt);
-                circuitosEncontrados++;
+        async function descargarDatosGoogleSheets() {
+            try {
+                const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+                const data = await res.json();
+                baseCircuitos = data.circuitos;
+                baseEquipos = data.equipos;
+                poblarListaCircuitos(); 
+            } catch(e) {
+                document.getElementById('circuito').innerHTML = '<option>Error cargando de Google Sheets</option>';
             }
         }
-    }
 
-    // 4. Mensaje por si el sector del usuario no está en la hoja
-    if (circuitosEncontrados === 0) {
-        selectCircuito.innerHTML = `<option value="">Cero circuitos para el sector: ${miSector}</option>`;
-    }
-}
+        function poblarListaCircuitos() {
+            const selectCircuito = document.getElementById('circuito');
+            selectCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
+            
+            let sectorLimpio = sectorSesion.toString().trim().toUpperCase();
+
+            baseCircuitos.forEach(fila => {
+                const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : ""; // Columna D
+                const nombreCircuito = fila[6] ? fila[6].toString().trim() : ""; // Columna G
+                
+                if (sectorHoja === sectorLimpio && nombreCircuito) {
+                    let opt = document.createElement('option');
+                    opt.value = nombreCircuito;
+                    opt.text = nombreCircuito;
+                    selectCircuito.appendChild(opt);
+                }
+            });
+        }
 
         function alCambiarCircuito() {
             const circSeleccionado = document.getElementById('circuito').value;
@@ -387,7 +382,7 @@
             if(!circSeleccionado) return;
 
             const filaCirc = baseCircuitos.find(f => f[6] === circSeleccionado);
-            if(filaCirc) document.getElementById('subestacion').value = filaCirc[4]; // Columna E (Índice 4)
+            if(filaCirc) document.getElementById('subestacion').value = filaCirc[4]; // Columna E
 
             baseEquipos.forEach(fila => {
                 const circEquipo = fila[0]; // Columna A
@@ -410,7 +405,7 @@
             if(filaEq) document.getElementById('ubicacion_del_equipo').value = filaEq[11]; // Columna L
         }
 
-        // FUNCIÓN PARA GUARDAR EN GOOGLE SHEETS
+        // ENVÍO DE DATOS
         async function guardarFormulario() {
             const btn = document.getElementById('btnSubmit');
             btn.disabled = true;
@@ -435,7 +430,6 @@
                 hora_inicio: document.getElementById('hora_inicio').value,
                 hora_final: document.getElementById('hora_final').value,
                 tiempo_necesario: document.getElementById('tiempo_necesario').value,
-                // CAMPOS DE TEXTO BÁSICO POR AHORA
                 trabajo_a_realizar: document.getElementById('trabajo_a_realizar').value,
                 responsable: document.getElementById('responsable').value,
                 sustituto: document.getElementById('sustituto').value,
@@ -466,3 +460,14 @@
             try {
                 await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
                 alert("¡Solicitud registrada con éxito!");
+                window.location.reload(); 
+            } catch (error) {
+                alert("Ocurrió un error al enviar.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'GUARDAR SOLICITUD';
+            }
+        }
+    </script>
+</body>
+</html>
