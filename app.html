@@ -2,14 +2,410 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>APP_SDM - Inicio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APP_SDM - Solicitud de Despejes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #0b141d; color: white; padding: 20px; }
+        :root {
+            --bg-color: #0b141d;
+            --card-color: #14212d;
+            --accent-color: #003366;
+            --accent-hover: #004080;
+            --success-color: #27ae60;
+            --text-color: #ffffff;
+            --muted-text: #a0aec0;
+            --border-color: #2c3e50;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        header { background-color: var(--card-color); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        header img { height: 50px; }
+        .user-info { font-size: 14px; color: var(--muted-text); text-align: right; }
+        .btn-logout { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 15px; }
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .card { background-color: var(--card-color); border-radius: 8px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h2 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+        .stepper { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .step { flex: 1; text-align: center; font-size: 12px; color: var(--muted-text); position: relative; z-index: 1; }
+        .step .circle { width: 30px; height: 30px; line-height: 30px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 50%; margin: 0 auto 5px auto; font-weight: bold; transition: all 0.3s; }
+        .step.active .circle { background-color: var(--accent-color); border-color: var(--accent-color); color: white; }
+        .step.completed .circle { background-color: var(--success-color); border-color: var(--success-color); color: white; }
+        .form-step { display: none; }
+        .form-step.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: span 2; }
+        @media (max-width: 600px) { .form-group.full-width { grid-column: span 1; } }
+        label { font-size: 14px; margin-bottom: 8px; color: var(--muted-text); font-weight: 500; }
+        input[type="text"], input[type="date"], input[type="time"], select, textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; color: white; font-size: 14px; outline: none; transition: border 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-color); }
+        .checkbox-group { display: flex; gap: 20px; background: var(--bg-color); padding: 15px; border-radius: 4px; border: 1px solid var(--border-color); }
+        .buttons-container { margin-top: 30px; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 25px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.3s; }
+        .btn-prev { background-color: #7f8c8d; color: white; }
+        .btn-next { background-color: var(--accent-color); color: white; }
+        .btn-submit { background-color: var(--success-color); color: white; display: none; }
+        textarea { resize: vertical; height: 80px; }
     </style>
 </head>
 <body>
-    <h1>Bienvenido al Panel de Control</h1>
-    <p>Esta es la página principal de tu aplicación.</p>
-    <button onclick="window.location.href='index.html'">Cerrar Sesión</button>
-</body>
-</html>
+    <header>
+        <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo">
+        <div style="display: flex; align-items: center;">
+            <div class="user-info">
+                <span id="lbl-usuario" style="font-weight: bold; color: white;">Usuario</span><br>
+                Sector: <span id="lbl-sector">Sector</span>
+            </div>
+            <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Formato de Solicitud de Despeje</h2>
+            
+            <div class="stepper">
+                <div class="step active" id="step1-tab"><div class="circle">1</div>Datos Generales</div>
+                <div class="step" id="step2-tab"><div class="circle">2</div>Trabajos</div>
+                <div class="step" id="step3-tab"><div class="circle">3</div>Clasificación</div>
+                <div class="step" id="step4-tab"><div class="circle">4</div>Aprobación</div>
+            </div>
+
+            <form id="mainForm">
+                
+                <div class="form-step active" id="step1">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>1. ID Solicitud</label>
+                            <input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;">
+                        </div>
+                        <div class="form-group">
+                            <label>2. Número de Despeje</label>
+                            <input type="text" id="numero_despeje" placeholder="Ej: EEH-LCB-010">
+                        </div>
+                        
+                        <div class="form-group full-width checkbox-group">
+                            <label><input type="checkbox" id="solicitud" value="X"> 3. Solicitud</label>
+                            <label><input type="checkbox" id="apego" value="X"> 4. Apego</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>5. Fecha de Solicitud</label>
+                            <input type="date" id="fecha_solicitud">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>7. Circuito</label>
+                            <select id="circuito" onchange="alCambiarCircuito()">
+                                <option value="">Cargando circuitos...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>6. Subestación</label>
+                            <input type="text" id="subestacion" readonly style="background: #2c3e50;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>8. Sección o Ramal</label>
+                            <select id="seccion">
+                                <option value="">Seleccione...</option>
+                                <option value="RAMAL">RAMAL</option>
+                                <option value="TRONCAL">TRONCAL</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>9. Interruptor de Circuito</label>
+                            <select id="interruptor_de_circuito" onchange="alCambiarEquipo(this.value)">
+                                <option value="">Seleccione Circuito primero...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>10. Restaurador</label>
+                            <select id="restaurador" onchange="alCambiarEquipo(this.value)">
+                                <option value="">Seleccione Circuito primero...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>11. Otros Equipos</label>
+                            <input type="text" id="otros_equipos">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>12. Ubicación del Equipo</label>
+                            <input type="text" id="ubicacion_del_equipo" readonly style="background: #2c3e50;">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>13. Ubicación del Trabajo</label>
+                            <input type="text" id="ubicacion_del_trabajo">
+                        </div>
+
+                        <div class="form-group">
+                            <label>14. Fecha de Interrupción</label>
+                            <input type="date" id="fecha_interrupcion" onchange="calcularDia()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>15. Día de la Semana</label>
+                            <input type="text" id="dia_de_semana" readonly style="background: #2c3e50;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>16. Hora de Inicio</label>
+                            <input type="time" id="hora_inicio" onchange="calcularTiempo()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>17. Hora Final</label>
+                            <input type="time" id="hora_final" onchange="calcularTiempo()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>18. Tiempo Necesario</label>
+                            <input type="text" id="tiempo_necesario" readonly style="background: #2c3e50;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-step" id="step2">
+                    <div class="form-grid">
+                        <div class="form-group full-width"><label>19. Trabajo a Realizar</label><textarea id="trabajo_a_realizar"></textarea></div>
+                        <div class="form-group"><label>20. Responsable</label><input type="text" id="responsable"></div>
+                        <div class="form-group"><label>21. Sustituto</label><input type="text" id="sustituto"></div>
+                        <div class="form-group full-width"><label>22. Zonas Afectadas</label><textarea id="zonas_afectadas"></textarea></div>
+                        <div class="form-group full-width"><label>23. Área Afectada</label><input type="text" id="area_afectada"></div>
+                        <div class="form-group"><label>24. Nombre del Despeje</label><input type="text" id="nombre_despeje"></div>
+                        <div class="form-group"><label>25. Apegos Enlaces</label><input type="text" id="apegos_enlaces"></div>
+                        <div class="form-group"><label>26. Apego Despeje</label><input type="text" id="apego_despeje"></div>
+                    </div>
+                </div>
+
+                <div class="form-step" id="step3">
+                    <div class="form-grid">
+                        <div class="form-group"><label>27. Manto. Programado</label><input type="text" id="manto_programado"></div>
+                        <div class="form-group"><label>28. Manto. Emergencia</label><input type="text" id="manto_emergencia"></div>
+                        <div class="form-group"><label>29. Manto. Eq. Medición</label><input type="text" id="manto_eq_medicion"></div>
+                        <div class="form-group"><label>30. Proyecto Expansión</label><input type="text" id="proyecto_expansion"></div>
+                        <div class="form-group"><label>31. Manto. Otros</label><input type="text" id="manto_otros"></div>
+                        <div class="form-group"><label>32. ODT Programada</label><input type="text" id="odt_programada"></div>
+                        <div class="form-group"><label>33. ODT Emergencia</label><input type="text" id="odt_emergencia"></div>
+                        <div class="form-group"><label>34. ODT OS</label><input type="text" id="odt_os"></div>
+                        <div class="form-group"><label>35. Código Proyecto</label><input type="text" id="codigo_proyecto"></div>
+                        <div class="form-group"><label>36. ODT Otros</label><input type="text" id="odt_otros"></div>
+                    </div>
+                </div>
+
+                <div class="form-step" id="step4">
+                    <div class="form-grid">
+                        <div class="form-group full-width"><label>37. Justificación</label><textarea id="justificacion"></textarea></div>
+                        <div class="form-group full-width"><label>38. Observaciones</label><textarea id="observaciones"></textarea></div>
+                        <div class="form-group"><label>39. Solicitado Por</label><input type="text" id="solicitado_por" readonly style="background: #2c3e50;"></div>
+                        <div class="form-group"><label>40. Cargo del Solicitante</label><input type="text" id="cargo_del_solicitante"></div>
+                        <div class="form-group"><label>41. Aprobado Por</label><input type="text" id="aprobado_por"></div>
+                    </div>
+                </div>
+
+                <div class="buttons-container">
+                    <button type="button" class="btn btn-prev" id="btnPrev" onclick="cambiarPaso(-1)" style="visibility: hidden;">Atrás</button>
+                    <button type="button" class="btn btn-next" id="btnNext" onclick="cambiarPaso(1)">Siguiente</button>
+                    <button type="button" class="btn btn-submit" id="btnSubmit" onclick="guardarFormulario()">GUARDAR SOLICITUD</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwOB545QGuv5SAV0wTzY0Qps5uhJe7amsIRCVXN-3gUj7HozCIGzSqeC3OszXaXqTKR/exec';
+
+        let baseCircuitos = [];
+        let baseEquipos = [];
+
+        // Cargar datos de la sesión del login
+        const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
+        const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
+
+        document.getElementById('lbl-usuario').innerText = usuarioSesion;
+        document.getElementById('lbl-sector').innerText = sectorSesion;
+        document.getElementById('solicitado_por').value = usuarioSesion;
+
+        // INICIALIZACIÓN
+        window.onload = async function() {
+            generarIDUnico(); 
+            await descargarDatosGoogleSheets(); 
+        };
+
+        // PASOS DEL FORMULARIO
+        let currentStep = 1;
+        const totalSteps = 4;
+        function cambiarPaso(dir) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}-tab`).classList.remove('active');
+            if(dir === 1) document.getElementById(`step${currentStep}-tab`).classList.add('completed');
+            currentStep += dir;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            document.getElementById(`step${currentStep}-tab`).classList.add('active');
+            document.getElementById('btnPrev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            
+            if (currentStep === totalSteps) {
+                document.getElementById('btnNext').style.display = 'none';
+                document.getElementById('btnSubmit').style.display = 'block';
+            } else {
+                document.getElementById('btnNext').style.display = 'block';
+                document.getElementById('btnSubmit').style.display = 'none';
+            }
+        }
+
+        // LÓGICAS DE LOS CAMPOS 1-18
+        function generarIDUnico() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let id = '';
+            for (let i = 0; i < 6; i++) { id += chars.charAt(Math.floor(Math.random() * chars.length)); }
+            document.getElementById('id_solicitud').value = id;
+        }
+
+        function calcularDia() {
+            const fechaVal = document.getElementById('fecha_interrupcion').value;
+            if(fechaVal) {
+                const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
+                const fecha = new Date(fechaVal + 'T00:00:00'); 
+                let indiceDia = fecha.getDay() - 1;
+                if(indiceDia === -1) indiceDia = 6; 
+                document.getElementById('dia_de_semana').value = dias[indiceDia];
+            }
+        }
+
+        function calcularTiempo() {
+            const hInicio = document.getElementById('hora_inicio').value;
+            const hFinal = document.getElementById('hora_final').value;
+            if (hInicio && hFinal) {
+                const [h1, m1] = hInicio.split(':').map(Number);
+                const [h2, m2] = hFinal.split(':').map(Number);
+                let minsTotal = (h2 * 60 + m2) - (h1 * 60 + m1);
+                if (minsTotal < 0) minsTotal += 24 * 60; 
+                const horas = Math.floor(minsTotal / 60);
+                const mins = minsTotal % 60;
+                document.getElementById('tiempo_necesario').value = `${horas} hrs ${mins} min`;
+            }
+        }
+
+        async function descargarDatosGoogleSheets() {
+            try {
+                const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+                const data = await res.json();
+                baseCircuitos = data.circuitos;
+                baseEquipos = data.equipos;
+                poblarListaCircuitos(); 
+            } catch(e) {
+                document.getElementById('circuito').innerHTML = '<option>Error cargando de Google Sheets</option>';
+            }
+        }
+
+        function poblarListaCircuitos() {
+            const selectCircuito = document.getElementById('circuito');
+            selectCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
+            baseCircuitos.forEach(fila => {
+                const sectorHoja = fila[3]; // Columna D (Índice 3)
+                const nombreCircuito = fila[6]; // Columna G (Índice 6)
+                if (sectorHoja === sectorSesion && nombreCircuito) {
+                    let opt = document.createElement('option');
+                    opt.value = nombreCircuito;
+                    opt.text = nombreCircuito;
+                    selectCircuito.appendChild(opt);
+                }
+            });
+        }
+
+        function alCambiarCircuito() {
+            const circSeleccionado = document.getElementById('circuito').value;
+            document.getElementById('subestacion').value = "";
+            const selInterruptor = document.getElementById('interruptor_de_circuito');
+            const selRestaurador = document.getElementById('restaurador');
+            selInterruptor.innerHTML = '<option value="">Seleccione...</option>';
+            selRestaurador.innerHTML = '<option value="">Seleccione...</option>';
+
+            if(!circSeleccionado) return;
+
+            const filaCirc = baseCircuitos.find(f => f[6] === circSeleccionado);
+            if(filaCirc) document.getElementById('subestacion').value = filaCirc[4]; // Columna E (Índice 4)
+
+            baseEquipos.forEach(fila => {
+                const circEquipo = fila[0]; // Columna A
+                const tipoEquipo = fila[6]; // Columna G
+                const nombreEquipo = fila[12]; // Columna M
+                if (circEquipo === circSeleccionado && nombreEquipo) {
+                    let opt = document.createElement('option');
+                    opt.value = nombreEquipo;
+                    opt.text = nombreEquipo;
+                    if (tipoEquipo === "INTERRUPTOR") selInterruptor.appendChild(opt);
+                    if (tipoEquipo === "RESTAURADOR") selRestaurador.appendChild(opt);
+                }
+            });
+        }
+
+        function alCambiarEquipo(nombreEquipoSeleccionado) {
+            document.getElementById('ubicacion_del_equipo').value = "";
+            if(!nombreEquipoSeleccionado) return;
+            const filaEq = baseEquipos.find(f => f[12] === nombreEquipoSeleccionado);
+            if(filaEq) document.getElementById('ubicacion_del_equipo').value = filaEq[11]; // Columna L
+        }
+
+        // FUNCIÓN PARA GUARDAR EN GOOGLE SHEETS
+        async function guardarFormulario() {
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerHTML = 'Enviando...';
+
+            const payload = {
+                id_solicitud: document.getElementById('id_solicitud').value,
+                numero_despeje: document.getElementById('numero_despeje').value,
+                solicitud: document.getElementById('solicitud').checked ? "X" : "",
+                apego: document.getElementById('apego').checked ? "X" : "",
+                fecha_solicitud: document.getElementById('fecha_solicitud').value,
+                subestacion: document.getElementById('subestacion').value,
+                circuito: document.getElementById('circuito').value,
+                seccion: document.getElementById('seccion').value,
+                interruptor_de_circuito: document.getElementById('interruptor_de_circuito').value,
+                restaurador: document.getElementById('restaurador').value,
+                otros_equipos: document.getElementById('otros_equipos').value,
+                ubicacion_del_equipo: document.getElementById('ubicacion_del_equipo').value,
+                ubicacion_del_trabajo: document.getElementById('ubicacion_del_trabajo').value,
+                fecha_interrupcion: document.getElementById('fecha_interrupcion').value,
+                dia_de_semana: document.getElementById('dia_de_semana').value,
+                hora_inicio: document.getElementById('hora_inicio').value,
+                hora_final: document.getElementById('hora_final').value,
+                tiempo_necesario: document.getElementById('tiempo_necesario').value,
+                // CAMPOS DE TEXTO BÁSICO POR AHORA
+                trabajo_a_realizar: document.getElementById('trabajo_a_realizar').value,
+                responsable: document.getElementById('responsable').value,
+                sustituto: document.getElementById('sustituto').value,
+                zonas_afectadas: document.getElementById('zonas_afectadas').value,
+                area_afectada: document.getElementById('area_afectada').value,
+                nombre_despeje: document.getElementById('nombre_despeje').value,
+                apegos_enlaces: document.getElementById('apegos_enlaces').value,
+                apego_despeje: document.getElementById('apego_despeje').value,
+                manto_programado: document.getElementById('manto_programado').value,
+                manto_emergencia: document.getElementById('manto_emergencia').value,
+                manto_eq_medicion: document.getElementById('manto_eq_medicion').value,
+                proyecto_expansion: document.getElementById('proyecto_expansion').value,
+                manto_otros: document.getElementById('manto_otros').value,
+                odt_programada: document.getElementById('odt_programada').value,
+                odt_emergencia: document.getElementById('odt_emergencia').value,
+                odt_os: document.getElementById('odt_os').value,
+                codigo_proyecto: document.getElementById('codigo_proyecto').value,
+                odt_otros: document.getElementById('odt_otros').value,
+                justificacion: document.getElementById('justificacion').value,
+                observaciones: document.getElementById('observaciones').value,
+                solicitado_por: document.getElementById('solicitado_por').value,
+                cargo_del_solicitante: document.getElementById('cargo_del_solicitante').value,
+                aprobado_por: document.getElementById('aprobado_por').value,
+                sector: sectorSesion,
+                usuario: usuarioSesion
+            };
+
+            try {
+                await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("¡Solicitud registrada con éxito!");
