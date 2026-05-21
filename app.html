@@ -7,13 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0b141d;
-            --card-color: #14212d;
-            --accent-color: #003366;
-            --accent-hover: #004080;
-            --success-color: #27ae60;
-            --text-color: #ffffff;
-            --muted-text: #a0aec0;
+            --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
+            --success-color: #27ae60; --text-color: #ffffff; --muted-text: #a0aec0;
             --border-color: #2c3e50;
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
@@ -50,29 +45,25 @@
         input[type="text"], input[type="time"], select, textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 9px; color: white; font-size: 14px; outline: none; transition: border 0.3s; width: 100%; box-sizing: border-box;}
         input:focus, select:focus, textarea:focus { border-color: var(--accent-color); }
         textarea { resize: vertical; height: 70px; }
-        
-        /* ESTILOS PARA INPUT DATE (CALENDARIO NATIVO) */
         .date-input { width: 100%; padding: 9px; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; color: white; font-size: 14px; cursor: pointer; box-sizing: border-box;}
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
-        /* BOTONES DE SELECCIÓN (SOLICITUD/APEGO) */
         .toggle-group { display: flex; gap: 10px; margin-top: 5px; }
         .btn-toggle { flex: 1; padding: 10px; border: 2px solid var(--border-color); background: var(--bg-color); color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s;}
         .btn-toggle.active { border-color: var(--accent-color); background: var(--accent-color); }
         
-        /* BOTONES DE NAVEGACIÓN */
         .buttons-container { margin-top: 25px; display: flex; justify-content: space-between; }
         .btn { padding: 12px 25px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.3s; }
         .btn-prev { background-color: #7f8c8d; color: white; }
         .btn-next { background-color: var(--accent-color); color: white; }
         .btn-submit { background-color: var(--success-color); color: white; display: none; }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo-box">
-            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo">
-        </div>
+        <div class="logo-box"><img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo"></div>
         <div class="header-right">
             <div style="font-size: 12px; color: var(--muted-text); text-align: right;">
                 Usuario: <span id="lbl-usuario" style="color:white; font-weight:bold;"></span> <br>
@@ -97,132 +88,80 @@
                 
                 <div class="form-step active" id="step1">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>1. ID Solicitud</label>
-                            <input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;">
-                        </div>
-                        <div class="form-group">
-                            <label>2. Número de Despeje</label>
-                            <input type="text" id="numero_despeje" placeholder="Ej: EEH-LCB-010">
-                        </div>
-                        
+                        <div class="form-group"><label>1. ID Solicitud</label><input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;"></div>
+                        <div class="form-group"><label>2. Número de Despeje</label><input type="text" id="numero_despeje" placeholder="Ej: EEH-LCB-010"></div>
                         <div class="form-group full-width">
                             <label>Tipo de Gestión</label>
                             <div class="toggle-group">
                                 <button type="button" class="btn-toggle" id="btn-solicitud" onclick="seleccionarGestion('solicitud')">SOLICITUD</button>
                                 <button type="button" class="btn-toggle" id="btn-apego" onclick="seleccionarGestion('apego')">APEGO</button>
                             </div>
-                            <input type="hidden" id="solicitud" value="">
-                            <input type="hidden" id="apego" value="">
+                            <input type="hidden" id="solicitud" value=""><input type="hidden" id="apego" value="">
                         </div>
-
-                        <div class="form-group">
-                            <label>5. Fecha de Solicitud</label>
-                            <input type="date" id="fecha_solicitud" class="date-input">
-                        </div>
-                        <div class="form-group">
-                            <label>6. Subestación</label>
-                            <input type="text" id="subestacion" readonly style="background: #2c3e50;">
-                        </div>
-                        <div class="form-group full-width">
-                            <label>7. Circuito</label>
-                            <select id="circuito" onchange="alCambiarCircuito()">
-                                <option value="">Cargando circuitos...</option>
-                            </select>
-                        </div>
+                        <div class="form-group"><label>5. Fecha de Solicitud</label><input type="date" id="fecha_solicitud" class="date-input"></div>
+                        <div class="form-group"><label>6. Subestación</label><input type="text" id="subestacion" readonly style="background: #2c3e50;"></div>
+                        <div class="form-group full-width"><label>7. Circuito</label><select id="circuito" onchange="alCambiarCircuito()"><option value="">Cargando circuitos...</option></select></div>
                         <div class="form-group full-width">
                             <label>8. Sección o Ramal</label>
                             <select id="seccion">
-                                <option value="">Seleccione...</option>
-                                <option value="RAMAL">RAMAL</option>
-                                <option value="TRONCAL">TRONCAL</option>
+                                <option value="">Seleccione...</option><option value="RAMAL">RAMAL</option><option value="TRONCAL">TRONCAL</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>9. Interruptor de Circuito</label>
-                            <select id="interruptor_de_circuito" onchange="alCambiarEquipo(this.value)">
-                                <option value="">Seleccione Circuito...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>10. Restaurador</label>
-                            <select id="restaurador" onchange="alCambiarEquipo(this.value)">
-                                <option value="">Seleccione Circuito...</option>
-                            </select>
-                        </div>
-                        <div class="form-group full-width">
-                            <label>11. Otros Equipos</label>
-                            <input type="text" id="otros_equipos">
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label>12. Ubicación del Equipo</label>
-                            <input type="text" id="ubicacion_del_equipo">
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>13. Ubicación del Trabajo</label>
-                            <input type="text" id="ubicacion_del_trabajo">
-                        </div>
-
-                        <div class="form-group">
-                            <label>14. Fecha de Interrupción</label>
-                            <input type="date" id="fecha_interrupcion" class="date-input" onchange="calcularDia()">
-                        </div>
-                        <div class="form-group">
-                            <label>15. Día de la Semana</label>
-                            <input type="text" id="dia_de_semana" readonly style="background: #2c3e50;">
-                        </div>
-                        <div class="form-group">
-                            <label>16. Hora de Inicio</label>
-                            <input type="time" id="hora_inicio" onchange="calcularTiempo()">
-                        </div>
-                        <div class="form-group">
-                            <label>17. Hora Final</label>
-                            <input type="time" id="hora_final" onchange="calcularTiempo()">
-                        </div>
-                        <div class="form-group full-width">
-                            <label>18. Tiempo Necesario</label>
-                            <input type="text" id="tiempo_necesario" readonly style="background: #2c3e50;">
-                        </div>
+                        <div class="form-group"><label>9. Interruptor de Circuito</label><select id="interruptor_de_circuito" onchange="alCambiarEquipo()"><option value="">Seleccione Circuito...</option></select></div>
+                        <div class="form-group"><label>10. Restaurador</label><select id="restaurador" onchange="alCambiarEquipo()"><option value="">Seleccione Circuito...</option></select></div>
+                        <div class="form-group full-width"><label>11. Otros Equipos</label><input type="text" id="otros_equipos"></div>
+                        <div class="form-group full-width"><label>12. Ubicación del Equipo</label><input type="text" id="ubicacion_del_equipo"></div>
+                        <div class="form-group full-width"><label>13. Ubicación del Trabajo</label><input type="text" id="ubicacion_del_trabajo"></div>
+                        <div class="form-group"><label>14. Fecha de Interrupción</label><input type="date" id="fecha_interrupcion" class="date-input" onchange="calcularDia()"></div>
+                        <div class="form-group"><label>15. Día de la Semana</label><input type="text" id="dia_de_semana" readonly style="background: #2c3e50;"></div>
+                        <div class="form-group"><label>16. Hora de Inicio</label><input type="time" id="hora_inicio" onchange="calcularTiempo()"></div>
+                        <div class="form-group"><label>17. Hora Final</label><input type="time" id="hora_final" onchange="calcularTiempo()"></div>
+                        <div class="form-group full-width"><label>18. Tiempo Necesario</label><input type="text" id="tiempo_necesario" readonly style="background: #2c3e50;"></div>
                     </div>
                 </div>
 
                 <div class="form-step" id="step2">
                     <div class="form-grid">
                         <div class="form-group full-width"><label>19. Trabajo a Realizar</label><textarea id="trabajo_a_realizar"></textarea></div>
-                        <div class="form-group"><label>20. Responsable</label><input type="text" id="responsable"></div>
-                        <div class="form-group"><label>21. Sustituto</label><input type="text" id="sustituto"></div>
+                        <div class="form-group"><label>20. Responsable</label><select id="responsable"><option value="">Seleccione...</option></select></div>
+                        <div class="form-group"><label>21. Sustituto</label><select id="sustituto"><option value="">Seleccione...</option></select></div>
                         <div class="form-group full-width"><label>22. Zonas Afectadas</label><textarea id="zonas_afectadas"></textarea></div>
-                        <div class="form-group full-width"><label>23. Área Afectada</label><input type="text" id="area_afectada"></div>
-                        <div class="form-group"><label>24. Nombre del Despeje</label><input type="text" id="nombre_despeje"></div>
-                        <div class="form-group"><label>25. Apegos Enlaces</label><input type="text" id="apegos_enlaces"></div>
-                        <div class="form-group"><label>26. Apego Despeje</label><input type="text" id="apego_despeje"></div>
+                        <div class="form-group full-width"><label>23. Área Afectada</label><input type="text" id="area_afectada" oninput="this.value = this.value.toUpperCase()"></div>
+                        <div class="form-group"><label>24. Nombre del Despeje</label><input type="text" id="nombre_despeje" oninput="this.value = this.value.toUpperCase()"></div>
+                        <div class="form-group"><label>25. Apegos Enlaces</label><input type="text" id="apegos_enlaces" oninput="this.value = this.value.toUpperCase()"></div>
+                        <div class="form-group"><label>26. Apego Despeje</label><input type="text" id="apego_despeje" oninput="this.value = this.value.toUpperCase()"></div>
                     </div>
                 </div>
 
                 <div class="form-step" id="step3">
                     <div class="form-grid">
-                        <div class="form-group"><label>27. Manto. Programado</label><input type="text" id="manto_programado"></div>
-                        <div class="form-group"><label>28. Manto. Emergencia</label><input type="text" id="manto_emergencia"></div>
-                        <div class="form-group"><label>29. Manto. Eq. Medición</label><input type="text" id="manto_eq_medicion"></div>
-                        <div class="form-group"><label>30. Proyecto Expansión</label><input type="text" id="proyecto_expansion"></div>
-                        <div class="form-group"><label>31. Manto. Otros</label><input type="text" id="manto_otros"></div>
-                        <div class="form-group"><label>32. ODT Programada</label><input type="text" id="odt_programada"></div>
-                        <div class="form-group"><label>33. ODT Emergencia</label><input type="text" id="odt_emergencia"></div>
-                        <div class="form-group"><label>34. ODT OS</label><input type="text" id="odt_os"></div>
-                        <div class="form-group"><label>35. Código Proyecto</label><input type="text" id="codigo_proyecto"></div>
-                        <div class="form-group"><label>36. ODT Otros</label><input type="text" id="odt_otros"></div>
+                        <div class="form-group full-width">
+                            <label>26. Tipo de Trabajo</label>
+                            <select id="tipo_trabajo" onchange="manejarTipoTrabajo(this.value)">
+                                <option value="">Seleccione una clasificación...</option>
+                                <option value="PROGRAMADO">Manto. Programado</option>
+                                <option value="EMERGENCIA">Manto. Emergencia</option>
+                                <option value="MEDICION">Manto. Eq. Medición</option>
+                                <option value="PROYECTO">Proyecto Expansión</option>
+                                <option value="OTROS">Manto. Otros</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width hidden" id="box_odt_programada"><label>32. ODT Programada</label><input type="text" id="odt_programada"></div>
+                        <div class="form-group full-width hidden" id="box_odt_emergencia"><label>33. ODT Emergencia</label><input type="text" id="odt_emergencia"></div>
+                        <div class="form-group full-width hidden" id="box_odt_os"><label>34. ODT OS (Medición)</label><input type="text" id="odt_os"></div>
+                        <div class="form-group full-width hidden" id="box_codigo_proyecto"><label>35. Código Proyecto</label><input type="text" id="codigo_proyecto"></div>
+                        <div class="form-group full-width hidden" id="box_odt_otros"><label>36. ODT Otros</label><input type="text" id="odt_otros"></div>
                     </div>
                 </div>
 
                 <div class="form-step" id="step4">
                     <div class="form-grid">
-                        <div class="form-group full-width"><label>37. Justificación</label><textarea id="justificacion"></textarea></div>
-                        <div class="form-group full-width"><label>38. Observaciones</label><textarea id="observaciones"></textarea></div>
-                        <div class="form-group"><label>39. Solicitado Por</label><input type="text" id="solicitado_por" readonly style="background: #2c3e50;"></div>
-                        <div class="form-group"><label>40. Cargo del Solicitante</label><input type="text" id="cargo_del_solicitante"></div>
-                        <div class="form-group"><label>41. Aprobado Por</label><input type="text" id="aprobado_por"></div>
+                        <div class="form-group full-width"><label>37. Justificación</label><textarea id="justificacion" oninput="this.value = this.value.toUpperCase()"></textarea></div>
+                        <div class="form-group full-width"><label>38. Observaciones</label><textarea id="observaciones" oninput="this.value = this.value.toUpperCase()"></textarea></div>
+                        <div class="form-group"><label>39. Solicitado Por</label><select id="solicitado_por" onchange="alSeleccionarIngeniero(this.value)"><option value="">Seleccione...</option></select></div>
+                        <div class="form-group"><label>40. Cargo del Solicitante</label><input type="text" id="cargo_del_solicitante" readonly style="background: #2c3e50;"></div>
+                        <div class="form-group"><label>41. Aprobado Por</label><select id="aprobado_por"><option value="">Seleccione...</option></select></div>
                     </div>
                 </div>
 
@@ -236,37 +175,32 @@
     </div>
 
     <script>
-        const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwOB545QGuv5SAV0wTzY0Qps5uhJe7amsIRCVXN-3gUj7HozCIGzSqeC3OszXaXqTKR/exec';
-        let baseCircuitos = [];
-        let baseEquipos = [];
+        // LA NUEVA URL 
+        const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyHzYDKKDHN0Pd90wFGvxz8ajF2e_PrhWhNJAW6U8gnWR-9O65pUiI_PuuUjk46vlt0/exec';
         
-        // Variables de sesión
+        let baseCircuitos = [], baseEquipos = [], baseResponsables = [], baseIngenieros = [];
+        
         const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
 
-        // SE EJECUTA AL CARGAR LA PÁGINA
         window.onload = async function() {
             document.getElementById('lbl-usuario').innerText = usuarioSesion;
             document.getElementById('lbl-sector').innerText = sectorSesion;
-            if(document.getElementById('solicitado_por')) document.getElementById('solicitado_por').value = usuarioSesion;
             
             generarIDUnico();
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('fecha_solicitud').value = hoy;
+            document.getElementById('fecha_solicitud').value = new Date().toISOString().split('T')[0];
             
             await descargarDatosGoogleSheets(); 
         };
 
-        // LÓGICA DE PAGINACIÓN (STEPS)
+        // --- NAVEGACIÓN ---
         let currentStep = 1;
         const totalSteps = 4;
         function cambiarPaso(dir) {
             document.getElementById(`step${currentStep}`).classList.remove('active');
             document.getElementById(`step${currentStep}-tab`).classList.remove('active');
             if(dir === 1) document.getElementById(`step${currentStep}-tab`).classList.add('completed');
-            
             currentStep += dir;
-            
             document.getElementById(`step${currentStep}`).classList.add('active');
             document.getElementById(`step${currentStep}-tab`).classList.add('active');
             document.getElementById('btnPrev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
@@ -280,99 +214,91 @@
             }
         }
 
-        // LÓGICA DE BOTONES SOLICITUD/APEGO
         function seleccionarGestion(tipo) {
-            const btnSol = document.getElementById('btn-solicitud');
-            const btnApe = document.getElementById('btn-apego');
-            const inputSol = document.getElementById('solicitud');
-            const inputApe = document.getElementById('apego');
-
-            if (tipo === 'solicitud') {
-                btnSol.classList.add('active');
-                btnApe.classList.remove('active');
-                inputSol.value = "X";
-                inputApe.value = "";
-            } else {
-                btnApe.classList.add('active');
-                btnSol.classList.remove('active');
-                inputApe.value = "X";
-                inputSol.value = "";
-            }
+            const btnSol = document.getElementById('btn-solicitud'), btnApe = document.getElementById('btn-apego');
+            if (tipo === 'solicitud') { btnSol.classList.add('active'); btnApe.classList.remove('active'); document.getElementById('solicitud').value = "X"; document.getElementById('apego').value = ""; } 
+            else { btnApe.classList.add('active'); btnSol.classList.remove('active'); document.getElementById('apego').value = "X"; document.getElementById('solicitud').value = ""; }
         }
 
-        // CÁLCULOS AUTOMÁTICOS
         function generarIDUnico() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let id = '';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let id = '';
             for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
             document.getElementById('id_solicitud').value = id;
         }
 
         function calcularDia() {
-            const fechaVal = document.getElementById('fecha_interrupcion').value;
-            if(fechaVal) {
+            const f = document.getElementById('fecha_interrupcion').value;
+            if(f) {
                 const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
-                const fecha = new Date(fechaVal + 'T00:00:00'); 
-                let indiceDia = fecha.getDay() - 1;
-                if(indiceDia === -1) indiceDia = 6; 
-                document.getElementById('dia_de_semana').value = dias[indiceDia];
+                let i = new Date(f + 'T00:00:00').getDay() - 1; if(i === -1) i = 6; 
+                document.getElementById('dia_de_semana').value = dias[i];
             }
         }
 
         function calcularTiempo() {
-            const hInicio = document.getElementById('hora_inicio').value;
-            const hFinal = document.getElementById('hora_final').value;
-            if (hInicio && hFinal) {
-                const [h1, m1] = hInicio.split(':').map(Number);
-                const [h2, m2] = hFinal.split(':').map(Number);
-                let minsTotal = (h2 * 60 + m2) - (h1 * 60 + m1);
-                if (minsTotal < 0) minsTotal += 24 * 60; 
-                const horas = Math.floor(minsTotal / 60);
-                const mins = minsTotal % 60;
-                document.getElementById('tiempo_necesario').value = `${horas} hrs ${mins} min`;
+            const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
+            if (h1 && h2) {
+                const [hh1, mm1] = h1.split(':').map(Number), [hh2, mm2] = h2.split(':').map(Number);
+                let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); if (mins < 0) mins += 24 * 60; 
+                document.getElementById('tiempo_necesario').value = `${Math.floor(mins / 60)} hrs ${mins % 60} min`;
             }
         }
 
-        // CONEXIÓN CON GOOGLE SHEETS
+        // --- DESCARGA Y LLENADO DE DATOS (AHORA CON LAS 4 HOJAS) ---
         async function descargarDatosGoogleSheets() {
             try {
                 const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
                 const data = await res.json();
-                baseCircuitos = data.circuitos;
-                baseEquipos = data.equipos;
-                poblarListaCircuitos(); 
-            } catch(e) {
-                document.getElementById('circuito').innerHTML = '<option>Error de red</option>';
-            }
+                baseCircuitos = data.circuitos; baseEquipos = data.equipos;
+                baseResponsables = data.responsables; baseIngenieros = data.ingenieros;
+                
+                poblarListaCircuitos();
+                poblarListasPersonal();
+            } catch(e) { alert("Error de red cargando datos."); }
         }
 
         function poblarListaCircuitos() {
-            const selectCircuito = document.getElementById('circuito');
-            selectCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
+            const selCircuito = document.getElementById('circuito');
+            selCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
             let sectorLimpio = sectorSesion.toString().trim().toUpperCase();
 
             for (let i = 1; i < baseCircuitos.length; i++) {
-                const fila = baseCircuitos[i];
-                if(fila.length > 6) {
-                    const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : ""; 
-                    const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
-                    if (sectorHoja === sectorLimpio && nombreCircuito !== "") {
-                        let opt = document.createElement('option');
-                        opt.value = nombreCircuito; opt.text = nombreCircuito;
-                        selectCircuito.appendChild(opt);
-                    }
+                const f = baseCircuitos[i];
+                if(f.length > 6 && f[3] && f[3].toString().trim().toUpperCase() === sectorLimpio && f[6]) {
+                    selCircuito.innerHTML += `<option value="${f[6].toString().trim()}">${f[6]}</option>`;
+                }
+            }
+        }
+
+        function poblarListasPersonal() {
+            const sectorLimpio = sectorSesion.toString().trim().toUpperCase();
+            
+            // Llenar Responsables (Col A=0, Col B=1 es Sector)
+            const selResp = document.getElementById('responsable'), selSust = document.getElementById('sustituto');
+            for(let i=1; i<baseResponsables.length; i++){
+                let f = baseResponsables[i];
+                if(f[1] && f[1].toString().trim().toUpperCase() === sectorLimpio && f[0]){
+                    selResp.innerHTML += `<option value="${f[0]}">${f[0]}</option>`;
+                    selSust.innerHTML += `<option value="${f[0]}">${f[0]}</option>`;
+                }
+            }
+
+            // Llenar Ingenieros (Col A=0, Col D=3 es Sector)
+            const selSol = document.getElementById('solicitado_por'), selAprob = document.getElementById('aprobado_por');
+            for(let i=1; i<baseIngenieros.length; i++){
+                let f = baseIngenieros[i];
+                if(f[3] && f[3].toString().trim().toUpperCase() === sectorLimpio && f[0]){
+                    selSol.innerHTML += `<option value="${f[0]}">${f[0]}</option>`;
+                    selAprob.innerHTML += `<option value="${f[0]}">${f[0]}</option>`;
                 }
             }
         }
 
         function alCambiarCircuito() {
-            const selectCircuito = document.getElementById('circuito');
-            const circSeleccionado = selectCircuito.value ? selectCircuito.value.toString().trim().toUpperCase() : "";
+            const circSeleccionado = document.getElementById('circuito').value.trim().toUpperCase();
             document.getElementById('subestacion').value = "";
-            const selInt = document.getElementById('interruptor_de_circuito');
-            const selRes = document.getElementById('restaurador');
-            selInt.innerHTML = '<option value="">Seleccione...</option>';
-            selRes.innerHTML = '<option value="">Seleccione...</option>';
+            const selInt = document.getElementById('interruptor_de_circuito'), selRes = document.getElementById('restaurador');
+            selInt.innerHTML = selRes.innerHTML = '<option value="">Seleccione...</option>';
 
             if(!circSeleccionado) return;
 
@@ -380,35 +306,59 @@
             if(filaCirc) document.getElementById('subestacion').value = filaCirc[4];
 
             for (let i = 1; i < baseEquipos.length; i++) {
-                const fila = baseEquipos[i];
-                if (fila && fila.length >= 12) {
-                    const circEquipo = fila[5] ? fila[5].toString().trim().toUpperCase() : "";
-                    const tipoEquipo = fila[6] ? fila[6].toString().trim().toUpperCase() : "";
-                    const nombreEquipo = fila[12] ? fila[12].toString().trim() : "";
-
-                    if (circEquipo === circSeleccionado && nombreEquipo !== "") {
-                        let opt = document.createElement('option');
-                        opt.value = nombreEquipo; opt.text = nombreEquipo;
-                        if (tipoEquipo === "INTERRUPTOR") selInt.appendChild(opt);
-                        else if (tipoEquipo === "RESTAURADOR") selRes.appendChild(opt);
-                    }
+                const f = baseEquipos[i];
+                if (f && f.length >= 12 && f[5] && f[5].toString().trim().toUpperCase() === circSeleccionado && f[12]) {
+                    const tipo = f[6] ? f[6].toString().trim().toUpperCase() : "";
+                    if (tipo === "INTERRUPTOR") selInt.innerHTML += `<option value="${f[12]}">${f[12]}</option>`;
+                    else if (tipo === "RESTAURADOR") selRes.innerHTML += `<option value="${f[12]}">${f[12]}</option>`;
                 }
             }
         }
 
-        function alCambiarEquipo(nombreEquipoSeleccionado) {
+        // Lógica de Ubicación y Zonas Afectadas (PASO 1 y 2)
+        function alCambiarEquipo() {
+            const equipoSeleccionado = document.getElementById('interruptor_de_circuito').value || document.getElementById('restaurador').value;
             const inputUbicacion = document.getElementById('ubicacion_del_equipo');
-            if(inputUbicacion.value === "" && nombreEquipoSeleccionado !== "") {
-                const filaEq = baseEquipos.find(f => f[12] && f[12].toString().trim() === nombreEquipoSeleccionado);
-                if(filaEq) inputUbicacion.value = filaEq[11]; 
+            const inputZonas = document.getElementById('zonas_afectadas');
+            
+            if(equipoSeleccionado !== "") {
+                const filaEq = baseEquipos.find(f => f[12] && f[12].toString().trim() === equipoSeleccionado);
+                if(filaEq) {
+                    if(inputUbicacion.value === "") inputUbicacion.value = filaEq[11] || ""; // Col L (Ubicación)
+                    if(inputZonas.value === "") inputZonas.value = filaEq[10] || ""; // Col K (Zonas Afectadas)
+                }
             }
         }
 
-        // GUARDAR TODO EL FORMULARIO
+        // Lógica Paso 3: Mostrar/Ocultar ODTs
+        function manejarTipoTrabajo(tipo) {
+            document.getElementById('box_odt_programada').classList.add('hidden');
+            document.getElementById('box_odt_emergencia').classList.add('hidden');
+            document.getElementById('box_odt_os').classList.add('hidden');
+            document.getElementById('box_codigo_proyecto').classList.add('hidden');
+            document.getElementById('box_odt_otros').classList.add('hidden');
+
+            if(tipo === 'PROGRAMADO') document.getElementById('box_odt_programada').classList.remove('hidden');
+            if(tipo === 'EMERGENCIA') document.getElementById('box_odt_emergencia').classList.remove('hidden');
+            if(tipo === 'MEDICION') document.getElementById('box_odt_os').classList.remove('hidden');
+            if(tipo === 'PROYECTO') document.getElementById('box_codigo_proyecto').classList.remove('hidden');
+            if(tipo === 'OTROS') document.getElementById('box_odt_otros').classList.remove('hidden');
+        }
+
+        // Lógica Paso 4: Ingenieros (Col B=1 es Cargo)
+        function alSeleccionarIngeniero(nombre) {
+            document.getElementById('cargo_del_solicitante').value = "";
+            const fila = baseIngenieros.find(f => f[0] && f[0].toString().trim() === nombre);
+            if(fila) document.getElementById('cargo_del_solicitante').value = fila[1] || "";
+        }
+
+        // --- ENVIAR DATOS A GOOGLE SHEETS ---
         async function guardarFormulario() {
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true;
-            btn.innerHTML = 'Enviando...';
+            btn.disabled = true; btn.innerHTML = 'Enviando...';
+
+            // Determinar las "X" del tipo de trabajo
+            const tipo = document.getElementById('tipo_trabajo').value;
 
             const payload = {
                 id_solicitud: document.getElementById('id_solicitud').value,
@@ -437,11 +387,14 @@
                 nombre_despeje: document.getElementById('nombre_despeje').value,
                 apegos_enlaces: document.getElementById('apegos_enlaces').value,
                 apego_despeje: document.getElementById('apego_despeje').value,
-                manto_programado: document.getElementById('manto_programado').value,
-                manto_emergencia: document.getElementById('manto_emergencia').value,
-                manto_eq_medicion: document.getElementById('manto_eq_medicion').value,
-                proyecto_expansion: document.getElementById('proyecto_expansion').value,
-                manto_otros: document.getElementById('manto_otros').value,
+                
+                // Mapeo automático de la X según el Tipo de Trabajo elegido
+                manto_programado: tipo === 'PROGRAMADO' ? 'X' : '',
+                manto_emergencia: tipo === 'EMERGENCIA' ? 'X' : '',
+                manto_eq_medicion: tipo === 'MEDICION' ? 'X' : '',
+                proyecto_expansion: tipo === 'PROYECTO' ? 'X' : '',
+                manto_otros: tipo === 'OTROS' ? 'X' : '',
+                
                 odt_programada: document.getElementById('odt_programada').value,
                 odt_emergencia: document.getElementById('odt_emergencia').value,
                 odt_os: document.getElementById('odt_os').value,
@@ -458,20 +411,16 @@
 
             try {
                 await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("¡Solicitud registrada con éxito!");
+                alert("¡Solicitud registrada con éxito en la base de datos!");
                 window.location.reload(); 
             } catch (error) {
-                alert("Ocurrió un error al enviar.");
+                alert("Ocurrió un error al enviar. Revisa tu conexión a internet.");
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'GUARDAR SOLICITUD';
+                btn.disabled = false; btn.innerHTML = 'GUARDAR SOLICITUD';
             }
         }
 
-        function cerrarSesion() {
-            sessionStorage.clear();
-            window.location.href = "index.html";
-        }
+        function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
 </body>
 </html>
