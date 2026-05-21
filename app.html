@@ -374,29 +374,47 @@
         function alCambiarCircuito() {
             const circSeleccionado = document.getElementById('circuito').value;
             document.getElementById('subestacion').value = "";
+            
             const selInterruptor = document.getElementById('interruptor_de_circuito');
             const selRestaurador = document.getElementById('restaurador');
-            selInterruptor.innerHTML = '<option value="">Seleccione...</option>';
-            selRestaurador.innerHTML = '<option value="">Seleccione...</option>';
+            
+            selInterruptor.innerHTML = '<option value="">Seleccione un interruptor...</option>';
+            selRestaurador.innerHTML = '<option value="">Seleccione un restaurador...</option>';
 
             if(!circSeleccionado) return;
 
+            // Autocompletar la Subestación leyendo de la hoja "circuitos"
             const filaCirc = baseCircuitos.find(f => f[6] === circSeleccionado);
-            if(filaCirc) document.getElementById('subestacion').value = filaCirc[4]; // Columna E
+            if(filaCirc) document.getElementById('subestacion').value = filaCirc[4];
 
+            // Filtrar Equipos basados en la hoja "equipos"
             baseEquipos.forEach(fila => {
-                const circEquipo = fila[0]; // Columna A
-                const tipoEquipo = fila[6]; // Columna G
-                const nombreEquipo = fila[12]; // Columna M
-                if (circEquipo === circSeleccionado && nombreEquipo) {
+                // CORRECCIÓN DE ÍNDICES SEGÚN TU HOJA DE EQUIPOS
+                const circEquipo = fila[5] ? fila[5].toString().trim() : ""; // Columna F (Índice 5)
+                const tipoEquipo = fila[6] ? fila[6].toString().trim().toUpperCase() : ""; // Columna G (Índice 6)
+                const nombreEquipo = fila[12] ? fila[12].toString().trim() : ""; // Columna M (Índice 12)
+
+                if (circEquipo === circSeleccionado && nombreEquipo !== "") {
                     let opt = document.createElement('option');
                     opt.value = nombreEquipo;
                     opt.text = nombreEquipo;
-                    if (tipoEquipo === "INTERRUPTOR") selInterruptor.appendChild(opt);
-                    if (tipoEquipo === "RESTAURADOR") selRestaurador.appendChild(opt);
+                    
+                    if (tipoEquipo === "INTERRUPTOR") {
+                        selInterruptor.appendChild(opt);
+                    } else if (tipoEquipo === "RESTAURADOR") {
+                        selRestaurador.appendChild(opt);
+                    }
                 }
             });
         }
+
+        // FUNCIÓN EXTRA: Hacer que Solicitud y Apego sean mutuamente excluyentes
+        document.getElementById('solicitud').addEventListener('change', function() {
+            if(this.checked) document.getElementById('apego').checked = false;
+        });
+        document.getElementById('apego').addEventListener('change', function() {
+            if(this.checked) document.getElementById('solicitud').checked = false;
+        });   
 
         function alCambiarEquipo(nombreEquipoSeleccionado) {
             document.getElementById('ubicacion_del_equipo').value = "";
