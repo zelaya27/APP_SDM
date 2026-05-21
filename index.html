@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - APP_SDM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; background: #0b141d; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #login-container { background: #14212d; padding: 30px; border-radius: 10px; width: 300px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: none; border-radius: 5px; }
+        .btn-enviar { background: #003366; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" style="width: 150px; margin-bottom: 20px;">
+        <input type="text" id="user" placeholder="Usuario">
+        <div style="position: relative;">
+            <input type="password" id="pass" placeholder="Contraseña">
+            <button type="button" onclick="togglePassword()" style="position: absolute; right: 10px; top: 15px; border:none; background:none; cursor:pointer;"><i class="fas fa-eye"></i></button>
+        </div>
+        <button class="btn-enviar" onclick="iniciarSesion()">INICIAR SESIÓN</button>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const p = document.getElementById('pass');
+            p.type = p.type === 'password' ? 'text' : 'password';
+        }
+
+        async function iniciarSesion() {
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
+            // TU URL DE GOOGLE APPS SCRIPT
+            const URL = 'https://script.google.com/macros/s/AKfycby6dJ3Hu5WTk7D97KqXw5U6IbzVusmIhluI-IiVVx3ejw4UlStnmpBs-uSyYwntx3O0/exec'; 
+
+            const res = await fetch(`${URL}?user=${user}&pass=${pass}`);
+            const data = await res.json();
+            
+            if (data.acceso) {
+                sessionStorage.setItem("usuario", data.usuario);
+                sessionStorage.setItem("sector", data.sector);
+                window.location.href = "app.html";
+            } else {
+                alert("Usuario o contraseña incorrectos.");
+            }
+        }
+    </script>
+</body>
+</html>
