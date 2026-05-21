@@ -292,17 +292,43 @@
             }
         }
 
-        async function descargarDatosGoogleSheets() {
-            try {
-                const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
-                const data = await res.json();
-                baseCircuitos = data.circuitos;
-                baseEquipos = data.equipos;
-                poblarListaCircuitos(); 
-            } catch(e) {
-                document.getElementById('circuito').innerHTML = '<option>Error cargando de Google Sheets</option>';
-            }
-        }
+   async function descargarDatosGoogleSheets() {
+    const btnSubmit = document.getElementById('btnSubmit');
+    const selectCircuito = document.getElementById('circuito');
+    
+    // 1. REVISAMOS SI LOS DATOS YA ESTÁN EN LA MEMORIA DEL NAVEGADOR
+    const cacheCircuitos = sessionStorage.getItem('cacheCircuitos');
+    const cacheEquipos = sessionStorage.getItem('cacheEquipos');
+
+    if (cacheCircuitos && cacheEquipos) {
+        console.log("Cargando datos súper rápido desde la memoria caché...");
+        baseCircuitos = JSON.parse(cacheCircuitos);
+        baseEquipos = JSON.parse(cacheEquipos);
+        poblarListaCircuitos();
+        return; // Detenemos la función aquí para no hacer esperar al usuario
+    }
+
+    // 2. SI NO ESTÁN EN MEMORIA, LOS DESCARGAMOS DE GOOGLE SHEETS
+    try {
+        console.log("Descargando datos desde Google Sheets por primera vez...");
+        selectCircuito.innerHTML = '<option value="">Descargando base de datos (por favor espere)...</option>';
+        
+        const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+        const data = await res.json();
+        
+        baseCircuitos = data.circuitos;
+        baseEquipos = data.equipos;
+
+        // 3. GUARDAMOS EN MEMORIA PARA LA PRÓXIMA VEZ
+        sessionStorage.setItem('cacheCircuitos', JSON.stringify(baseCircuitos));
+        sessionStorage.setItem('cacheEquipos', JSON.stringify(baseEquipos));
+
+        poblarListaCircuitos(); 
+    } catch(e) {
+        console.error("Error cargando base de datos:", e);
+        selectCircuito.innerHTML = '<option value="">Error de conexión de red</option>';
+    }
+}
 
        function poblarListaCircuitos() {
     const selectCircuito = document.getElementById('circuito');
