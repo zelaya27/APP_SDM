@@ -304,20 +304,51 @@
             }
         }
 
-        function poblarListaCircuitos() {
-            const selectCircuito = document.getElementById('circuito');
-            selectCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
-            baseCircuitos.forEach(fila => {
-                const sectorHoja = fila[3]; // Columna D (Índice 3)
-                const nombreCircuito = fila[6]; // Columna G (Índice 6)
-                if (sectorHoja === sectorSesion && nombreCircuito) {
-                    let opt = document.createElement('option');
-                    opt.value = nombreCircuito;
-                    opt.text = nombreCircuito;
-                    selectCircuito.appendChild(opt);
-                }
-            });
+       function poblarListaCircuitos() {
+    const selectCircuito = document.getElementById('circuito');
+    selectCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
+    
+    // 1. Obtenemos el sector del usuario y lo limpiamos (mayúsculas y sin espacios)
+    let miSector = sessionStorage.getItem("sector");
+    if (!miSector) {
+        selectCircuito.innerHTML = '<option value="">Error: Usuario sin sector</option>';
+        return;
+    }
+    miSector = miSector.toString().trim().toUpperCase();
+
+    if (!baseCircuitos || baseCircuitos.length <= 1) {
+        selectCircuito.innerHTML = '<option value="">Error leyendo la hoja "circuitos"</option>';
+        return;
+    }
+
+    let circuitosEncontrados = 0;
+
+    // 2. Recorremos la hoja desde i = 1 (para ignorar la fila de encabezados)
+    for (let i = 1; i < baseCircuitos.length; i++) {
+        const fila = baseCircuitos[i];
+        
+        // Aseguramos que la fila tenga suficientes datos
+        if(fila.length > 6) {
+            // fila[3] = SECTOR | fila[6] = CIRCUITO
+            const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : ""; 
+            const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
+
+            // 3. Comparamos los sectores limpios
+            if (sectorHoja === miSector && nombreCircuito !== "") {
+                let opt = document.createElement('option');
+                opt.value = nombreCircuito;
+                opt.text = nombreCircuito;
+                selectCircuito.appendChild(opt);
+                circuitosEncontrados++;
+            }
         }
+    }
+
+    // 4. Mensaje por si el sector del usuario no está en la hoja
+    if (circuitosEncontrados === 0) {
+        selectCircuito.innerHTML = `<option value="">Cero circuitos para el sector: ${miSector}</option>`;
+    }
+}
 
         function alCambiarCircuito() {
             const circSeleccionado = document.getElementById('circuito').value;
