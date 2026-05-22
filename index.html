@@ -43,7 +43,10 @@
                 if (data.acceso) {
                     sessionStorage.setItem("usuario", data.usuario);
                     sessionStorage.setItem("sector", data.sector);
-                    window.location.href = "app.html";
+                    
+                    // ---> AQUÍ ESTÁ EL CAMBIO: AHORA REDIRIGE AL DASHBOARD <---
+                    window.location.href = "dashboard.html"; 
+                    
                 } else {
                     alert("Usuario o contraseña incorrectos.");
                 }
