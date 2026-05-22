@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+    <script src="config.js"></script>
+
+<script>
+    // En lugar de escribir la URL larga, simplemente usas la variable del archivo config
+    const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
+
+    // ... el resto de tu código JS ...
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,9 +41,7 @@
             const user = document.getElementById('user').value;
             const pass = document.getElementById('pass').value;
             
-            // NUEVA URL ACTUALIZADA
-                const URL = 'https://script.google.com/macros/s/AKfycbxF-w7lHx4wdOkVrA_hHl1dd6GdvUJ1mARwUm_PwZwNZ9T1_Yk1f0RbTdak-Pn6qwEc/exec';
-
+        
             try {
                 const res = await fetch(`${URL}?user=${user}&pass=${pass}`);
                 const data = await res.json();
