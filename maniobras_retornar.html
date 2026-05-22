@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maniobras a Retornar - APP_SDM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0b141d; 
+            --card-color: #14212d; 
+            --accent-color: #003366;
+            --success-color: #27ae60; 
+            --text-color: #ffffff; 
+            --muted-text: #a0aec0;
+            --border-color: #2c3e50;
+        }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 0; 
+        }
+        header { 
+            background-color: var(--card-color); 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 30px auto; 
+            background: var(--card-color); 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        }
+        h2 { margin-top: 0; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted-text); }
+        input, select { 
+            width: 100%; 
+            padding: 10px; 
+            background-color: var(--bg-color); 
+            border: 1px solid var(--border-color); 
+            color: #fff; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        input[readonly] { background-color: #1a2a3a; color: #a0aec0; cursor: not-allowed; }
+        .btn-submit { 
+            background: var(--success-color); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
+            cursor: pointer; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            font-size: 16px;
+            margin-top: 15px;
+        }
+        .btn-submit:disabled { background: #555; cursor: not-allowed; }
+        .btn-volver { 
+            background: transparent; 
+            color: var(--muted-text); 
+            border: 1px solid var(--border-color); 
+            padding: 8px 15px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px; 
+        }
+        .btn-volver:hover { color: #fff; border-color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-box" style="background: white; padding: 5px; border-radius:4px;">
+            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
+        </div>
+        <a href="dashboard.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
+    </header>
+
+    <div class="container">
+        <h2><i class="fas fa-arrow-circle-up" style="color:#27ae60;"></i> Registro de Maniobra a Retornar</h2>
+        
+        <form id="form-maniobra" onsubmit="guardarManiobra(event)">
+            <div class="form-group">
+                <label>ID Solicitud</label>
+                <input type="text" id="id_solicitud" readonly required>
+            </div>
+            <div class="form-group">
+                <label>Secuencia</label>
+                <input type="number" id="secuencia" placeholder="Ej. 1" required>
+            </div>
+            <div class="form-group">
+                <label>Maniobra</label>
+                <input type="text" id="maniobra" placeholder="Ej. CIERRE" required oninput="this.value = this.value.toUpperCase()">
+            </div>
+            <div class="form-group">
+                <label>Equipo</label>
+                <input type="text" id="equipo" placeholder="Ej. INT-01" required oninput="this.value = this.value.toUpperCase()">
+            </div>
+            <div class="form-group">
+                <label>Dirección</label>
+                <input type="text" id="direccion" placeholder="Ej. SUBESTACION NORTE" required oninput="this.value = this.value.toUpperCase()">
+            </div>
+            <div class="form-group">
+                <label>Operación a Ejecutar</label>
+                <input type="text" id="operacion_a_ejecutar" placeholder="Ej. CERRAR CUCHILLAS" required oninput="this.value = this.value.toUpperCase()">
+            </div>
+            <div class="form-group">
+                <label>Personal que Ejecutará</label>
+                <input type="text" id="personal_que_ejecutara" placeholder="Nombre del operador" required oninput="this.value = this.value.toUpperCase()">
+            </div>
+            <div class="form-group">
+                <label>Hora de Ejecución</label>
+                <input type="time" id="hora_de_ejecucion" required>
+            </div>
+
+            <button type="submit" id="btn-guardar" class="btn-submit">GUARDAR MANIOBRA A RETORNAR</button>
+        </form>
+    </div>
+
+    <script>
+        // Obtener sesión
+        const usuarioSesion = sessionStorage.getItem("usuario");
+        const sectorSesion = sessionStorage.getItem("sector");
+        if (!usuarioSesion) window.location.href = "index.html";
+
+        // Capturar el ID de la solicitud desde la URL (?id=SOL-001)
+        const urlParams = new URLSearchParams(window.location.search);
+        const idSol = urlParams.get('id');
+        
+        if (idSol) {
+            document.getElementById('id_solicitud').value = idSol;
+        } else {
+            alert("Error: No se detectó un ID de solicitud válido.");
+            window.location.href = "dashboard.html";
+        }
+
+        const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbxf26r_LxdGjYSlp3lZ-ULPKk00hpUfHfNjl6mAAL7w3pBZ_xzp38zfLWRjRetEOl4z/exec';
+
+        async function guardarManiobra(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-guardar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const payload = {
+                action: "guardarRetornar", // Acción que procesará el Apps Script
+                id_solicitud: document.getElementById('id_solicitud').value,
+                secuencia: document.getElementById('secuencia').value,
+                maniobra: document.getElementById('maniobra').value,
+                equipo: document.getElementById('equipo').value,
+                direccion: document.getElementById('direccion').value,
+                operacion_a_ejecutar: document.getElementById('operacion_a_ejecutar').value,
+                personal_que_ejecutara: document.getElementById('personal_que_ejecutara').value,
+                hora_de_ejecucion: document.getElementById('hora_de_ejecucion').value,
+                sector: sectorSesion,
+                usuario: usuarioSesion
+            };
+
+            try {
+                await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("¡Maniobra a RETORNAR registrada con éxito!");
+                window.location.href = "dashboard.html"; // Regresa al panel
+            } catch (error) {
+                alert("Ocurrió un error al guardar.");
+                btn.disabled = false;
+                btn.innerHTML = 'GUARDAR MANIOBRA A RETORNAR';
+            }
+        }
+    </script>
+</body>
+</html>
