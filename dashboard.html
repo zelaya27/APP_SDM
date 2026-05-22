@@ -166,16 +166,28 @@
             cargarSolicitudes(); // Llamar a la base de datos
         }
 
-     async function cargarSolicitudes() {
-    console.log("Intentando conectar a:", `${URL_APPS_SCRIPT}?action=getLista`);
+  async function cargarSolicitudes() {
     try {
         const response = await fetch(`${URL_APPS_SCRIPT}?action=getLista`);
         const data = await response.json();
-        console.log("Datos recibidos:", data); // Mira esto en F12
+        
+        console.log("Datos recibidos:", data);
+
+        // Si data es un objeto y tiene una propiedad 'error' o 'debug', no es la lista que esperamos
+        if (!Array.isArray(data)) {
+            console.warn("El servidor no devolvió una lista, sino un objeto:", data);
+            document.getElementById("tabla-body").innerHTML = 
+                `<tr><td colspan="6" style="text-align:center; color:red;">
+                 Error en el servidor: ${data.error || data.debug || "Formato de datos incorrecto"}
+                </td></tr>`;
+            return;
+        }
+
         renderizarTabla(data);
     } catch (error) {
-        console.error("Error exacto:", error);
-        alert("Error de conexión. Mira la consola (F12).");
+        console.error("Error de conexión:", error);
+        document.getElementById("tabla-body").innerHTML = 
+            `<tr><td colspan="6" style="text-align:center;">Error al conectar. Revisa la consola (F12).</td></tr>`;
     }
 }
 
