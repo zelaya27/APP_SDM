@@ -166,19 +166,25 @@
             cargarSolicitudes(); // Llamar a la base de datos
         }
 
-  async function cargarSolicitudes() {
+async function cargarSolicitudes() {
+    // 1. Obtenemos el sector guardado durante el login
+    const sector = sessionStorage.getItem("sector");
+    
+    // 2. Construimos la URL enviando el parámetro sector
+    // Usamos encodeURIComponent por seguridad, por si el nombre del sector tiene espacios
+    const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sector)}`;
+    
     try {
-        const response = await fetch(`${URL_APPS_SCRIPT}?action=getLista`);
+        console.log("Consultando al servidor con sector:", sector);
+        const response = await fetch(url);
         const data = await response.json();
         
         console.log("Datos recibidos:", data);
 
-        // Si data es un objeto y tiene una propiedad 'error' o 'debug', no es la lista que esperamos
         if (!Array.isArray(data)) {
-            console.warn("El servidor no devolvió una lista, sino un objeto:", data);
             document.getElementById("tabla-body").innerHTML = 
                 `<tr><td colspan="6" style="text-align:center; color:red;">
-                 Error en el servidor: ${data.error || data.debug || "Formato de datos incorrecto"}
+                  Error: ${data.error || "No se recibieron datos válidos"}
                 </td></tr>`;
             return;
         }
