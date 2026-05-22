@@ -211,25 +211,38 @@
         };
 
         // Función para rellenar el formulario con datos ya existentes en Sheets
-        async function cargarDatosEdicion(id) {
-            try {
-                document.getElementById('numero_despeje').placeholder = "Cargando datos...";
-                const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
-                const fila = await res.json();
-                if (!fila.error) {
-                    document.getElementById('numero_despeje').value = fila[1] || "";
-                    if(fila[4]) document.getElementById('fecha_solicitud').value = fila[4].split('T')[0];
-                    if(fila[13]) document.getElementById('fecha_interrupcion').value = fila[13].split('T')[0];
-                    document.getElementById('subestacion').value = fila[5] || "";
-                    document.getElementById('circuito').value = fila[6] || "";
-                    alCambiarCircuito(); 
-                    document.getElementById('interruptor_de_circuito').value = fila[8] || "";
-                    document.getElementById('trabajo_a_realizar').value = fila[18] || "";
-                } else {
-                    alert("No se encontró la solicitud original.");
-                }
-            } catch (error) { console.error("Error cargando edición:", error); }
+     async function cargarDatosEdicion(id) {
+    try {
+        document.getElementById('numero_despeje').placeholder = "Cargando datos...";
+        
+        const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
+        const fila = await res.json(); // Ahora 'fila' es un objeto, no una lista
+
+        // --- AGREGA ESTO PARA VER QUÉ RECIBES ---
+        console.log("Datos recibidos del servidor:", fila);
+
+        if (!fila.error) {
+            // USAMOS LAS KEYS DEL OBJETO (ej: fila.no_despeje) en lugar de índices (fila[1])
+            document.getElementById('numero_despeje').value = fila.no_despeje || "";
+            document.getElementById('fecha_solicitud').value = fila.fecha || ""; 
+            
+            // Si la fecha de interrupción es un campo nuevo, agrégalo en el objeto en codigo.gs
+            // O si prefieres usar el array original, debemos ajustar codigo.gs.
+            
+            document.getElementById('subestacion').value = fila.subestacion || "";
+            document.getElementById('circuito').value = fila.circuito || "";
+            
+            alCambiarCircuito(); // Esto cargará los equipos dependientes
+            
+            document.getElementById('interruptor_de_circuito').value = fila.interruptor_de_circuito || "";
+            document.getElementById('trabajo_a_realizar').value = fila.trabajo_a_realizar || "";
+        } else {
+            alert("No se encontró la solicitud original.");
         }
+    } catch (error) { 
+        console.error("Error cargando edición:", error); 
+    }
+}
 
         // Navegación entre los 4 pasos del formulario
         function cambiarPaso(dir) {
