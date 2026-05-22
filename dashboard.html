@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
-    <script src="config.js"></script>
-
-<script>
-    // En lugar de escribir la URL larga, simplemente usas la variable del archivo config
-    const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-
-    // ... el resto de tu código JS ...
-</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Principal - Solicitudes de Despeje</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="config.js"></script>
+    <script>
+        // En lugar de escribir la URL larga, usamos la variable del archivo config
+        const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
+    </script>
     <style>
         :root {
             --bg-color: #0b141d; 
@@ -137,14 +134,15 @@
 
         <div class="table-responsive">
             <div style="margin-bottom: 15px; text-align: right; color: white;">
-    <label for="limitSelector">Mostrar registros: </label>
-    <select id="limitSelector" onchange="renderizarTabla()" style="padding: 5px; border-radius: 5px; background: var(--card-color); color: white; border: 1px solid #ccc;">
-        <option value="10" selected>Últimos 10</option>
-        <option value="20">Últimos 20</option>
-        <option value="30">Últimos 30</option>
-        <option value="ALL">Todos</option>
-    </select>
-</div>
+                <label for="limitSelector">Mostrar registros: </label>
+                <select id="limitSelector" onchange="renderizarTabla()" style="padding: 5px; border-radius: 5px; background: var(--card-color); color: white; border: 1px solid #ccc;">
+                    <option value="10" selected>Últimos 10</option>
+                    <option value="20">Últimos 20</option>
+                    <option value="30">Últimos 30</option>
+                    <option value="ALL">Todos</option>
+                </select>
+            </div>
+            
             <table>
                 <thead>
                     <tr>
@@ -164,6 +162,9 @@
     </div>
 
     <script>
+        // VARIABLE GLOBAL PARA ALMACENAR TODOS LOS DATOS
+        let todosLosDatos = [];
+
         // 1. Validar sesión al cargar
         const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
@@ -175,54 +176,81 @@
             cargarSolicitudes(); // Llamar a la base de datos
         }
 
-async function cargarSolicitudes() {
-    // 1. Obtenemos el sector guardado durante el login
-    const sector = sessionStorage.getItem("sector");
-    
-    // 2. Construimos la URL enviando el parámetro sector
-    // Usamos encodeURIComponent por seguridad, por si el nombre del sector tiene espacios
-    const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sector)}`;
-    
-    try {
-        console.log("Consultando al servidor con sector:", sector);
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        console.log("Datos recibidos:", data);
-
-        if (!Array.isArray(data)) {
-            document.getElementById("tabla-body").innerHTML = 
-                `<tr><td colspan="6" style="text-align:center; color:red;">
-                  Error: ${data.error || "No se recibieron datos válidos"}
-                </td></tr>`;
-            return;
+        // FUNCIÓN PARA FORMATEAR LA FECHA A DD/MM/AAAA
+        function formatearFecha(fechaOriginal) {
+            if (!fechaOriginal) return "Sin fecha";
+            
+            // Si la fecha ya viene en un formato corto que no es de sistema, evitamos romperla
+            let fecha = new Date(fechaOriginal);
+            if(isNaN(fecha.getTime())) return fechaOriginal; 
+            
+            let dia = String(fecha.getDate()).padStart(2, '0');
+            let mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            let anio = fecha.getFullYear();
+            
+            return `${dia}/${mes}/${anio}`;
         }
 
-        renderizarTabla(data);
-    } catch (error) {
-        console.error("Error de conexión:", error);
-        document.getElementById("tabla-body").innerHTML = 
-            `<tr><td colspan="6" style="text-align:center;">Error al conectar. Revisa la consola (F12).</td></tr>`;
-    }
-}
+        async function cargarSolicitudes() {
+            const sector = sessionStorage.getItem("sector");
+            const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sector)}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (!Array.isArray(data)) {
+                    document.getElementById("tabla-body").innerHTML = 
+                        `<tr><td colspan="6" style="text-align:center; color:red;">
+                          Error: ${data.error || "No se recibieron datos válidos"}
+                        </td></tr>`;
+                    return;
+                }
 
-        function renderizarTabla(datos) {
+                // GUARDAMOS LOS DATOS EN LA VARIABLE GLOBAL
+                todosLosDatos = data;
+                
+                // LLAMAMOS A LA FUNCIÓN QUE DIBUJA (Con el filtro de 10 por defecto)
+                renderizarTabla();
+
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                document.getElementById("tabla-body").innerHTML = 
+                    `<tr><td colspan="6" style="text-align:center;">Error al conectar. Revisa la consola (F12).</td></tr>`;
+            }
+        }
+
+        // FUNCIÓN QUE FILTRA, ORDENA Y DIBUJA LA TABLA
+        function renderizarTabla() {
             const tbody = document.getElementById("tabla-body");
             tbody.innerHTML = ""; // Limpiar tabla
 
-            if (datos.length === 0) {
+            if (todosLosDatos.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
                 return;
             }
 
-            datos.forEach(fila => {
+            // A. Leer qué límite seleccionó el usuario
+            let limiteSeleccionado = document.getElementById("limitSelector").value;
+
+            // B. Ordenar de más reciente a más antiguo
+            let datosOrdenados = [...todosLosDatos].reverse();
+
+            // C. Filtrar la cantidad de registros
+            let datosAMostrar = datosOrdenados;
+            if (limiteSeleccionado !== "ALL") {
+                datosAMostrar = datosOrdenados.slice(0, parseInt(limiteSeleccionado));
+            }
+
+            // D. Dibujar los registros
+            datosAMostrar.forEach(fila => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td><strong>${fila.id}</strong></td>
-                    <td>${fila.no_despeje}</td>
-                    <td>${fila.fecha}</td>
-                    <td>${fila.circuito}</td>
-                    <td>${fila.nombre}</td>
+                    <td>${fila.no_despeje || '-'}</td>
+                    <td>${formatearFecha(fila.fecha)}</td>
+                    <td>${fila.circuito || '-'}</td>
+                    <td>${fila.nombre || '-'}</td>
                     <td class="acciones-td">
                         <button class="btn-accion btn-editar" title="Editar Solicitud" onclick="abrirAccion('editar', '${fila.id}')">
                             <i class="fas fa-edit"></i> Editar
@@ -245,13 +273,10 @@ async function cargarSolicitudes() {
         // Función para redirigir según el botón presionado
         function abrirAccion(accion, idSolicitud) {
             if (accion === 'editar' || accion === 'formulario') {
-                // Redirige al app.html pasándole el ID de la solicitud en la URL para que cargue los datos
                 window.location.href = `app.html?id=${idSolicitud}&modo=${accion}`;
             } else if (accion === 'retirar') {
-                // Futura pantalla de maniobras a retirar
                 window.location.href = `maniobras_retirar.html?id=${idSolicitud}`;
             } else if (accion === 'retornar') {
-                // Futura pantalla de maniobras a retornar
                 window.location.href = `maniobras_retornar.html?id=${idSolicitud}`;
             }
         }
