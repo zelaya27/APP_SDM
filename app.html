@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
-    <script src="config.js"></script>
-
+<script src="config.js"></script>
 <script>
-    // En lugar de escribir la URL larga, simplemente usas la variable del archivo config
     const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-
-    // ... el resto de tu código JS ...
 </script>
 <head>
     <meta charset="UTF-8">
@@ -21,41 +17,35 @@
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
         
-        /* HEADER COMPACTO */
         header { background-color: var(--card-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
         .logo-box { background: #ffffff; padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; }
         .logo-box img { height: 35px; display: block; }
         .btn-logout { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-left: 15px;}
         .header-right { display: flex; align-items: center; }
         
-        /* CONTENEDORES Y TARJETAS */
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         .card { background-color: var(--card-color); border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         h2 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; font-size: 20px; }
         
-        /* BARRA DE PROGRESO (STEPPER) */
         .stepper { display: flex; justify-content: space-between; margin-bottom: 25px; position: relative; }
         .step { flex: 1; text-align: center; font-size: 12px; color: var(--muted-text); position: relative; z-index: 1; }
         .step .circle { width: 30px; height: 30px; line-height: 30px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 50%; margin: 0 auto 5px auto; font-weight: bold; transition: all 0.3s; }
         .step.active .circle { background-color: var(--accent-color); border-color: var(--accent-color); color: white; }
         .step.completed .circle { background-color: var(--success-color); border-color: var(--success-color); color: white; }
         
-        /* FORMULARIO COMPACTO */
         .form-step { display: none; }
         .form-step.active { display: block; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
         .form-group { display: flex; flex-direction: column; margin-bottom: 5px; }
         .form-group.full-width { grid-column: span 2; }
-        @media (max-width: 600px) { .form-group.full-width { grid-column: span 1; } }
         
         label { font-size: 13px; margin-bottom: 5px; color: var(--muted-text); font-weight: 500; }
         input[type="text"], input[type="time"], select, textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 9px; color: white; font-size: 14px; outline: none; transition: border 0.3s; width: 100%; box-sizing: border-box;}
         input:focus, select:focus, textarea:focus { border-color: var(--accent-color); }
         textarea { resize: vertical; height: 70px; }
         .date-input { width: 100%; padding: 9px; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; color: white; font-size: 14px; cursor: pointer; box-sizing: border-box;}
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-
+        
         .toggle-group { display: flex; gap: 10px; margin-top: 5px; }
         .btn-toggle { flex: 1; padding: 10px; border: 2px solid var(--border-color); background: var(--bg-color); color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s;}
         .btn-toggle.active { border-color: var(--accent-color); background: var(--accent-color); }
@@ -65,7 +55,6 @@
         .btn-prev { background-color: #7f8c8d; color: white; }
         .btn-next { background-color: var(--accent-color); color: white; }
         .btn-submit { background-color: var(--success-color); color: white; display: none; }
-        
         .hidden { display: none !important; }
     </style>
 </head>
@@ -93,7 +82,6 @@
             </div>
 
             <form id="mainForm">
-                
                 <div class="form-step active" id="step1">
                     <div class="form-grid">
                         <div class="form-group"><label>1. ID Solicitud</label><input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;"></div>
@@ -154,7 +142,6 @@
                                 <option value="OTROS">Manto. Otros</option>
                             </select>
                         </div>
-                        
                         <div class="form-group full-width hidden" id="box_odt_programada"><label>32. ODT Programada</label><input type="text" id="odt_programada"></div>
                         <div class="form-group full-width hidden" id="box_odt_emergencia"><label>33. ODT Emergencia</label><input type="text" id="odt_emergencia"></div>
                         <div class="form-group full-width hidden" id="box_odt_os"><label>34. ODT OS (Medición)</label><input type="text" id="odt_os"></div>
@@ -183,26 +170,18 @@
     </div>
 
     <script>
-       
-        
         let baseCircuitos = [], baseEquipos = [], baseResponsables = [], baseIngenieros = [];
-        
         const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
 
         window.onload = async function() {
             document.getElementById('lbl-usuario').innerText = usuarioSesion;
             document.getElementById('lbl-sector').innerText = sectorSesion;
-            
             generarIDUnico();
             document.getElementById('fecha_solicitud').value = new Date().toISOString().split('T')[0];
-            
             await descargarDatosGoogleSheets(); 
         };
 
-        // --- NAVEGACIÓN ---
-        let currentStep = 1;
-        const totalSteps = 4;
         function cambiarPaso(dir) {
             document.getElementById(`step${currentStep}`).classList.remove('active');
             document.getElementById(`step${currentStep}-tab`).classList.remove('active');
@@ -211,7 +190,6 @@
             document.getElementById(`step${currentStep}`).classList.add('active');
             document.getElementById(`step${currentStep}-tab`).classList.add('active');
             document.getElementById('btnPrev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-            
             if (currentStep === totalSteps) {
                 document.getElementById('btnNext').style.display = 'none';
                 document.getElementById('btnSubmit').style.display = 'block';
@@ -251,14 +229,12 @@
             }
         }
 
-        // --- DESCARGA Y LLENADO DE DATOS (AHORA CON LAS 4 HOJAS) ---
         async function descargarDatosGoogleSheets() {
             try {
                 const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
                 const data = await res.json();
                 baseCircuitos = data.circuitos; baseEquipos = data.equipos;
                 baseResponsables = data.responsables; baseIngenieros = data.ingenieros;
-                
                 poblarListaCircuitos();
                 poblarListasPersonal();
             } catch(e) { alert("Error de red cargando datos."); }
@@ -268,7 +244,6 @@
             const selCircuito = document.getElementById('circuito');
             selCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
             let sectorLimpio = sectorSesion.toString().trim().toUpperCase();
-
             for (let i = 1; i < baseCircuitos.length; i++) {
                 const f = baseCircuitos[i];
                 if(f.length > 6 && f[3] && f[3].toString().trim().toUpperCase() === sectorLimpio && f[6]) {
@@ -279,8 +254,6 @@
 
         function poblarListasPersonal() {
             const sectorLimpio = sectorSesion.toString().trim().toUpperCase();
-            
-            // Llenar Responsables (Col A=0, Col B=1 es Sector)
             const selResp = document.getElementById('responsable'), selSust = document.getElementById('sustituto');
             for(let i=1; i<baseResponsables.length; i++){
                 let f = baseResponsables[i];
@@ -289,8 +262,6 @@
                     selSust.innerHTML += `<option value="${f[0]}">${f[0]}</option>`;
                 }
             }
-
-            // Llenar Ingenieros (Col A=0, Col D=3 es Sector)
             const selSol = document.getElementById('solicitado_por'), selAprob = document.getElementById('aprobado_por');
             for(let i=1; i<baseIngenieros.length; i++){
                 let f = baseIngenieros[i];
@@ -306,12 +277,9 @@
             document.getElementById('subestacion').value = "";
             const selInt = document.getElementById('interruptor_de_circuito'), selRes = document.getElementById('restaurador');
             selInt.innerHTML = selRes.innerHTML = '<option value="">Seleccione...</option>';
-
             if(!circSeleccionado) return;
-
             const filaCirc = baseCircuitos.find(f => f[6] && f[6].toString().trim().toUpperCase() === circSeleccionado);
             if(filaCirc) document.getElementById('subestacion').value = filaCirc[4];
-
             for (let i = 1; i < baseEquipos.length; i++) {
                 const f = baseEquipos[i];
                 if (f && f.length >= 12 && f[5] && f[5].toString().trim().toUpperCase() === circSeleccionado && f[12]) {
@@ -322,29 +290,25 @@
             }
         }
 
-        // Lógica de Ubicación y Zonas Afectadas (PASO 1 y 2)
         function alCambiarEquipo() {
             const equipoSeleccionado = document.getElementById('interruptor_de_circuito').value || document.getElementById('restaurador').value;
             const inputUbicacion = document.getElementById('ubicacion_del_equipo');
             const inputZonas = document.getElementById('zonas_afectadas');
-            
             if(equipoSeleccionado !== "") {
                 const filaEq = baseEquipos.find(f => f[12] && f[12].toString().trim() === equipoSeleccionado);
                 if(filaEq) {
-                    if(inputUbicacion.value === "") inputUbicacion.value = filaEq[11] || ""; // Col L (Ubicación)
-                    if(inputZonas.value === "") inputZonas.value = filaEq[10] || ""; // Col K (Zonas Afectadas)
+                    if(inputUbicacion.value === "") inputUbicacion.value = filaEq[11] || "";
+                    if(inputZonas.value === "") inputZonas.value = filaEq[10] || "";
                 }
             }
         }
 
-        // Lógica Paso 3: Mostrar/Ocultar ODTs
         function manejarTipoTrabajo(tipo) {
             document.getElementById('box_odt_programada').classList.add('hidden');
             document.getElementById('box_odt_emergencia').classList.add('hidden');
             document.getElementById('box_odt_os').classList.add('hidden');
             document.getElementById('box_codigo_proyecto').classList.add('hidden');
             document.getElementById('box_odt_otros').classList.add('hidden');
-
             if(tipo === 'PROGRAMADO') document.getElementById('box_odt_programada').classList.remove('hidden');
             if(tipo === 'EMERGENCIA') document.getElementById('box_odt_emergencia').classList.remove('hidden');
             if(tipo === 'MEDICION') document.getElementById('box_odt_os').classList.remove('hidden');
@@ -352,21 +316,16 @@
             if(tipo === 'OTROS') document.getElementById('box_odt_otros').classList.remove('hidden');
         }
 
-        // Lógica Paso 4: Ingenieros (Col B=1 es Cargo)
         function alSeleccionarIngeniero(nombre) {
             document.getElementById('cargo_del_solicitante').value = "";
             const fila = baseIngenieros.find(f => f[0] && f[0].toString().trim() === nombre);
             if(fila) document.getElementById('cargo_del_solicitante').value = fila[1] || "";
         }
 
-        // --- ENVIAR DATOS A GOOGLE SHEETS ---
         async function guardarFormulario() {
             const btn = document.getElementById('btnSubmit');
             btn.disabled = true; btn.innerHTML = 'Enviando...';
-
-            // Determinar las "X" del tipo de trabajo
             const tipo = document.getElementById('tipo_trabajo').value;
-
             const payload = {
                 id_solicitud: document.getElementById('id_solicitud').value,
                 numero_despeje: document.getElementById('numero_despeje').value,
@@ -394,14 +353,11 @@
                 nombre_despeje: document.getElementById('nombre_despeje').value,
                 apegos_enlaces: document.getElementById('apegos_enlaces').value,
                 apego_despeje: document.getElementById('apego_despeje').value,
-                
-                // Mapeo automático de la X según el Tipo de Trabajo elegido
                 manto_programado: tipo === 'PROGRAMADO' ? 'X' : '',
                 manto_emergencia: tipo === 'EMERGENCIA' ? 'X' : '',
                 manto_eq_medicion: tipo === 'MEDICION' ? 'X' : '',
                 proyecto_expansion: tipo === 'PROYECTO' ? 'X' : '',
                 manto_otros: tipo === 'OTROS' ? 'X' : '',
-                
                 odt_programada: document.getElementById('odt_programada').value,
                 odt_emergencia: document.getElementById('odt_emergencia').value,
                 odt_os: document.getElementById('odt_os').value,
@@ -415,19 +371,18 @@
                 sector: sectorSesion,
                 usuario: usuarioSesion
             };
-
             try {
                 await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("¡Solicitud registrada con éxito en la base de datos!");
+                alert("¡Solicitud registrada con éxito!");
                 window.location.reload(); 
             } catch (error) {
-                alert("Ocurrió un error al enviar. Revisa tu conexión a internet.");
+                alert("Ocurrió un error al enviar. Revisa tu conexión.");
             } finally {
                 btn.disabled = false; btn.innerHTML = 'GUARDAR SOLICITUD';
             }
         }
-
         function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
+        let currentStep = 1; const totalSteps = 4;
     </script>
 </body>
 </html>
