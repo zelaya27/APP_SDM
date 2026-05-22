@@ -166,24 +166,18 @@
             cargarSolicitudes(); // Llamar a la base de datos
         }
 
-        async function cargarSolicitudes() {
-            try {
-                // Aquí haremos una petición GET enviando el usuario para que traiga SOLO sus solicitudes (o todas si es admin)
-                // Nota: Tu Código.gs necesitará una función doGet() configurada para esto.
-                const response = await fetch(`${URL_APPS_SCRIPT}?action=getLista&usuario=${usuarioSesion}`);
-                const data = await response.json();
-                
-                renderizarTabla(data);
-            } catch (error) {
-                console.error("Error cargando datos:", error);
-                // DATOS DE PRUEBA PARA QUE VEAS CÓMO SE VE EL DISEÑO MIENTRAS CONECTAMOS EL BACKEND:
-                const datosPrueba = [
-                    { id: "SOL-001", no_despeje: "DSP-101", fecha: "2026-05-21", circuito: "Circuito Norte", nombre: "Mantenimiento L1" },
-                    { id: "SOL-002", no_despeje: "DSP-102", fecha: "2026-05-20", circuito: "Circuito Sur", nombre: "Cambio de Transformador" }
-                ];
-                renderizarTabla(datosPrueba);
-            }
-        }
+     async function cargarSolicitudes() {
+    console.log("Intentando conectar a:", `${URL_APPS_SCRIPT}?action=getLista`);
+    try {
+        const response = await fetch(`${URL_APPS_SCRIPT}?action=getLista`);
+        const data = await response.json();
+        console.log("Datos recibidos:", data); // Mira esto en F12
+        renderizarTabla(data);
+    } catch (error) {
+        console.error("Error exacto:", error);
+        alert("Error de conexión. Mira la consola (F12).");
+    }
+}
 
         function renderizarTabla(datos) {
             const tbody = document.getElementById("tabla-body");
