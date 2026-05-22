@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-    <script src="config.js"></script>
-
-<script>
-    // En lugar de escribir la URL larga, simplemente usas la variable del archivo config
-    const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-
-    // ... el resto de tu código JS ...
-</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - APP_SDM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="config.js"></script>
     <style>
         body { font-family: sans-serif; background: #0b141d; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         #login-container { background: #14212d; padding: 30px; border-radius: 10px; width: 300px; text-align: center; }
@@ -41,22 +34,23 @@
             const user = document.getElementById('user').value;
             const pass = document.getElementById('pass').value;
             
-        
+            // 2. Usamos la variable del archivo config.js
+            const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT; 
+
             try {
-                const res = await fetch(`${URL}?user=${user}&pass=${pass}`);
+                // 3. ¡OJO! Aquí usabas 'URL' en el fetch, debe ser 'URL_APPS_SCRIPT'
+                const res = await fetch(`${URL_APPS_SCRIPT}?user=${user}&pass=${pass}`);
                 const data = await res.json();
                 
                 if (data.acceso) {
                     sessionStorage.setItem("usuario", data.usuario);
                     sessionStorage.setItem("sector", data.sector);
-                    
-                    // ---> AQUÍ ESTÁ EL CAMBIO: AHORA REDIRIGE AL DASHBOARD <---
                     window.location.href = "dashboard.html"; 
-                    
                 } else {
                     alert("Usuario o contraseña incorrectos.");
                 }
             } catch (error) {
+                console.error(error); // Verás el error real en la consola F12
                 alert("Error de conexión con Google Sheets.");
             }
         }
