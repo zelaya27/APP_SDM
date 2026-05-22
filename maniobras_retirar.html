@@ -7,75 +7,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0b141d; 
-            --card-color: #14212d; 
-            --accent-color: #003366;
-            --success-color: #27ae60; 
-            --text-color: #ffffff; 
-            --muted-text: #a0aec0;
-            --border-color: #2c3e50;
+            --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
+            --success-color: #27ae60; --danger-color: #e74c3c; --info-color: #3498db;
+            --text-color: #ffffff; --muted-text: #a0aec0; --border-color: #2c3e50;
         }
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 0; 
-        }
-        header { 
-            background-color: var(--card-color); 
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid var(--border-color); 
-        }
-        .container { 
-            max-width: 600px; 
-            margin: 30px auto; 
-            background: var(--card-color); 
-            padding: 30px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
-        }
-        h2 { margin-top: 0; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted-text); }
-        input, select { 
-            width: 100%; 
-            padding: 10px; 
-            background-color: var(--bg-color); 
-            border: 1px solid var(--border-color); 
-            color: #fff; 
-            border-radius: 4px; 
-            box-sizing: border-box; 
-        }
-        input[readonly] { background-color: #1a2a3a; color: #a0aec0; cursor: not-allowed; }
-        .btn-submit { 
-            background: var(--success-color); 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            width: 100%; 
-            cursor: pointer; 
-            border-radius: 5px; 
-            font-weight: bold; 
-            font-size: 16px;
-            margin-top: 15px;
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        header { background-color: var(--card-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .container { max-width: 1200px; margin: 30px auto; background: var(--card-color); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow-x: auto;}
+        h2 { margin-top: 0; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        
+        .header-info { display: flex; gap: 20px; margin-bottom: 20px; background: #1a2a3a; padding: 15px; border-radius: 5px; }
+        .header-info div { flex: 1; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted-text); font-size: 14px;}
+        .id-input { width: 100%; padding: 10px; background-color: #0b141d; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; box-sizing: border-box; font-weight: bold;}
+        
+        /* ESTILOS DE LA TABLA DINÁMICA */
+        table { width: 100%; border-collapse: collapse; min-width: 900px;}
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: var(--accent-color); color: white; font-size: 13px;}
+        td input { width: 100%; padding: 8px; background-color: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 13px;}
+        
+        .btn-add { background: var(--info-color); color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;}
+        .btn-remove { background: var(--danger-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        
+        .btn-submit { background: var(--success-color); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 20px; }
         .btn-submit:disabled { background: #555; cursor: not-allowed; }
-        .btn-volver { 
-            background: transparent; 
-            color: var(--muted-text); 
-            border: 1px solid var(--border-color); 
-            padding: 8px 15px; 
-            text-decoration: none; 
-            border-radius: 4px; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 5px; 
-        }
-        .btn-volver:hover { color: #fff; border-color: #fff; }
+        .btn-volver { background: transparent; color: var(--muted-text); border: 1px solid var(--border-color); padding: 8px 15px; text-decoration: none; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -88,58 +45,65 @@
     </header>
 
     <div class="container">
-        <h2><i class="fas fa-arrow-circle-down" style="color:#e74c3c;"></i> Registro de Maniobra a Retirar</h2>
+        <h2>
+            <span><i class="fas fa-arrow-circle-down" style="color:#e74c3c;"></i> Secuencia de Maniobras a Retirar</span>
+            <button type="button" class="btn-add" onclick="agregarFila()"><i class="fas fa-plus"></i> Agregar Paso</button>
+        </h2>
         
-        <form id="form-maniobra" onsubmit="guardarManiobra(event)">
-            <div class="form-group">
+        <div class="header-info">
+            <div>
                 <label>ID Solicitud</label>
-                <input type="text" id="id_solicitud" readonly required>
+                <input type="text" id="id_solicitud" class="id-input" readonly>
             </div>
-            <div class="form-group">
-                <label>Secuencia</label>
-                <input type="number" id="secuencia" placeholder="Ej. 1" required>
+            <div>
+                <label>Usuario Registra</label>
+                <input type="text" id="usuario_info" class="id-input" readonly>
             </div>
-            <div class="form-group">
-                <label>Maniobra</label>
-                <input type="text" id="maniobra" placeholder="Ej. APERTURA" required oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="form-group">
-                <label>Equipo</label>
-                <input type="text" id="equipo" placeholder="Ej. INT-01" required oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="form-group">
-                <label>Dirección</label>
-                <input type="text" id="direccion" placeholder="Ej. SUBESTACION NORTE" required oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="form-group">
-                <label>Operación a Ejecutar</label>
-                <input type="text" id="operacion_a_ejecutar" placeholder="Ej. ABRIR CUCHILLAS" required oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="form-group">
-                <label>Personal que Ejecutará</label>
-                <input type="text" id="personal_que_ejecutara" placeholder="Nombre del operador" required oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="form-group">
-                <label>Hora de Ejecución</label>
-                <input type="time" id="hora_de_ejecucion" required>
-            </div>
+        </div>
 
-            <button type="submit" id="btn-guardar" class="btn-submit">GUARDAR MANIOBRA A RETIRAR</button>
+        <form id="form-maniobra" onsubmit="guardarManiobras(event)">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Secuencia</th>
+                        <th>Maniobra</th>
+                        <th>Equipo</th>
+                        <th>Dirección</th>
+                        <th>Operación a Ejecutar</th>
+                        <th>Personal</th>
+                        <th style="width: 100px;">Hora</th>
+                        <th style="width: 50px;">Quitar</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body">
+                    <tr>
+                        <td><input type="number" class="m-sec" value="1" required></td>
+                        <td><input type="text" class="m-man" placeholder="Ej. ABRIR" required oninput="this.value = this.value.toUpperCase()"></td>
+                        <td><input type="text" class="m-equ" placeholder="Ej. INT-01" required oninput="this.value = this.value.toUpperCase()"></td>
+                        <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACION" required oninput="this.value = this.value.toUpperCase()"></td>
+                        <td><input type="text" class="m-ope" placeholder="Ej. ABRIR CUCHILLAS" required oninput="this.value = this.value.toUpperCase()"></td>
+                        <td><input type="text" class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+                        <td><input type="time" class="m-hor" required></td>
+                        <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button type="submit" id="btn-guardar" class="btn-submit"><i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETIRAR</button>
         </form>
     </div>
 
     <script>
-        // Obtener sesión
         const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
         if (!usuarioSesion) window.location.href = "index.html";
 
-        // Capturar el ID de la solicitud desde la URL (?id=SOL-001)
         const urlParams = new URLSearchParams(window.location.search);
         const idSol = urlParams.get('id');
         
         if (idSol) {
             document.getElementById('id_solicitud').value = idSol;
+            document.getElementById('usuario_info').value = usuarioSesion + " (" + sectorSesion + ")";
         } else {
             alert("Error: No se detectó un ID de solicitud válido.");
             window.location.href = "dashboard.html";
@@ -147,35 +111,73 @@
 
         const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbxF-w7lHx4wdOkVrA_hHl1dd6GdvUJ1mARwUm_PwZwNZ9T1_Yk1f0RbTdak-Pn6qwEc/exec';
 
-        async function guardarManiobra(e) {
+        let contadorFilas = 1;
+
+        function agregarFila() {
+            contadorFilas++;
+            const tbody = document.getElementById('tabla-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="number" class="m-sec" value="${contadorFilas}" required></td>
+                <td><input type="text" class="m-man" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="text" class="m-equ" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="text" class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="text" class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="time" class="m-hor" required></td>
+                <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function eliminarFila(btn) {
+            const fila = btn.closest('tr');
+            // Evitar que eliminen la última fila que queda
+            if(document.querySelectorAll('#tabla-body tr').length > 1) {
+                fila.remove();
+            } else {
+                alert("Debe haber al menos una maniobra registrada.");
+            }
+        }
+
+        async function guardarManiobras(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-guardar');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando Secuencia...';
+
+            // Recopilar todas las filas de la tabla
+            const filas = document.querySelectorAll('#tabla-body tr');
+            const arrayManiobras = [];
+
+            filas.forEach(fila => {
+                arrayManiobras.push({
+                    secuencia: fila.querySelector('.m-sec').value,
+                    maniobra: fila.querySelector('.m-man').value,
+                    equipo: fila.querySelector('.m-equ').value,
+                    direccion: fila.querySelector('.m-dir').value,
+                    operacion_a_ejecutar: fila.querySelector('.m-ope').value,
+                    personal_que_ejecutara: fila.querySelector('.m-per').value,
+                    hora_de_ejecucion: fila.querySelector('.m-hor').value
+                });
+            });
 
             const payload = {
-                action: "guardarRetirar", // Acción que procesará el Apps Script
-                id_solicitud: document.getElementById('id_solicitud').value,
-                secuencia: document.getElementById('secuencia').value,
-                maniobra: document.getElementById('maniobra').value,
-                equipo: document.getElementById('equipo').value,
-                direccion: document.getElementById('direccion').value,
-                operacion_a_ejecutar: document.getElementById('operacion_a_ejecutar').value,
-                personal_que_ejecutara: document.getElementById('personal_que_ejecutara').value,
-                hora_de_ejecucion: document.getElementById('hora_de_ejecucion').value,
+                action: "guardarRetirarMulti", // Nueva acción para arreglos
+                id_solicitud: idSol,
                 sector: sectorSesion,
-                usuario: usuarioSesion
+                usuario: usuarioSesion,
+                maniobras: arrayManiobras // Enviamos todo el array de una vez
             };
 
             try {
-                // Se envía por método POST pasándole los contenidos
                 await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("¡Maniobra a RETIRAR registrada con éxito!");
-                window.location.href = "dashboard.html"; // Regresa al panel
+                alert("¡Secuencia de Maniobras a RETIRAR registrada con éxito!");
+                window.location.href = "dashboard.html";
             } catch (error) {
                 alert("Ocurrió un error al guardar.");
                 btn.disabled = false;
-                btn.innerHTML = 'GUARDAR MANIOBRA A RETIRAR';
+                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETIRAR';
             }
         }
     </script>
