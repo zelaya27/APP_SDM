@@ -379,67 +379,80 @@
         }
 
         // Envía el formulario a Google Sheets
-        async function guardarFormulario() {
-            const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; btn.innerHTML = 'Enviando...';
-            const tipo = document.getElementById('tipo_trabajo').value;
-            // Estructura del JSON que se enviará al servidor
-            const payload = {
-                id_solicitud: document.getElementById('id_solicitud').value,
-                numero_despeje: document.getElementById('numero_despeje').value,
-                solicitud: document.getElementById('solicitud').value,
-                apego: document.getElementById('apego').value,
-                fecha_solicitud: document.getElementById('fecha_solicitud').value,
-                subestacion: document.getElementById('subestacion').value,
-                circuito: document.getElementById('circuito').value,
-                seccion: document.getElementById('seccion').value,
-                interruptor_de_circuito: document.getElementById('interruptor_de_circuito').value,
-                restaurador: document.getElementById('restaurador').value,
-                otros_equipos: document.getElementById('otros_equipos').value,
-                ubicacion_del_equipo: document.getElementById('ubicacion_del_equipo').value,
-                ubicacion_del_trabajo: document.getElementById('ubicacion_del_trabajo').value,
-                fecha_interrupcion: document.getElementById('fecha_interrupcion').value,
-                dia_de_semana: document.getElementById('dia_de_semana').value,
-                hora_inicio: document.getElementById('hora_inicio').value,
-                hora_final: document.getElementById('hora_final').value,
-                tiempo_necesario: document.getElementById('tiempo_necesario').value,
-                trabajo_a_realizar: document.getElementById('trabajo_a_realizar').value,
-                responsable: document.getElementById('responsable').value,
-                sustituto: document.getElementById('sustituto').value,
-                zonas_afectadas: document.getElementById('zonas_afectadas').value,
-                area_afectada: document.getElementById('area_afectada').value,
-                nombre_despeje: document.getElementById('nombre_despeje').value,
-                apegos_enlaces: document.getElementById('apegos_enlaces').value,
-                apego_despeje: document.getElementById('apego_despeje').value,
-                manto_programado: tipo === 'PROGRAMADO' ? 'X' : '',
-                manto_emergencia: tipo === 'EMERGENCIA' ? 'X' : '',
-                manto_eq_medicion: tipo === 'MEDICION' ? 'X' : '',
-                proyecto_expansion: tipo === 'PROYECTO' ? 'X' : '',
-                manto_otros: tipo === 'OTROS' ? 'X' : '',
-                odt_programada: document.getElementById('odt_programada').value,
-                odt_emergencia: document.getElementById('odt_emergencia').value,
-                odt_os: document.getElementById('odt_os').value,
-                codigo_proyecto: document.getElementById('codigo_proyecto').value,
-                odt_otros: document.getElementById('odt_otros').value,
-                justificacion: document.getElementById('justificacion').value,
-                observaciones: document.getElementById('observaciones').value,
-                solicitado_por: document.getElementById('solicitado_por').value,
-                cargo_del_solicitante: document.getElementById('cargo_del_solicitante').value,
-                aprobado_por: document.getElementById('aprobado_por').value,
-                sector: sectorSesion,
-                usuario: usuarioSesion
-            };
-            try {
-                // Petición POST al backend
-                await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("¡Solicitud registrada con éxito!");
-                window.location.reload(); 
-            } catch (error) {
-                alert("Ocurrió un error al enviar. Revisa tu conexión.");
-            } finally {
-                btn.disabled = false; btn.innerHTML = 'GUARDAR SOLICITUD';
-            }
-        }
+           async function guardarFormulario() {
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true; 
+    btn.innerHTML = 'Enviando...';
+
+    // Obtenemos el tipo de trabajo para marcar la columna correspondiente
+    const tipo = document.getElementById('tipo_trabajo').value;
+
+    // EL PAYLOAD DEBE TENER LOS MISMOS NOMBRES QUE TU TABLA
+    const payload = {
+        "ID_SOLICITUD": document.getElementById('id_solicitud').value,
+        "NUMERO_DESPEJE": document.getElementById('numero_despeje').value,
+        "SOLICITUD": document.getElementById('solicitud').value,
+        "APEGO": document.getElementById('apego').value,
+        "FECHA_SOLICITUD": document.getElementById('fecha_solicitud').value,
+        "SUBESTACION": document.getElementById('subestacion').value,
+        "CIRCUITO": document.getElementById('circuito').value,
+        "SECCION": document.getElementById('seccion').value,
+        "INTERRUPTOR_DE_CIRCUITO": document.getElementById('interruptor_de_circuito').value,
+        "RESTAURADOR": document.getElementById('restaurador').value,
+        "OTROS_EQUIPOS": document.getElementById('otros_equipos').value,
+        "UBICACION_DEL_EQUIPO": document.getElementById('ubicacion_del_equipo').value,
+        "UBICACION_DEL_TRABAJO": document.getElementById('ubicacion_del_trabajo').value,
+        "FECHA_INTERRUPCION": document.getElementById('fecha_interrupcion').value,
+        "DIA_DE_SEMANA": document.getElementById('dia_de_semana').value,
+        "HORA_INICIO": document.getElementById('hora_inicio').value,
+        "HORA_FINAL": document.getElementById('hora_final').value,
+        "TIEMPO_NECESARIO": document.getElementById('tiempo_necesario').value,
+        "TRABAJO_A_REALIZAR": document.getElementById('trabajo_a_realizar').value,
+        "RESPONSABLE": document.getElementById('responsable').value,
+        "SUSTITUTO": document.getElementById('sustituto').value,
+        "ZONAS_AFECTADAS": document.getElementById('zonas_afectadas').value,
+        "AREA_AFECTADA": document.getElementById('area_afectada').value,
+        "NOMBRE_DESPEJE": document.getElementById('nombre_despeje').value,
+        "APEGOS_ENLACES": document.getElementById('apegos_enlaces').value,
+        "APEGO_DESPEJE": document.getElementById('apego_despeje').value,
+        // Clasificación
+        "MANTO_PROGRAMADO": tipo === 'PROGRAMADO' ? 'X' : '',
+        "MANTO_EMERGENCIA": tipo === 'EMERGENCIA' ? 'X' : '',
+        "MANTO_EQ_MEDICION": tipo === 'MEDICION' ? 'X' : '',
+        "PROYECTO_EXPANSION": tipo === 'PROYECTO' ? 'X' : '',
+        "MANTO_OTROS": tipo === 'OTROS' ? 'X' : '',
+        "ODT_PROGRAMADA": document.getElementById('odt_programada').value,
+        "ODT_EMERGENCIA": document.getElementById('odt_emergencia').value,
+        "ODT_OS": document.getElementById('odt_os').value,
+        "CODIGO_PROYECTO": document.getElementById('codigo_proyecto').value,
+        "ODT_OTROS": document.getElementById('odt_otros').value,
+        // Aprobación
+        "JUSTIFICACION": document.getElementById('justificacion').value,
+        "OBSERVACIONES": document.getElementById('observaciones').value,
+        "SOLICITADO_POR": document.getElementById('solicitado_por').value,
+        "CARGO_DEL_SOLICITANTE": document.getElementById('cargo_del_solicitante').value,
+        "APROBADO_POR": document.getElementById('aprobado_por').value,
+        // Metadatos
+        "SECTOR": sectorSesion,
+        "USUARIO": usuarioSesion
+    };
+
+    try {
+        const response = await fetch(URL_APPS_SCRIPT, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify(payload) 
+        });
+        alert("¡Solicitud registrada con éxito!");
+        window.location.reload(); 
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Ocurrió un error al enviar. Revisa tu conexión.");
+    } finally {
+        btn.disabled = false; 
+        btn.innerHTML = 'GUARDAR SOLICITUD';
+    }
+}
 
         // Cierra sesión limpiando el almacenamiento
         function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
