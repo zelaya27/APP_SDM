@@ -177,10 +177,64 @@
         window.onload = async function() {
             document.getElementById('lbl-usuario').innerText = usuarioSesion;
             document.getElementById('lbl-sector').innerText = sectorSesion;
-            generarIDUnico();
-            document.getElementById('fecha_solicitud').value = new Date().toISOString().split('T')[0];
+            
+            // Primero cargamos las listas desplegables (circuitos, equipos, etc)
             await descargarDatosGoogleSheets(); 
+
+            // Verificamos si venimos desde el Dashboard a Editar
+            const urlParams = new URLSearchParams(window.location.search);
+            const idEdicion = urlParams.get('id');
+            const modo = urlParams.get('modo');
+
+            if (idEdicion && (modo === 'editar' || modo === 'formulario')) {
+                // Modo Edición: Usamos el ID del dashboard
+                document.getElementById('id_solicitud').value = idEdicion;
+                await cargarDatosEdicion(idEdicion);
+            } else {
+                // Modo Nueva Solicitud: Generamos ID nuevo
+                generarIDUnico();
+                document.getElementById('fecha_solicitud').value = new Date().toISOString().split('T')[0];
+            }
         };
+
+        // --- NUEVA FUNCIÓN PARA AUTO-LLENAR DATOS ---
+        async function cargarDatosEdicion(id) {
+            try {
+                // Bloquear pantalla visualmente mientras carga
+                document.getElementById('numero_despeje').placeholder = "Cargando datos...";
+                
+                const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
+                const fila = await res.json();
+
+                if (!fila.error) {
+                    // Rellenar campos basándonos en el índice de tu hoja de cálculo
+                    // fila[0] es el ID, fila[1] el num_despeje, etc.
+                    document.getElementById('numero_despeje').value = fila[1] || "";
+                    
+                    // Fechas (hay que recortarlas si Google manda el formato completo)
+                    if(fila[4]) document.getElementById('fecha_solicitud').value = fila[4].split('T')[0];
+                    if(fila[13]) document.getElementById('fecha_interrupcion').value = fila[13].split('T')[0];
+
+                    document.getElementById('subestacion').value = fila[5] || "";
+                    document.getElementById('circuito').value = fila[6] || "";
+                    
+                    // Al cambiar el circuito por código, forzamos que se llenen los equipos
+                    alCambiarCircuito(); 
+                    
+                    // Para que esto sea rápido, hazlo con los campos más importantes primero:
+                    document.getElementById('interruptor_de_circuito').value = fila[8] || "";
+                    document.getElementById('trabajo_a_realizar').value = fila[18] || "";
+                    
+                    // Puedes seguir mapeando el resto de tus inputs usando: fila[indice_columna]
+                    // Ej: document.getElementById('tu_input').value = fila[indice];
+                    
+                } else {
+                    alert("No se encontró la solicitud original.");
+                }
+            } catch (error) {
+                console.error("Error cargando edición:", error);
+            }
+        }
 
         function cambiarPaso(dir) {
             document.getElementById(`step${currentStep}`).classList.remove('active');
