@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Principal - Solicitudes de Despeje</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0b141d; 
+            --card-color: #14212d; 
+            --accent-color: #003366;
+            --success-color: #27ae60; 
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --text-color: #ffffff; 
+            --muted-text: #a0aec0;
+            --border-color: #2c3e50;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        /* HEADER */
+        header { 
+            background-color: var(--card-color); 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .btn-logout { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        
+        /* CONTENEDOR PRINCIPAL */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            background: var(--card-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .header-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .btn-nueva {
+            background: var(--success-color);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .btn-nueva:hover { background: #219653; }
+
+        /* TABLA DE DATOS */
+        .table-responsive { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th { background-color: var(--accent-color); color: white; font-weight: 600; }
+        tr:hover { background-color: #1a2a3a; }
+
+        /* BOTONES DE ACCIÓN EN TABLA */
+        .acciones-td { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn-accion {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+        .btn-editar { background: var(--warning-color); color: #000; font-weight:bold;}
+        .btn-form { background: var(--info-color); }
+        .btn-retirar { background: var(--danger-color); }
+        .btn-retornar { background: var(--success-color); }
+        .btn-accion:hover { opacity: 0.8; }
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-box" style="background: white; padding: 5px; border-radius:4px;">
+            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
+        </div>
+        <div class="user-info">
+            <span id="nombre-usuario"><i class="fas fa-user-circle"></i> Cargando...</span>
+            <button class="btn-logout" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="header-panel">
+            <h2><i class="fas fa-list-alt"></i> Mis Solicitudes de Despeje</h2>
+            <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Solicitud</th>
+                        <th>No. Despeje</th>
+                        <th>Fecha de Solicitud</th>
+                        <th>Circuito</th>
+                        <th>Nombre del Despeje</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body">
+                    <tr><td colspan="6" style="text-align:center;">Cargando solicitudes...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 1. Validar sesión al cargar
+        const usuarioSesion = sessionStorage.getItem("usuario");
+        const sectorSesion = sessionStorage.getItem("sector");
+
+        if (!usuarioSesion) {
+            window.location.href = "index.html"; // Redirigir al login si no hay sesión
+        } else {
+            document.getElementById("nombre-usuario").innerHTML = `<i class="fas fa-user-circle"></i> ${usuarioSesion} (${sectorSesion})`;
+            cargarSolicitudes(); // Llamar a la base de datos
+        }
+
+        // URL de tu Google Apps Script
+        const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/TU_URL_ACTUAL_AQUI/exec';
+
+        async function cargarSolicitudes() {
+            try {
+                // Aquí haremos una petición GET enviando el usuario para que traiga SOLO sus solicitudes (o todas si es admin)
+                // Nota: Tu Código.gs necesitará una función doGet() configurada para esto.
+                const response = await fetch(`${URL_APPS_SCRIPT}?action=getLista&usuario=${usuarioSesion}`);
+                const data = await response.json();
+                
+                renderizarTabla(data);
+            } catch (error) {
+                console.error("Error cargando datos:", error);
+                // DATOS DE PRUEBA PARA QUE VEAS CÓMO SE VE EL DISEÑO MIENTRAS CONECTAMOS EL BACKEND:
+                const datosPrueba = [
+                    { id: "SOL-001", no_despeje: "DSP-101", fecha: "2026-05-21", circuito: "Circuito Norte", nombre: "Mantenimiento L1" },
+                    { id: "SOL-002", no_despeje: "DSP-102", fecha: "2026-05-20", circuito: "Circuito Sur", nombre: "Cambio de Transformador" }
+                ];
+                renderizarTabla(datosPrueba);
+            }
+        }
+
+        function renderizarTabla(datos) {
+            const tbody = document.getElementById("tabla-body");
+            tbody.innerHTML = ""; // Limpiar tabla
+
+            if (datos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
+                return;
+            }
+
+            datos.forEach(fila => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${fila.id}</strong></td>
+                    <td>${fila.no_despeje}</td>
+                    <td>${fila.fecha}</td>
+                    <td>${fila.circuito}</td>
+                    <td>${fila.nombre}</td>
+                    <td class="acciones-td">
+                        <button class="btn-accion btn-editar" title="Editar Solicitud" onclick="abrirAccion('editar', '${fila.id}')">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn-accion btn-form" title="Ver Formulario" onclick="abrirAccion('formulario', '${fila.id}')">
+                            <i class="fas fa-file-alt"></i> Formulario
+                        </button>
+                        <button class="btn-accion btn-retirar" title="Maniobras a Retirar" onclick="abrirAccion('retirar', '${fila.id}')">
+                            <i class="fas fa-arrow-circle-down"></i> M. Retirar
+                        </button>
+                        <button class="btn-accion btn-retornar" title="Maniobras a Retornar" onclick="abrirAccion('retornar', '${fila.id}')">
+                            <i class="fas fa-arrow-circle-up"></i> M. Retornar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Función para redirigir según el botón presionado
+        function abrirAccion(accion, idSolicitud) {
+            if (accion === 'editar' || accion === 'formulario') {
+                // Redirige al app.html pasándole el ID de la solicitud en la URL para que cargue los datos
+                window.location.href = `app.html?id=${idSolicitud}&modo=${accion}`;
+            } else if (accion === 'retirar') {
+                // Futura pantalla de maniobras a retirar
+                window.location.href = `maniobras_retirar.html?id=${idSolicitud}`;
+            } else if (accion === 'retornar') {
+                // Futura pantalla de maniobras a retornar
+                window.location.href = `maniobras_retornar.html?id=${idSolicitud}`;
+            }
+        }
+
+        function cerrarSesion() {
+            sessionStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
