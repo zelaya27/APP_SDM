@@ -32,14 +32,14 @@
         .card { background-color: var(--card-color); border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         h2 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; font-size: 20px; }
         
-        /* Estilos del indicador de pasos (Stepper) */
+        /* Estilos del indicador de s (Stepper) */
         .stepper { display: flex; justify-content: space-between; margin-bottom: 25px; position: relative; }
         .step { flex: 1; text-align: center; font-size: 12px; color: var(--muted-text); position: relative; z-index: 1; }
         .step .circle { width: 30px; height: 30px; line-height: 30px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 50%; margin: 0 auto 5px auto; font-weight: bold; transition: all 0.3s; }
         .step.active .circle { background-color: var(--accent-color); border-color: var(--accent-color); color: white; }
         .step.completed .circle { background-color: var(--success-color); border-color: var(--success-color); color: white; }
         
-        /* Visibilidad de los pasos del formulario */
+        /* Visibilidad de los s del formulario */
         .form-step { display: none; }
         .form-step.active { display: block; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -171,8 +171,8 @@
                 </div>
 
                 <div class="buttons-container">
-                    <button type="button" class="btn btn-prev" id="btnPrev" onclick="cambiarPaso(-1)" style="visibility: hidden;">Atrás</button>
-                    <button type="button" class="btn btn-next" id="btnNext" onclick="cambiarPaso(1)">Siguiente</button>
+                    <button type="button" class="btn btn-prev" id="btnPrev" onclick="cambiar(-1)" style="visibility: hidden;">Atrás</button>
+                    <button type="button" class="btn btn-next" id="btnNext" onclick="cambiar(1)">Siguiente</button>
                     <button type="button" class="btn btn-submit" id="btnSubmit" onclick="guardarFormulario()">GUARDAR SOLICITUD</button>
                 </div>
             </form>
@@ -185,7 +185,7 @@
         // Variables de sesión para identificar quién opera la app
         const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
-        // Control de pasos del formulario
+        // Control de s del formulario
         let currentStep = 1; const totalSteps = 4;
 
         // Función que corre al cargar la página
@@ -209,7 +209,45 @@
                 document.getElementById('fecha_solicitud').value = new Date().toISOString().split('T')[0];
             }
         };
+// ==========================================
+// 1. FUNCIÓN PARA CAMBIAR DE PASO (LA QUE FALTABA)
+// ==========================================
+let pasoActual = 1;
+function cambiarPaso(paso) {
+    // Oculta todos los pasos
+    document.querySelectorAll('.step-content').forEach(el => {
+        if(el) el.style.display = 'none';
+    });
+    // Quita la clase active de los indicadores
+    document.querySelectorAll('.step').forEach(el => {
+        if(el) el.classList.remove('step-active');
+    });
+    
+    // Muestra el paso seleccionado
+    const pasoMostrar = document.getElementById('paso' + paso);
+    const indMostrar = document.getElementById('ind-paso' + paso);
+    
+    if (pasoMostrar) pasoMostrar.style.display = 'block';
+    if (indMostrar) indMostrar.classList.add('step-active');
+    
+    pasoActual = paso;
+}
 
+// ==========================================
+// 2. DISPARAR LOS AUTOCOMPLETADOS MANUALMENTE
+// ==========================================
+// Cuando llenamos campos con Javascript (el.value = "X"), el navegador 
+// NO dispara los eventos "onchange" automáticamente. Hay que forzarlos.
+function dispararEventosAutocompletado() {
+    // Si tienes una función que se ejecuta al cambiar el circuito, llámala:
+    if (typeof alCambiarCircuito === "function") {
+        alCambiarCircuito();
+    }
+    // Si tienes una función que calcula el tiempo entre las horas, llámala:
+    if (typeof calcularTiempo === "function") {
+        calcularTiempo();
+    }
+}
         // Función para rellenar el formulario con datos ya existentes en Sheets
   async function cargarDatosEdicion(id) {
     try {
@@ -229,7 +267,15 @@
                     // Si el campo es un checkbox o radio button (como las "X")
                     if (el.type === 'checkbox' || el.type === 'radio') {
                         el.checked = (valor === 'X' || valor === true);
-                    } else {
+                 // ... (todo tu mapeo de setVal) ...
+            setVal('aprobado_por', fila[40]); 
+
+            // AGREGA ESTA LÍNEA AL FINAL DEL MAPEO:
+            setTimeout(dispararEventosAutocompletado, 500); // Espera medio segundo y dispara autocompletados
+
+        } else {
+            alert("No se encontró la solicitud original o no tiene datos.");
+        }   } else {
                         el.value = valor;
                     }
                 }
@@ -254,7 +300,7 @@
             // MAPEO EXACTO DE LOS 43 CAMPOS
             // ==========================================
             
-            // --- PASO 1: Datos Generales ---
+            // ---  1: Datos Generales ---
             setVal('ID_SOLICITUD', fila[0]); 
             setVal('numero_despeje', fila[1]);
             
@@ -265,7 +311,7 @@
             
             setVal('fecha_solicitud', formatFecha(fila[4])); 
             
-            // --- PASO 2: Datos Técnicos ---
+            // ---  2: Datos Técnicos ---
             setVal('subestacion', fila[5]); 
             setVal('circuito', fila[6]); 
             
@@ -281,7 +327,7 @@
             setVal('lugar_trabajo', fila[11]); 
             setVal('trabajo_a_realizar', fila[12]); 
             
-            // --- PASO 3: Tiempos e Impacto ---
+            // ---  3: Tiempos e Impacto ---
             setVal('fecha_interrupcion', formatFecha(fila[13])); 
             setVal('dia_interrupcion', fila[14]); 
             setVal('hora_inicio', formatHora(fila[15])); 
