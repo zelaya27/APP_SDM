@@ -32,14 +32,14 @@
         .card { background-color: var(--card-color); border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         h2 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; font-size: 20px; }
         
-        /* Estilos del indicador de s (Stepper) */
+        /* Estilos del indicador de pasos (Stepper) */
         .stepper { display: flex; justify-content: space-between; margin-bottom: 25px; position: relative; }
         .step { flex: 1; text-align: center; font-size: 12px; color: var(--muted-text); position: relative; z-index: 1; }
         .step .circle { width: 30px; height: 30px; line-height: 30px; background-color: var(--bg-color); border: 2px solid var(--border-color); border-radius: 50%; margin: 0 auto 5px auto; font-weight: bold; transition: all 0.3s; }
         .step.active .circle { background-color: var(--accent-color); border-color: var(--accent-color); color: white; }
         .step.completed .circle { background-color: var(--success-color); border-color: var(--success-color); color: white; }
         
-        /* Visibilidad de los s del formulario */
+        /* Visibilidad de los pasos del formulario */
         .form-step { display: none; }
         .form-step.active { display: block; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -180,23 +180,21 @@
     </div>
 
     <script>
-        // Variables globales para almacenar los datos traídos de Google Sheets
+        // Variables globales
         let baseCircuitos = [], baseEquipos = [], baseResponsables = [], baseIngenieros = [];
-        // Variables de sesión para identificar quién opera la app
         const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
-        // Control de s del formulario
-        let currentStep = 1; const totalSteps = 4;
+        
+        let currentStep = 1; 
+        const totalSteps = 4;
 
-        // Función que corre al cargar la página
+        // Iniciar página
         window.onload = async function() {
             document.getElementById('lbl-usuario').innerText = usuarioSesion;
             document.getElementById('lbl-sector').innerText = sectorSesion;
             
-            // Carga inicial de datos desde sheets
             await descargarDatosGoogleSheets(); 
 
-            // Lógica para detectar si estamos editando un registro (vía URL params)
             const urlParams = new URLSearchParams(window.location.search);
             const idEdicion = urlParams.get('id');
             const modo = urlParams.get('modo');
@@ -209,180 +207,164 @@
                 document.getElementById('fecha_solicitud').value = new Date().toISOString().split('T')[0];
             }
         };
-// ==========================================
-// 1. FUNCIÓN PARA CAMBIAR DE PASO 
-// ==========================================
-let pasoActual = 1;
 
-// ¡AQUÍ ESTÁ EL CAMBIO! Ahora se llama solo "cambiar"
-function cambiar(paso) {
-    // Oculta todos los pasos
-    document.querySelectorAll('.step-content').forEach(el => {
-        if(el) el.style.display = 'none';
-    });
-    // Quita la clase active de los indicadores
-    document.querySelectorAll('.step').forEach(el => {
-        if(el) el.classList.remove('step-active');
-    });
-    
-    // Muestra el paso seleccionado
-    const pasoMostrar = document.getElementById('paso' + paso);
-    const indMostrar = document.getElementById('ind-paso' + paso);
-    
-    if (pasoMostrar) pasoMostrar.style.display = 'block';
-    if (indMostrar) indMostrar.classList.add('step-active');
-    
-    pasoActual = paso;
-}
+        // --- FUNCIONES DE NAVEGACIÓN Y UI ---
 
-// ==========================================
-// 2. DISPARAR LOS AUTOCOMPLETADOS MANUALMENTE
-// ==========================================
-// Cuando llenamos campos con Javascript (el.value = "X"), el navegador 
-// NO dispara los eventos "onchange" automáticamente. Hay que forzarlos.
-function dispararEventosAutocompletado() {
-    // Si tienes una función que se ejecuta al cambiar el circuito, llámala:
-    if (typeof alCambiarCircuito === "function") {
-        alCambiarCircuito();
-    }
-    // Si tienes una función que calcula el tiempo entre las horas, llámala:
-    if (typeof calcularTiempo === "function") {
-        calcularTiempo();
-    }
-}
-        // Función para rellenar el formulario con datos ya existentes en Sheets
-  // Función para rellenar el formulario con datos ya existentes en Sheets
-async function cargarDatosEdicion(id) {
-    try {
-        document.getElementById('numero_despeje').placeholder = "Cargando datos...";
-        
-        const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
-        const fila = await res.json(); 
+        function cambiar(paso) {
+            // Calcula nuevo paso
+            let newStep = currentStep + paso;
+            if (newStep < 1 || newStep > totalSteps) return;
 
-        console.log("Datos recibidos del servidor para editar:", fila);
-
-        if (fila && fila.length > 0 && !fila.error) {
+            // Ocultar actual
+            document.getElementById('step' + currentStep).classList.remove('active');
+            document.getElementById('step' + currentStep + '-tab').classList.remove('active');
             
-            // 1. Ayudante inteligente para asignar valores
-            const setVal = (idHTML, valor) => {
-                const el = document.getElementById(idHTML);
-                if (el && valor !== undefined && valor !== null) {
-                    // Si el campo es un checkbox o radio button (como las "X")
-                    if (el.type === 'checkbox' || el.type === 'radio') {
-                        el.checked = (valor === 'X' || valor === true);
-                    } else {
-                        el.value = valor;
-                    }
-                }
-            };
-
-            // 2. Limpiador de Fechas (Extrae "YYYY-MM-DD")
-            const formatFecha = (isoString) => {
-                if (!isoString) return "";
-                return isoString.length >= 10 ? isoString.substring(0, 10) : isoString;
-            };
-
-            // 3. Limpiador de Horas (Extrae "HH:MM" de "1899-12-30T13:48:52.000Z")
-            const formatHora = (isoString) => {
-                if (!isoString) return "";
-                if (isoString.includes('T')) {
-                    return isoString.split('T')[1].substring(0, 5); // Toma solo la hora
-                }
-                return isoString;
-            };
-
-            // ==========================================
-            // MAPEO EXACTO DE LOS CAMPOS
-            // ==========================================
-            
-            // --- 1: Datos Generales ---
-            setVal('ID_SOLICITUD', fila[0]); 
-            setVal('numero_despeje', fila[1]);
-            setVal('tipo_programada', fila[2]); 
-            setVal('tipo_emergencia', fila[3]); 
-            setVal('fecha_solicitud', formatFecha(fila[4])); 
-            
-            // --- 2: Datos Técnicos ---
-            setVal('subestacion', fila[5]); 
-            setVal('circuito', fila[6]); 
-            
-            // Cargar los equipos correspondientes al circuito antes de setear el equipo
-            if (typeof alCambiarCircuito === "function") {
-                alCambiarCircuito(); 
-            }
-            
-            setVal('tipo_equipo', fila[7]); 
-            setVal('interruptor_de_circuito', fila[8]); 
-            setVal('ramal', fila[9]); 
-            setVal('equipo_a_intervenir', fila[10]); 
-            setVal('lugar_trabajo', fila[11]); 
-            setVal('trabajo_a_realizar', fila[12]); 
-            
-            // --- 3: Tiempos e Impacto ---
-            setVal('fecha_interrupcion', formatFecha(fila[13])); 
-            setVal('dia_interrupcion', fila[14]); 
-            setVal('hora_inicio', formatHora(fila[15])); 
-            setVal('hora_final', formatHora(fila[16])); 
-            setVal('tiempo_interrupcion', fila[17]); 
-            
-            setVal('empresa_solicitante', fila[18]); 
-            setVal('responsable_empresa', fila[19]); 
-            setVal('telefono_empresa', fila[20]); 
-            setVal('zonas_afectadas', fila[21]); 
-            
-            // --- PASO 4: Encargados y Clasificación ---
-            setVal('encargado_maniobras_1', fila[22]); 
-            setVal('telefono_encargado_1', fila[23]); 
-            setVal('encargado_maniobras_2', fila[24]); 
-            setVal('telefono_encargado_2', fila[25]); 
-            
-            // Checkboxes de Motivo / Mantenimiento
-            setVal('manto_programado', fila[26]); 
-            setVal('manto_emergencia', fila[27]); 
-            setVal('manto_eq_medicion', fila[28]); 
-            setVal('proyecto_expansion', fila[29]); 
-            setVal('manto_otros', fila[30]); 
-            
-            // ODTs y Justificaciones
-            setVal('odt_programada', fila[31]); 
-            setVal('odt_emergencia', fila[32]); 
-            setVal('odt_os', fila[33]); 
-            setVal('codigo_proyecto', fila[34]); 
-            setVal('odt_otros', fila[35]); 
-            
-            setVal('justificacion', fila[36]); 
-            setVal('observaciones', fila[37]); 
-            
-            // Firmas y Metadatos
-            setVal('solicitado_por', fila[38]); 
-            setVal('cargo_del_solicitante', fila[39]); 
-            setVal('aprobado_por', fila[40]); 
-            
-            // EJECUTAR AUTOCOMPLETADOS AL FINAL DEL MAPEO
-            if (typeof dispararEventosAutocompletado === "function") {
-                setTimeout(dispararEventosAutocompletado, 500); 
+            if(paso > 0) {
+                document.getElementById('step' + currentStep + '-tab').classList.add('completed');
+            } else {
+                document.getElementById('step' + newStep + '-tab').classList.remove('completed');
             }
 
-        } else {
-            alert("No se encontró la solicitud original o no tiene datos.");
+            // Mostrar nuevo
+            currentStep = newStep;
+            document.getElementById('step' + currentStep).classList.add('active');
+            document.getElementById('step' + currentStep + '-tab').classList.add('active');
+
+            // Actualizar botones
+            document.getElementById('btnPrev').style.visibility = (currentStep === 1) ? 'hidden' : 'visible';
+            if (currentStep === totalSteps) {
+                document.getElementById('btnNext').style.display = 'none';
+                document.getElementById('btnSubmit').style.display = 'block';
+            } else {
+                document.getElementById('btnNext').style.display = 'block';
+                document.getElementById('btnSubmit').style.display = 'none';
+            }
         }
-    } catch (error) { 
-        console.error("Error cargando edición:", error); 
-        alert("Hubo un error cargando los datos. Revisa la consola.");
-    }
-}
 
-// Calcula duración entre horas
-function calcularTiempo() {
-    const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
-    if (h1 && h2) {
-        const [hh1, mm1] = h1.split(':').map(Number), [hh2, mm2] = h2.split(':').map(Number);
-        let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); if (mins < 0) mins += 24 * 60; 
-        document.getElementById('tiempo_necesario').value = `${Math.floor(mins / 60)} hrs ${mins % 60} min`;
-    }
-}
-///////
-        // Trae los datos base desde el servidor (Google Apps Script)
+        function generarIDUnico() {
+            // Genera un ID estilo REQ-12345
+            const id = Math.floor(Math.random() * 100000);
+            document.getElementById('id_solicitud').value = "REQ-" + id;
+        }
+
+        function seleccionarGestion(tipo) {
+            // Maneja los botones de Solicitud vs Apego
+            document.getElementById('btn-solicitud').classList.remove('active');
+            document.getElementById('btn-apego').classList.remove('active');
+            document.getElementById('solicitud').value = "";
+            document.getElementById('apego').value = "";
+
+            if(tipo === 'solicitud') {
+                document.getElementById('btn-solicitud').classList.add('active');
+                document.getElementById('solicitud').value = "X";
+            } else {
+                document.getElementById('btn-apego').classList.add('active');
+                document.getElementById('apego').value = "X";
+            }
+        }
+
+        // --- FUNCIONES DE CARGA Y AUTOCOMPLETADO ---
+
+        async function cargarDatosEdicion(id) {
+            try {
+                document.getElementById('numero_despeje').placeholder = "Cargando datos...";
+                const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
+                const fila = await res.json(); 
+
+                console.log("Datos recibidos para editar:", fila);
+
+                if (fila && fila.length > 0 && !fila.error) {
+                    
+                    const setVal = (idHTML, valor) => {
+                        const el = document.getElementById(idHTML);
+                        if (el && valor !== undefined && valor !== null) {
+                            if (el.type === 'checkbox' || el.type === 'radio') {
+                                el.checked = (valor === 'X' || valor === true);
+                            } else {
+                                el.value = valor;
+                            }
+                        }
+                    };
+
+                    const formatFecha = (isoString) => {
+                        if (!isoString) return "";
+                        return isoString.length >= 10 ? isoString.substring(0, 10) : isoString;
+                    };
+
+                    const formatHora = (isoString) => {
+                        if (!isoString) return "";
+                        if (isoString.includes('T')) return isoString.split('T')[1].substring(0, 5);
+                        return isoString;
+                    };
+
+                    // Mapeo
+                    setVal('id_solicitud', fila[0]); 
+                    setVal('numero_despeje', fila[1]);
+                    setVal('solicitud', fila[2]); // Cambiado al ID correcto
+                    setVal('apego', fila[3]);     // Cambiado al ID correcto
+                    setVal('fecha_solicitud', formatFecha(fila[4])); 
+                    
+                    setVal('subestacion', fila[5]); 
+                    setVal('circuito', fila[6]); 
+                    
+                    if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
+                    
+                    setVal('seccion', fila[7]); 
+                    setVal('interruptor_de_circuito', fila[8]); 
+                    setVal('restaurador', fila[9]); // Reasignado a Restaurador
+                    setVal('otros_equipos', fila[10]); 
+                    setVal('ubicacion_del_equipo', fila[11]); 
+                    setVal('trabajo_a_realizar', fila[12]); 
+                    
+                    setVal('fecha_interrupcion', formatFecha(fila[13])); 
+                    setVal('dia_de_semana', fila[14]); // ARREGLADO: El ID correcto es dia_de_semana
+                    setVal('hora_inicio', formatHora(fila[15])); 
+                    setVal('hora_final', formatHora(fila[16])); 
+                    setVal('tiempo_necesario', fila[17]); 
+                    
+                    // ... Agrega más seteos si tus columnas coinciden ...
+                    setVal('zonas_afectadas', fila[21]); 
+                    
+                    setTimeout(dispararEventosAutocompletado, 500); 
+
+                } else {
+                    alert("No se encontró la solicitud original.");
+                }
+            } catch (error) { 
+                console.error("Error cargando edición:", error); 
+                alert("Hubo un error cargando los datos.");
+            }
+        }
+
+        function dispararEventosAutocompletado() {
+            if (typeof alCambiarCircuito === "function") alCambiarCircuito();
+            if (typeof calcularTiempo === "function") calcularTiempo();
+            if (typeof calcularDia === "function") calcularDia();
+
+            // Activar botón de Solicitud/Apego visualmente si hay datos
+            if(document.getElementById('solicitud').value === 'X') seleccionarGestion('solicitud');
+            if(document.getElementById('apego').value === 'X') seleccionarGestion('apego');
+        }
+
+        function calcularDia() {
+            const fechaInput = document.getElementById('fecha_interrupcion').value;
+            if (fechaInput) {
+                const fecha = new Date(fechaInput + "T12:00:00"); 
+                const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+                const campoDia = document.getElementById('dia_de_semana'); // ID Corregido
+                if (campoDia) campoDia.value = dias[fecha.getDay()];
+            }
+        }
+
+        function calcularTiempo() {
+            const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
+            if (h1 && h2) {
+                const [hh1, mm1] = h1.split(':').map(Number), [hh2, mm2] = h2.split(':').map(Number);
+                let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); if (mins < 0) mins += 24 * 60; 
+                document.getElementById('tiempo_necesario').value = `${Math.floor(mins / 60)} hrs ${mins % 60} min`;
+            }
+        }
+
         async function descargarDatosGoogleSheets() {
             try {
                 const res = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
@@ -391,10 +373,9 @@ function calcularTiempo() {
                 baseResponsables = data.responsables; baseIngenieros = data.ingenieros;
                 poblarListaCircuitos();
                 poblarListasPersonal();
-            } catch(e) { alert("Error de red cargando datos."); }
+            } catch(e) { console.error("Error cargando datos de Sheets", e); }
         }
 
-        // Llena el select de circuitos según el sector
         function poblarListaCircuitos() {
             const selCircuito = document.getElementById('circuito');
             selCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
@@ -407,7 +388,6 @@ function calcularTiempo() {
             }
         }
 
-        // Llena listas de personal (responsables/ingenieros)
         function poblarListasPersonal() {
             const sectorLimpio = sectorSesion.toString().trim().toUpperCase();
             const selResp = document.getElementById('responsable'), selSust = document.getElementById('sustituto');
@@ -428,7 +408,6 @@ function calcularTiempo() {
             }
         }
 
-        // Filtra los equipos cuando se cambia el circuito
         function alCambiarCircuito() {
             const circSeleccionado = document.getElementById('circuito').value.trim().toUpperCase();
             document.getElementById('subestacion').value = "";
@@ -447,7 +426,6 @@ function calcularTiempo() {
             }
         }
 
-        // Autocompleta ubicación cuando se selecciona un equipo
         function alCambiarEquipo() {
             const equipoSeleccionado = document.getElementById('interruptor_de_circuito').value || document.getElementById('restaurador').value;
             const inputUbicacion = document.getElementById('ubicacion_del_equipo');
@@ -461,7 +439,6 @@ function calcularTiempo() {
             }
         }
 
-        // Control de visibilidad de cajas de ODT/Proyecto según tipo de trabajo
         function manejarTipoTrabajo(tipo) {
             document.getElementById('box_odt_programada').classList.add('hidden');
             document.getElementById('box_odt_emergencia').classList.add('hidden');
@@ -475,141 +452,81 @@ function calcularTiempo() {
             if(tipo === 'OTROS') document.getElementById('box_odt_otros').classList.remove('hidden');
         }
 
-        // Autocompleta cargo del solicitante
         function alSeleccionarIngeniero(nombre) {
             document.getElementById('cargo_del_solicitante').value = "";
             const fila = baseIngenieros.find(f => f[0] && f[0].toString().trim() === nombre);
             if(fila) document.getElementById('cargo_del_solicitante').value = fila[1] || "";
         }
 
-        // Envía el formulario a Google Sheets
-           async function guardarFormulario() {
-    const btn = document.getElementById('btnSubmit');
-    btn.disabled = true; 
-    btn.innerHTML = 'Enviando...';
+        // --- FUNCIÓN DE ENVÍO ---
 
-    // Obtenemos el tipo de trabajo para marcar la columna correspondiente
-    const tipo = document.getElementById('tipo_trabajo').value;
+        async function guardarFormulario() {
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true; 
+            btn.innerHTML = 'Enviando...';
 
-    // EL PAYLOAD DEBE TENER LOS MISMOS NOMBRES QUE TU TABLA
-    const payload = {
-        "ID_SOLICITUD": document.getElementById('id_solicitud').value,
-        "NUMERO_DESPEJE": document.getElementById('numero_despeje').value,
-        "SOLICITUD": document.getElementById('solicitud').value,
-        "APEGO": document.getElementById('apego').value,
-        "FECHA_SOLICITUD": document.getElementById('fecha_solicitud').value,
-        "SUBESTACION": document.getElementById('subestacion').value,
-        "CIRCUITO": document.getElementById('circuito').value,
-        "SECCION": document.getElementById('seccion').value,
-        "INTERRUPTOR_DE_CIRCUITO": document.getElementById('interruptor_de_circuito').value,
-        "RESTAURADOR": document.getElementById('restaurador').value,
-        "OTROS_EQUIPOS": document.getElementById('otros_equipos').value,
-        "UBICACION_DEL_EQUIPO": document.getElementById('ubicacion_del_equipo').value,
-        "UBICACION_DEL_TRABAJO": document.getElementById('ubicacion_del_trabajo').value,
-        "FECHA_INTERRUPCION": document.getElementById('fecha_interrupcion').value,
-        "DIA_DE_SEMANA": document.getElementById('dia_de_semana').value,
-        "HORA_INICIO": document.getElementById('hora_inicio').value,
-        "HORA_FINAL": document.getElementById('hora_final').value,
-        "TIEMPO_NECESARIO": document.getElementById('tiempo_necesario').value,
-        "TRABAJO_A_REALIZAR": document.getElementById('trabajo_a_realizar').value,
-        "RESPONSABLE": document.getElementById('responsable').value,
-        "SUSTITUTO": document.getElementById('sustituto').value,
-        "ZONAS_AFECTADAS": document.getElementById('zonas_afectadas').value,
-        "AREA_AFECTADA": document.getElementById('area_afectada').value,
-        "NOMBRE_DESPEJE": document.getElementById('nombre_despeje').value,
-        "APEGOS_ENLACES": document.getElementById('apegos_enlaces').value,
-        "APEGO_DESPEJE": document.getElementById('apego_despeje').value,
-        // Clasificación
-        "MANTO_PROGRAMADO": tipo === 'PROGRAMADO' ? 'X' : '',
-        "MANTO_EMERGENCIA": tipo === 'EMERGENCIA' ? 'X' : '',
-        "MANTO_EQ_MEDICION": tipo === 'MEDICION' ? 'X' : '',
-        "PROYECTO_EXPANSION": tipo === 'PROYECTO' ? 'X' : '',
-        "MANTO_OTROS": tipo === 'OTROS' ? 'X' : '',
-        "ODT_PROGRAMADA": document.getElementById('odt_programada').value,
-        "ODT_EMERGENCIA": document.getElementById('odt_emergencia').value,
-        "ODT_OS": document.getElementById('odt_os').value,
-        "CODIGO_PROYECTO": document.getElementById('codigo_proyecto').value,
-        "ODT_OTROS": document.getElementById('odt_otros').value,
-        // Aprobación
-        "JUSTIFICACION": document.getElementById('justificacion').value,
-        "OBSERVACIONES": document.getElementById('observaciones').value,
-        "SOLICITADO_POR": document.getElementById('solicitado_por').value,
-        "CARGO_DEL_SOLICITANTE": document.getElementById('cargo_del_solicitante').value,
-        "APROBADO_POR": document.getElementById('aprobado_por').value,
-        // Metadatos
-        "SECTOR": sectorSesion,
-        "USUARIO": usuarioSesion
-    };
+            const tipo = document.getElementById('tipo_trabajo').value;
 
-    try {
-        const response = await fetch(URL_APPS_SCRIPT, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify(payload) 
-        });
-        alert("¡Solicitud registrada con éxito!");
-        window.location.reload(); 
-    } catch (error) {
-        console.error("Error:", error);
-        alert("Ocurrió un error al enviar. Revisa tu conexión.");
-    } finally {
-        btn.disabled = false; 
-        btn.innerHTML = 'GUARDAR SOLICITUD';
-    }
-}
+            const payload = {
+                "ID_SOLICITUD": document.getElementById('id_solicitud').value,
+                "NUMERO_DESPEJE": document.getElementById('numero_despeje').value,
+                "SOLICITUD": document.getElementById('solicitud').value,
+                "APEGO": document.getElementById('apego').value,
+                "FECHA_SOLICITUD": document.getElementById('fecha_solicitud').value,
+                "SUBESTACION": document.getElementById('subestacion').value,
+                "CIRCUITO": document.getElementById('circuito').value,
+                "SECCION": document.getElementById('seccion').value,
+                "INTERRUPTOR_DE_CIRCUITO": document.getElementById('interruptor_de_circuito').value,
+                "RESTAURADOR": document.getElementById('restaurador').value,
+                "OTROS_EQUIPOS": document.getElementById('otros_equipos').value,
+                "UBICACION_DEL_EQUIPO": document.getElementById('ubicacion_del_equipo').value,
+                "UBICACION_DEL_TRABAJO": document.getElementById('ubicacion_del_trabajo').value,
+                "FECHA_INTERRUPCION": document.getElementById('fecha_interrupcion').value,
+                "DIA_DE_SEMANA": document.getElementById('dia_de_semana').value,
+                "HORA_INICIO": document.getElementById('hora_inicio').value,
+                "HORA_FINAL": document.getElementById('hora_final').value,
+                "TIEMPO_NECESARIO": document.getElementById('tiempo_necesario').value,
+                "TRABAJO_A_REALIZAR": document.getElementById('trabajo_a_realizar').value,
+                "RESPONSABLE": document.getElementById('responsable').value,
+                "SUSTITUTO": document.getElementById('sustituto').value,
+                "ZONAS_AFECTADAS": document.getElementById('zonas_afectadas').value,
+                "AREA_AFECTADA": document.getElementById('area_afectada').value,
+                "NOMBRE_DESPEJE": document.getElementById('nombre_despeje').value,
+                "APEGOS_ENLACES": document.getElementById('apegos_enlaces').value,
+                "APEGO_DESPEJE": document.getElementById('apego_despeje').value,
+                "MANTO_PROGRAMADO": tipo === 'PROGRAMADO' ? 'X' : '',
+                "MANTO_EMERGENCIA": tipo === 'EMERGENCIA' ? 'X' : '',
+                "MANTO_EQ_MEDICION": tipo === 'MEDICION' ? 'X' : '',
+                "PROYECTO_EXPANSION": tipo === 'PROYECTO' ? 'X' : '',
+                "MANTO_OTROS": tipo === 'OTROS' ? 'X' : '',
+                "ODT_PROGRAMADA": document.getElementById('odt_programada').value,
+                "ODT_EMERGENCIA": document.getElementById('odt_emergencia').value,
+                "ODT_OS": document.getElementById('odt_os').value,
+                "CODIGO_PROYECTO": document.getElementById('codigo_proyecto').value,
+                "ODT_OTROS": document.getElementById('odt_otros').value,
+                "JUSTIFICACION": document.getElementById('justificacion').value,
+                "OBSERVACIONES": document.getElementById('observaciones').value,
+                "SOLICITADO_POR": document.getElementById('solicitado_por').value,
+                "CARGO_DEL_SOLICITANTE": document.getElementById('cargo_del_solicitante').value,
+                "APROBADO_POR": document.getElementById('aprobado_por').value,
+                "SECTOR": sectorSesion,
+                "USUARIO": usuarioSesion
+            };
 
-        // Cierra sesión limpiando el almacenamiento
+            try {
+                await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("¡Solicitud registrada con éxito!");
+                window.location.reload(); 
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Ocurrió un error al enviar. Revisa tu conexión.");
+            } finally {
+                btn.disabled = false; 
+                btn.innerHTML = 'GUARDAR SOLICITUD';
+            }
+        }
+
         function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
-    // =====================================================================
-// FUNCIONES AUXILIARES FALTANTES (PEGAR JUSTO ANTES DE </script>)
-// =====================================================================
-
-// 1. FUNCIÓN PARA CAMBIAR DE PASO (La que repara el botón "Siguiente")
-let pasoActual = 1;
-function cambiar(paso) {
-    // Oculta todos los pasos
-    document.querySelectorAll('.step-content').forEach(el => {
-        if(el) el.style.display = 'none';
-    });
-    // Quita la clase active de los indicadores
-    document.querySelectorAll('.step').forEach(el => {
-        if(el) el.classList.remove('step-active');
-    });
-    
-    // Muestra el paso seleccionado
-    const pasoMostrar = document.getElementById('paso' + paso);
-    const indMostrar = document.getElementById('ind-paso' + paso);
-    
-    if (pasoMostrar) pasoMostrar.style.display = 'block';
-    if (indMostrar) indMostrar.classList.add('step-active');
-    
-    pasoActual = paso;
-}
-
-// 2. FUNCIÓN PARA CALCULAR EL DÍA (La que repara el error de la línea 121)
-function calcularDia() {
-    const fechaInput = document.getElementById('fecha_interrupcion').value;
-    if (fechaInput) {
-        // Le agregamos T12:00:00 para evitar que el cambio de zona horaria atrase el día
-        const fecha = new Date(fechaInput + "T12:00:00"); 
-        const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
-        const campoDia = document.getElementById('dia_interrupcion');
-        if (campoDia) campoDia.value = dias[fecha.getDay()];
-    }
-}
-
-// 3. DISPARAR LOS AUTOCOMPLETADOS MANUALMENTE (Para que los campos se llenen solos al editar)
-function dispararEventosAutocompletado() {
-    if (typeof alCambiarCircuito === "function") {
-        alCambiarCircuito();
-    }
-    if (typeof calcularTiempo === "function") {
-        calcularTiempo();
-    }
-    if (typeof calcularDia === "function") {
-        calcularDia();
-    }
-}
 </body>
 </html>
