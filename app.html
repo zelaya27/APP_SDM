@@ -579,19 +579,26 @@
             }
         }
 
-        function manejarTipoTrabajo(tipo) {
-            document.getElementById('box_odt_programada').classList.add('hidden');
-            document.getElementById('box_odt_emergencia').classList.add('hidden');
-            document.getElementById('box_odt_os').classList.add('hidden');
-            document.getElementById('box_codigo_proyecto').classList.add('hidden');
-            document.getElementById('box_odt_otros').classList.add('hidden');
-            if(tipo === 'PROGRAMADO') document.getElementById('box_odt_programada').classList.remove('hidden');
-            if(tipo === 'EMERGENCIA') document.getElementById('box_odt_emergencia').classList.remove('hidden');
-            if(tipo === 'MEDICION') document.getElementById('box_odt_os').classList.remove('hidden');
-            if(tipo === 'PROYECTO') document.getElementById('box_codigo_proyecto').classList.remove('hidden');
-            if(tipo === 'OTROS') document.getElementById('box_odt_otros').classList.remove('hidden');
-        }
+     function manejarTipoTrabajo(tipo) {
+    // Lista de todos los IDs
+    const campos = {
+        'PROGRAMADO': 'box_odt_programada',
+        'EMERGENCIA': 'box_odt_emergencia',
+        'MEDICION': 'box_odt_os',
+        'PROYECTO': 'box_codigo_proyecto',
+        'OTROS': 'box_odt_otros'
+    };
 
+    // 1. Ocultar todos
+    Object.values(campos).forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+
+    // 2. Mostrar solo el seleccionado
+    if (campos[tipo]) {
+        document.getElementById(campos[tipo]).classList.remove('hidden');
+    }
+}
         function alSeleccionarIngeniero(nombre) {
             document.getElementById('cargo_del_solicitante').value = "";
             const fila = baseIngenieros.find(f => f[0] && f[0].toString().trim() === nombre);
