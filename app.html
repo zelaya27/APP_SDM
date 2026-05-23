@@ -561,5 +561,55 @@ function calcularTiempo() {
         // Cierra sesión limpiando el almacenamiento
         function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
+    // =====================================================================
+// FUNCIONES AUXILIARES FALTANTES (PEGAR JUSTO ANTES DE </script>)
+// =====================================================================
+
+// 1. FUNCIÓN PARA CAMBIAR DE PASO (La que repara el botón "Siguiente")
+let pasoActual = 1;
+function cambiar(paso) {
+    // Oculta todos los pasos
+    document.querySelectorAll('.step-content').forEach(el => {
+        if(el) el.style.display = 'none';
+    });
+    // Quita la clase active de los indicadores
+    document.querySelectorAll('.step').forEach(el => {
+        if(el) el.classList.remove('step-active');
+    });
+    
+    // Muestra el paso seleccionado
+    const pasoMostrar = document.getElementById('paso' + paso);
+    const indMostrar = document.getElementById('ind-paso' + paso);
+    
+    if (pasoMostrar) pasoMostrar.style.display = 'block';
+    if (indMostrar) indMostrar.classList.add('step-active');
+    
+    pasoActual = paso;
+}
+
+// 2. FUNCIÓN PARA CALCULAR EL DÍA (La que repara el error de la línea 121)
+function calcularDia() {
+    const fechaInput = document.getElementById('fecha_interrupcion').value;
+    if (fechaInput) {
+        // Le agregamos T12:00:00 para evitar que el cambio de zona horaria atrase el día
+        const fecha = new Date(fechaInput + "T12:00:00"); 
+        const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+        const campoDia = document.getElementById('dia_interrupcion');
+        if (campoDia) campoDia.value = dias[fecha.getDay()];
+    }
+}
+
+// 3. DISPARAR LOS AUTOCOMPLETADOS MANUALMENTE (Para que los campos se llenen solos al editar)
+function dispararEventosAutocompletado() {
+    if (typeof alCambiarCircuito === "function") {
+        alCambiarCircuito();
+    }
+    if (typeof calcularTiempo === "function") {
+        calcularTiempo();
+    }
+    if (typeof calcularDia === "function") {
+        calcularDia();
+    }
+}
 </body>
 </html>
