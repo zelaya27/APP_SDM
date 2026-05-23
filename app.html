@@ -211,103 +211,125 @@
         };
 
         // Función para rellenar el formulario con datos ya existentes en Sheets
-    async function cargarDatosEdicion(id) {
+  async function cargarDatosEdicion(id) {
     try {
         document.getElementById('numero_despeje').placeholder = "Cargando datos...";
         
         const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
         const fila = await res.json(); 
 
-        console.log("Datos recibidos del servidor:", fila);
+        console.log("Datos recibidos del servidor para editar:", fila);
 
         if (fila && fila.length > 0 && !fila.error) {
             
-            // 1. Función inteligente para asignar valores sin causar errores
+            // 1. Ayudante inteligente para asignar valores
             const setVal = (idHTML, valor) => {
                 const el = document.getElementById(idHTML);
                 if (el && valor !== undefined && valor !== null) {
-                    el.value = valor;
+                    // Si el campo es un checkbox o radio button (como las "X")
+                    if (el.type === 'checkbox' || el.type === 'radio') {
+                        el.checked = (valor === 'X' || valor === true);
+                    } else {
+                        el.value = valor;
+                    }
                 }
             };
 
-            // 2. Limpiar el formato de la Fecha (Corta '2026-05-27T06:00:00.000Z' a '2026-05-27')
-            let fechaLimpia = "";
-            if (fila[4] && fila[4].length >= 10) {
-                fechaLimpia = fila[4].substring(0, 10);
-            }
+            // 2. Limpiador de Fechas (Extrae "YYYY-MM-DD")
+            const formatFecha = (isoString) => {
+                if (!isoString) return "";
+                return isoString.length >= 10 ? isoString.substring(0, 10) : isoString;
+            };
 
-            // 3. MAPEO DE DATOS POR POSICIÓN (Índices)
-            // (La posición en Javascript siempre es el número de la columna en Excel menos 1)
+            // 3. Limpiador de Horas (Extrae "HH:MM" de "1899-12-30T13:48:52.000Z")
+            const formatHora = (isoString) => {
+                if (!isoString) return "";
+                if (isoString.includes('T')) {
+                    return isoString.split('T')[1].substring(0, 5); // Toma solo la hora
+                }
+                return isoString;
+            };
+
+            // ==========================================
+            // MAPEO EXACTO DE LOS 43 CAMPOS
+            // ==========================================
             
-            setVal('ID_SOLICITUD', fila[0]); // Columna A
-            setVal('numero_despeje', fila[1]); // Columna B
+            // --- PASO 1: Datos Generales ---
+            setVal('ID_SOLICITUD', fila[0]); 
+            setVal('numero_despeje', fila[1]);
             
-            // fila[2] es la "X" de Programada/Emergencia (Ver nota abajo)
+            // Tipo de Solicitud (Programada / Emergencia)
+            // Asumiendo que usas IDs 'tipo_programada' o similar. Ajusta el ID si es necesario
+            setVal('tipo_programada', fila[2]); 
+            setVal('tipo_emergencia', fila[3]); 
             
-            setVal('fecha_solicitud', fechaLimpia); // Columna E (Índice 4)
-            setVal('subestacion', fila[5]); // 'JUTICALPA'
-            setVal('circuito', fila[6]); // 'JUT-L379'
+            setVal('fecha_solicitud', formatFecha(fila[4])); 
             
-            // Disparar las zonas dependientes del circuito
+            // --- PASO 2: Datos Técnicos ---
+            setVal('subestacion', fila[5]); 
+            setVal('circuito', fila[6]); 
+            
+            // Cargar los equipos correspondientes al circuito antes de setear el equipo
             if (typeof alCambiarCircuito === "function") {
-                alCambiarCircuito();
+                alCambiarCircuito(); 
             }
             
-            // setVal('tipo_equipo', fila[7]); // 'TRONCAL' (si tienes este ID)
-            setVal('interruptor_de_circuito', fila[8]); // 'JUT-32L79'
+            setVal('tipo_equipo', fila[7]); 
+            setVal('interruptor_de_circuito', fila[8]); 
+            setVal('ramal', fila[9]); 
+            setVal('equipo_a_intervenir', fila[10]); 
+            setVal('lugar_trabajo', fila[11]); 
+            setVal('trabajo_a_realizar', fila[12]); 
             
-            // setVal('lugar_trabajo', fila[11]); // 'SUBESTACION JUTICALPA 1'
-            setVal('zonas_afectadas', fila[21]); // 'TODA CIUDAD DE JUTICALPA...'
-
-            // === CONTINÚA MAPEANDO EL RESTO DE TUS CAMPOS AQUÍ ABAJO ===
-            // setVal('ID_DE_TU_INPUT', fila[NUMERO_DE_POSICION]);
-
+            // --- PASO 3: Tiempos e Impacto ---
+            setVal('fecha_interrupcion', formatFecha(fila[13])); 
+            setVal('dia_interrupcion', fila[14]); 
+            setVal('hora_inicio', formatHora(fila[15])); 
+            setVal('hora_final', formatHora(fila[16])); 
+            setVal('tiempo_interrupcion', fila[17]); 
+            
+            setVal('empresa_solicitante', fila[18]); 
+            setVal('responsable_empresa', fila[19]); 
+            setVal('telefono_empresa', fila[20]); 
+            setVal('zonas_afectadas', fila[21]); 
+            
+            // --- PASO 4: Encargados y Clasificación ---
+            setVal('encargado_maniobras_1', fila[22]); 
+            setVal('telefono_encargado_1', fila[23]); 
+            setVal('encargado_maniobras_2', fila[24]); 
+            setVal('telefono_encargado_2', fila[25]); 
+            
+            // Checkboxes de Motivo / Mantenimiento
+            setVal('manto_programado', fila[26]); 
+            setVal('manto_emergencia', fila[27]); // Aquí viene la "X"
+            setVal('manto_eq_medicion', fila[28]); 
+            setVal('proyecto_expansion', fila[29]); 
+            setVal('manto_otros', fila[30]); 
+            
+            // ODTs y Justificaciones
+            setVal('odt_programada', fila[31]); 
+            setVal('odt_emergencia', fila[32]); 
+            setVal('odt_os', fila[33]); 
+            setVal('codigo_proyecto', fila[34]); 
+            setVal('odt_otros', fila[35]); 
+            
+            setVal('justificacion', fila[36]); 
+            setVal('observaciones', fila[37]); 
+            
+            // Firmas y Metadatos
+            setVal('solicitado_por', fila[38]); 
+            setVal('cargo_del_solicitante', fila[39]); 
+            setVal('aprobado_por', fila[40]); 
+            // sector (41) y usuario (42) normalmente no se editan o se manejan internamente
 
         } else {
-            alert("No se encontró la solicitud original.");
+            alert("No se encontró la solicitud original o no tiene datos.");
         }
     } catch (error) { 
         console.error("Error cargando edición:", error); 
+        alert("Hubo un error cargando los datos. Revisa la consola.");
     }
 }
-
-        // Navegación entre los 4 pasos del formulario
-        function cambiarPaso(dir) {
-            document.getElementById(`step${currentStep}`).classList.remove('active');
-            document.getElementById(`step${currentStep}-tab`).classList.remove('active');
-            if(dir === 1) document.getElementById(`step${currentStep}-tab`).classList.add('completed');
-            currentStep += dir;
-            document.getElementById(`step${currentStep}`).classList.add('active');
-            document.getElementById(`step${currentStep}-tab`).classList.add('active');
-            document.getElementById('btnPrev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-            document.getElementById('btnNext').style.display = (currentStep === totalSteps) ? 'none' : 'block';
-            document.getElementById('btnSubmit').style.display = (currentStep === totalSteps) ? 'block' : 'none';
-        }
-
-        // Alterna entre los botones de gestión
-        function seleccionarGestion(tipo) {
-            const btnSol = document.getElementById('btn-solicitud'), btnApe = document.getElementById('btn-apego');
-            if (tipo === 'solicitud') { btnSol.classList.add('active'); btnApe.classList.remove('active'); document.getElementById('solicitud').value = "X"; document.getElementById('apego').value = ""; } 
-            else { btnApe.classList.add('active'); btnSol.classList.remove('active'); document.getElementById('apego').value = "X"; document.getElementById('solicitud').value = ""; }
-        }
-
-        // Crea ID aleatorio para nueva solicitud
-        function generarIDUnico() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let id = '';
-            for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
-            document.getElementById('id_solicitud').value = id;
-        }
-
-        // Calcula automáticamente el día de la semana
-        function calcularDia() {
-            const f = document.getElementById('fecha_interrupcion').value;
-            if(f) {
-                const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
-                let i = new Date(f + 'T00:00:00').getDay() - 1; if(i === -1) i = 6; 
-                document.getElementById('dia_de_semana').value = dias[i];
-            }
-        }
-
         // Calcula duración entre horas
         function calcularTiempo() {
             const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
