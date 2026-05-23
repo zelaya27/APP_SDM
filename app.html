@@ -374,7 +374,18 @@
 }
 
         function dispararEventosAutocompletado() {
+            // 1. Guardamos en memoria los valores que acaba de cargar la base de datos
+            const valInt = document.getElementById('interruptor_de_circuito').value;
+            const valRes = document.getElementById('restaurador').value;
+
+            // 2. Disparamos la función del circuito
             if (typeof alCambiarCircuito === "function") alCambiarCircuito();
+            
+            // 3. Restauramos los valores para que no se pierdan al regenerar la lista
+            if (valInt) document.getElementById('interruptor_de_circuito').value = valInt;
+            if (valRes) document.getElementById('restaurador').value = valRes;
+
+            // 4. Disparamos el resto de eventos normales
             if (typeof calcularTiempo === "function") calcularTiempo();
             if (typeof calcularDia === "function") calcularDia();
 
