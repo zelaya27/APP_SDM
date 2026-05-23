@@ -211,31 +211,58 @@
         };
 
         // Función para rellenar el formulario con datos ya existentes en Sheets
-     async function cargarDatosEdicion(id) {
+    async function cargarDatosEdicion(id) {
     try {
         document.getElementById('numero_despeje').placeholder = "Cargando datos...";
         
         const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
-        const fila = await res.json(); // Ahora 'fila' es un objeto, no una lista
+        const fila = await res.json(); 
 
-        // --- AGREGA ESTO PARA VER QUÉ RECIBES ---
         console.log("Datos recibidos del servidor:", fila);
 
-        if (!fila.error) {
-            // USAMOS LAS KEYS DEL OBJETO (ej: fila.no_despeje) en lugar de índices (fila[1])
-            document.getElementById('numero_despeje').value = fila.no_despeje || "";
-            document.getElementById('fecha_solicitud').value = fila.fecha || ""; 
+        if (fila && fila.length > 0 && !fila.error) {
             
-            // Si la fecha de interrupción es un campo nuevo, agrégalo en el objeto en codigo.gs
-            // O si prefieres usar el array original, debemos ajustar codigo.gs.
+            // 1. Función inteligente para asignar valores sin causar errores
+            const setVal = (idHTML, valor) => {
+                const el = document.getElementById(idHTML);
+                if (el && valor !== undefined && valor !== null) {
+                    el.value = valor;
+                }
+            };
+
+            // 2. Limpiar el formato de la Fecha (Corta '2026-05-27T06:00:00.000Z' a '2026-05-27')
+            let fechaLimpia = "";
+            if (fila[4] && fila[4].length >= 10) {
+                fechaLimpia = fila[4].substring(0, 10);
+            }
+
+            // 3. MAPEO DE DATOS POR POSICIÓN (Índices)
+            // (La posición en Javascript siempre es el número de la columna en Excel menos 1)
             
-            document.getElementById('subestacion').value = fila.subestacion || "";
-            document.getElementById('circuito').value = fila.circuito || "";
+            setVal('ID_SOLICITUD', fila[0]); // Columna A
+            setVal('numero_despeje', fila[1]); // Columna B
             
-            alCambiarCircuito(); // Esto cargará los equipos dependientes
+            // fila[2] es la "X" de Programada/Emergencia (Ver nota abajo)
             
-            document.getElementById('interruptor_de_circuito').value = fila.interruptor_de_circuito || "";
-            document.getElementById('trabajo_a_realizar').value = fila.trabajo_a_realizar || "";
+            setVal('fecha_solicitud', fechaLimpia); // Columna E (Índice 4)
+            setVal('subestacion', fila[5]); // 'JUTICALPA'
+            setVal('circuito', fila[6]); // 'JUT-L379'
+            
+            // Disparar las zonas dependientes del circuito
+            if (typeof alCambiarCircuito === "function") {
+                alCambiarCircuito();
+            }
+            
+            // setVal('tipo_equipo', fila[7]); // 'TRONCAL' (si tienes este ID)
+            setVal('interruptor_de_circuito', fila[8]); // 'JUT-32L79'
+            
+            // setVal('lugar_trabajo', fila[11]); // 'SUBESTACION JUTICALPA 1'
+            setVal('zonas_afectadas', fila[21]); // 'TODA CIUDAD DE JUTICALPA...'
+
+            // === CONTINÚA MAPEANDO EL RESTO DE TUS CAMPOS AQUÍ ABAJO ===
+            // setVal('ID_DE_TU_INPUT', fila[NUMERO_DE_POSICION]);
+
+
         } else {
             alert("No se encontró la solicitud original.");
         }
