@@ -210,10 +210,12 @@
             }
         };
 // ==========================================
-// 1. FUNCIÓN PARA CAMBIAR DE PASO (LA QUE FALTABA)
+// 1. FUNCIÓN PARA CAMBIAR DE PASO 
 // ==========================================
 let pasoActual = 1;
-function cambiarPaso(paso) {
+
+// ¡AQUÍ ESTÁ EL CAMBIO! Ahora se llama solo "cambiar"
+function cambiar(paso) {
     // Oculta todos los pasos
     document.querySelectorAll('.step-content').forEach(el => {
         if(el) el.style.display = 'none';
