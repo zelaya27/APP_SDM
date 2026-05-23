@@ -249,7 +249,8 @@ function dispararEventosAutocompletado() {
     }
 }
         // Función para rellenar el formulario con datos ya existentes en Sheets
-  async function cargarDatosEdicion(id) {
+  // Función para rellenar el formulario con datos ya existentes en Sheets
+async function cargarDatosEdicion(id) {
     try {
         document.getElementById('numero_despeje').placeholder = "Cargando datos...";
         
@@ -267,15 +268,7 @@ function dispararEventosAutocompletado() {
                     // Si el campo es un checkbox o radio button (como las "X")
                     if (el.type === 'checkbox' || el.type === 'radio') {
                         el.checked = (valor === 'X' || valor === true);
-                 // ... (todo tu mapeo de setVal) ...
-            setVal('aprobado_por', fila[40]); 
-
-            // AGREGA ESTA LÍNEA AL FINAL DEL MAPEO:
-            setTimeout(dispararEventosAutocompletado, 500); // Espera medio segundo y dispara autocompletados
-
-        } else {
-            alert("No se encontró la solicitud original o no tiene datos.");
-        }   } else {
+                    } else {
                         el.value = valor;
                     }
                 }
@@ -297,21 +290,17 @@ function dispararEventosAutocompletado() {
             };
 
             // ==========================================
-            // MAPEO EXACTO DE LOS 43 CAMPOS
+            // MAPEO EXACTO DE LOS CAMPOS
             // ==========================================
             
-            // ---  1: Datos Generales ---
+            // --- 1: Datos Generales ---
             setVal('ID_SOLICITUD', fila[0]); 
             setVal('numero_despeje', fila[1]);
-            
-            // Tipo de Solicitud (Programada / Emergencia)
-            // Asumiendo que usas IDs 'tipo_programada' o similar. Ajusta el ID si es necesario
             setVal('tipo_programada', fila[2]); 
             setVal('tipo_emergencia', fila[3]); 
-            
             setVal('fecha_solicitud', formatFecha(fila[4])); 
             
-            // ---  2: Datos Técnicos ---
+            // --- 2: Datos Técnicos ---
             setVal('subestacion', fila[5]); 
             setVal('circuito', fila[6]); 
             
@@ -327,7 +316,7 @@ function dispararEventosAutocompletado() {
             setVal('lugar_trabajo', fila[11]); 
             setVal('trabajo_a_realizar', fila[12]); 
             
-            // ---  3: Tiempos e Impacto ---
+            // --- 3: Tiempos e Impacto ---
             setVal('fecha_interrupcion', formatFecha(fila[13])); 
             setVal('dia_interrupcion', fila[14]); 
             setVal('hora_inicio', formatHora(fila[15])); 
@@ -347,7 +336,7 @@ function dispararEventosAutocompletado() {
             
             // Checkboxes de Motivo / Mantenimiento
             setVal('manto_programado', fila[26]); 
-            setVal('manto_emergencia', fila[27]); // Aquí viene la "X"
+            setVal('manto_emergencia', fila[27]); 
             setVal('manto_eq_medicion', fila[28]); 
             setVal('proyecto_expansion', fila[29]); 
             setVal('manto_otros', fila[30]); 
@@ -366,7 +355,11 @@ function dispararEventosAutocompletado() {
             setVal('solicitado_por', fila[38]); 
             setVal('cargo_del_solicitante', fila[39]); 
             setVal('aprobado_por', fila[40]); 
-            // sector (41) y usuario (42) normalmente no se editan o se manejan internamente
+            
+            // EJECUTAR AUTOCOMPLETADOS AL FINAL DEL MAPEO
+            if (typeof dispararEventosAutocompletado === "function") {
+                setTimeout(dispararEventosAutocompletado, 500); 
+            }
 
         } else {
             alert("No se encontró la solicitud original o no tiene datos.");
@@ -376,16 +369,17 @@ function dispararEventosAutocompletado() {
         alert("Hubo un error cargando los datos. Revisa la consola.");
     }
 }
-        // Calcula duración entre horas
-        function calcularTiempo() {
-            const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
-            if (h1 && h2) {
-                const [hh1, mm1] = h1.split(':').map(Number), [hh2, mm2] = h2.split(':').map(Number);
-                let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); if (mins < 0) mins += 24 * 60; 
-                document.getElementById('tiempo_necesario').value = `${Math.floor(mins / 60)} hrs ${mins % 60} min`;
-            }
-        }
 
+// Calcula duración entre horas
+function calcularTiempo() {
+    const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
+    if (h1 && h2) {
+        const [hh1, mm1] = h1.split(':').map(Number), [hh2, mm2] = h2.split(':').map(Number);
+        let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); if (mins < 0) mins += 24 * 60; 
+        document.getElementById('tiempo_necesario').value = `${Math.floor(mins / 60)} hrs ${mins % 60} min`;
+    }
+}
+///////
         // Trae los datos base desde el servidor (Google Apps Script)
         async function descargarDatosGoogleSheets() {
             try {
