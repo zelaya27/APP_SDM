@@ -265,17 +265,21 @@
         }
        
       // CARGAR CATÁLOGO DE CIRCUITOS DEL SECTOR
-    async function inicializarFiltroCircuitos() {
+  async function inicializarFiltroCircuitos() {
     const selectCircuito = document.getElementById('filtroCircuito');
     if (!selectCircuito) return;
 
+    // --- CONFIGURACIÓN DE ÍNDICES ---
+    // Si tu sector NO está en la columna B (índice 1), cambia esto por 0, 2, 3...
+    const INDICE_SECTOR = 1; 
+    // Si tu circuito NO está en la columna G (índice 6), cambia esto
+    const INDICE_CIRCUITO = 6; 
+
     try {
-        // 1. Obtener datos
         const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
         const catalogos = await response.json();
         
         if (catalogos && catalogos.circuitos) {
-            // 2. Limpiar select
             selectCircuito.innerHTML = '<option value="ALL">Todos</option>';
             
             const sectorSesion = sessionStorage.getItem("sector");
@@ -284,18 +288,32 @@
                 return;
             }
 
-            // Normalizamos para comparación segura
             const miSector = sectorSesion.trim().toUpperCase();
+            console.log("DEBUG: Buscando sector:", `"${miSector}"`);
 
-            // 3. Filtrar: fila[1] sector, fila[6] circuito (según tu lógica anterior)
-            const circuitosFiltrados = catalogos.circuitos.slice(1).filter(fila => {
-                const sectorHoja = fila[1] ? fila[1].toString().trim().toUpperCase() : "";
+            // Filtrado con diagnóstico
+            const circuitosFiltrados = catalogos.circuitos.slice(1).filter((fila, index) => {
+                // Obtenemos el valor de la columna correspondiente al sector
+                const valRaw = fila[INDICE_SECTOR];
+                const sectorHoja = valRaw ? valRaw.toString().trim().toUpperCase() : "";
+                
+                // DIAGNÓSTICO: Si ves esto en la consola, sabrás qué está pasando
+                if (index < 5) { // Solo imprimimos las primeras 5 filas para no saturar
+                    console.log(`Fila ${index} | Valor real en hoja: "${sectorHoja}" | ¿Coincide? ${sectorHoja === miSector}`);
+                }
+                
                 return sectorHoja === miSector;
             });
 
-            // 4. Llenar el select solo con los filtrados
+            console.log("Circuitos encontrados tras filtrar:", circuitosFiltrados.length);
+
+            if (circuitosFiltrados.length === 0) {
+                console.warn("ADVERTENCIA: El filtro no encontró coincidencias. Verifica si la columna del sector es la correcta.");
+            }
+
+            // Llenar el select
             circuitosFiltrados.forEach(fila => {
-                const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
+                const nombreCircuito = fila[INDICE_CIRCUITO] ? fila[INDICE_CIRCUITO].toString().trim() : "";
                 if (nombreCircuito) {
                     const opt = document.createElement('option');
                     opt.value = nombreCircuito;
@@ -303,18 +321,11 @@
                     selectCircuito.appendChild(opt);
                 }
             });
-            
-            console.log(`Circuitos cargados para ${miSector}:`, circuitosFiltrados.length);
         }
     } catch (error) {
-        console.error("Error al cargar circuitos:", error);
+        console.error("Error crítico al cargar circuitos:", error);
     }
 }
-
-// Asegúrate de llamar a esta función cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    inicializarFiltroCircuitos();
-});
 
         // CARGAR SOLICITUDES DESDE APPS SCRIPT
         async function cargarSolicitudes() {
