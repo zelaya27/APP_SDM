@@ -156,7 +156,7 @@
             <button class="btn-logout" onclick="cerrarSesion()">
                 <i class="material-icons" style="font-size: 14px;">exit_to_app</i> Salir
             </button>
-            <button type="button" onclick="generarExcelSolicitud()" class="btn-descargar">
+            <button type="button" onclick="generarExcelSolicitud()" class="btn_generar_excel">
   <i class="material-icons">download</i> Descargar Excel
 </button>
         </div>
@@ -687,6 +687,82 @@ setVal('aprobado_por', fila[40]);
                 btn.innerHTML = 'GUARDAR SOLICITUD';
             }
         }
+                async function generarExcelSolicitud() {
+    // 1. Obtener referencia del botón para feedback visual
+    const btn = document.getElementById('btn_generar_excel'); // Asegúrate que tu botón tenga este ID
+    if(btn) {
+        btn.disabled = true;
+        btn.innerHTML = 'Generando...';
+    }
+
+    // 2. Construir el objeto con todos los datos del formulario
+    const datos = {
+        id_solicitud: document.getElementById('id_solicitud').value,
+        numero_despeje: document.getElementById('numero_despeje').value,
+        solicitud: document.getElementById('solicitud').value,
+        apego: document.getElementById('apego').value,
+        fecha_solicitud: document.getElementById('fecha_solicitud').value,
+        subestacion: document.getElementById('subestacion').value,
+        circuito: document.getElementById('circuito').value,
+        seccion: document.getElementById('seccion').value,
+        interruptor_de_circuito: document.getElementById('interruptor_de_circuito').value,
+        restaurador: document.getElementById('restaurador').value,
+        otros_equipos: document.getElementById('otros_equipos').value,
+        ubicacion_del_equipo: document.getElementById('ubicacion_del_equipo').value,
+        ubicacion_del_trabajo: document.getElementById('ubicacion_del_trabajo').value,
+        fecha_interrupcion: document.getElementById('fecha_interrupcion').value,
+        dia_de_semana: document.getElementById('dia_de_semana').value,
+        hora_inicio: document.getElementById('hora_inicio').value,
+        hora_final: document.getElementById('hora_final').value,
+        tiempo_necesario: document.getElementById('tiempo_necesario').value,
+        trabajo_a_realizar: document.getElementById('trabajo_a_realizar').value,
+        responsable: document.getElementById('responsable').value,
+        sustituto: document.getElementById('sustituto').value,
+        zonas_afectadas: document.getElementById('zonas_afectadas').value,
+        area_afectada: document.getElementById('area_afectada').value,
+        nombre_despeje: document.getElementById('nombre_despeje').value,
+        apegos_enlaces: document.getElementById('apegos_enlaces').value,
+        apego_despeje: document.getElementById('apego_despeje').value,
+        manto_programado: document.getElementById('manto_programado').value,
+        manto_emergencia: document.getElementById('manto_emergencia').value,
+        manto_eq_medicion: document.getElementById('manto_eq_medicion').value,
+        proyecto_expansion: document.getElementById('proyecto_expansion').value,
+        manto_otros: document.getElementById('manto_otros').value,
+        odt_programada: document.getElementById('odt_programada').value,
+        odt_emergencia: document.getElementById('odt_emergencia').value,
+        odt_os: document.getElementById('odt_os').value,
+        codigo_proyecto: document.getElementById('codigo_proyecto').value,
+        odt_otros: document.getElementById('odt_otros').value,
+        justificacion: document.getElementById('justificacion').value,
+        observaciones: document.getElementById('observaciones').value,
+        solicitado_por: document.getElementById('solicitado_por').value,
+        cargo_del_solicitante: document.getElementById('cargo_del_solicitante').value,
+        aprobado_por: document.getElementById('aprobado_por').value,
+        sector: document.getElementById('sector').value,
+        usuario: document.getElementById('usuario').value
+    };
+
+    // 3. Llamada al servidor (Código.gs)
+    google.script.run
+        .withSuccessHandler(function(url) {
+            // Abrir el archivo generado en una nueva pestaña
+            window.open(url, '_blank');
+            
+            // Restaurar botón
+            if(btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Descargar Excel';
+            }
+        })
+        .withFailureHandler(function(err) {
+            alert("Error al generar el documento: " + err);
+            if(btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Descargar Excel';
+            }
+        })
+        .generarDocumentoExcel(datos);
+}
 
         function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
