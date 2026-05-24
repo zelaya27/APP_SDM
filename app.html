@@ -531,58 +531,82 @@
         }
 
         // --- EXCEL ---
-        async function generarExcelSolicitud() {
-            const btn = document.getElementById('btn_generar_excel');
-            if(btn) { btn.disabled = true; btn.innerHTML = 'Generando...'; }
-            
-            // Recolección de datos usando la función de seguridad getVal
-            const datos = {
-                id_solicitud: getVal('id_solicitud'), numero_despeje: getVal('numero_despeje'),
-                solicitud: getVal('solicitud'), apego: getVal('apego'),
-                fecha_solicitud: getVal('fecha_solicitud'), subestacion: getVal('subestacion'),
-                circuito: getVal('circuito'), seccion: getVal('seccion'),
-                interruptor_de_circuito: getVal('interruptor_de_circuito'), restaurador: getVal('restaurador'),
-                otros_equipos: getVal('otros_equipos'), ubicacion_del_equipo: getVal('ubicacion_del_equipo'),
-                ubicacion_del_trabajo: getVal('ubicacion_del_trabajo'), fecha_interrupcion: getVal('fecha_interrupcion'),
-                dia_de_semana: getVal('dia_de_semana'), hora_inicio: getVal('hora_inicio'),
-                hora_final: getVal('hora_final'), tiempo_necesario: getVal('tiempo_necesario'),
-                trabajo_a_realizar: getVal('trabajo_a_realizar'), responsable: getVal('responsable'),
-                sustituto: getVal('sustituto'), zonas_afectadas: getVal('zonas_afectadas'),
-                area_afectada: getVal('area_afectada'), nombre_despeje: getVal('nombre_despeje'),
-                apegos_enlaces: getVal('apegos_enlaces'), apego_despeje: getVal('apego_despeje'),
-                manto_programado: document.getElementById('tipo_trabajo').value === 'PROGRAMADO' ? 'X' : '',
-                manto_emergencia: document.getElementById('tipo_trabajo').value === 'EMERGENCIA' ? 'X' : '',
-                manto_eq_medicion: document.getElementById('tipo_trabajo').value === 'MEDICION' ? 'X' : '',
-                proyecto_expansion: document.getElementById('tipo_trabajo').value === 'PROYECTO' ? 'X' : '',
-                manto_otros: document.getElementById('tipo_trabajo').value === 'OTROS' ? 'X' : '',
-                odt_programada: getVal('odt_programada'), odt_emergencia: getVal('odt_emergencia'),
-                odt_os: getVal('odt_os'), codigo_proyecto: getVal('codigo_proyecto'),
-                odt_otros: getVal('odt_otros'), justificacion: getVal('justificacion'),
-                observaciones: getVal('observaciones'), solicitado_por: getVal('solicitado_por'),
-                cargo_del_solicitante: getVal('cargo_del_solicitante'), aprobado_por: getVal('aprobado_por'),
-                sector: sectorSesion, usuario: usuarioSesion
-            };
-           
+        // --- EXCEL ---
+async function generarExcelSolicitud() {
+    const btn = document.getElementById('btn_generar_excel');
+    if(btn) { btn.disabled = true; btn.innerHTML = 'Generando...'; }
+    
+    // Claves en MAYÚSCULAS para emparejar con el archivo .gs
+    const datos = {
+        ID_SOLICITUD: getVal('id_solicitud'), 
+        NUMERO_DESPEJE: getVal('numero_despeje'),
+        SOLICITUD: getVal('solicitud'), 
+        APEGO: getVal('apego'),
+        FECHA_SOLICITUD: getVal('fecha_solicitud'), 
+        SUBESTACION: getVal('subestacion'),
+        CIRCUITO: getVal('circuito'), 
+        SECCION: getVal('seccion'),
+        INTERRUPTOR_DE_CIRCUITO: getVal('interruptor_de_circuito'), 
+        RESTAURADOR: getVal('restaurador'),
+        OTROS_EQUIPOS: getVal('otros_equipos'), 
+        UBICACION_DEL_EQUIPO: getVal('ubicacion_del_equipo'),
+        UBICACION_DEL_TRABAJO: getVal('ubicacion_del_trabajo'), 
+        FECHA_INTERRUPCION: getVal('fecha_interrupcion'),
+        DIA_DE_SEMANA: getVal('dia_de_semana'), 
+        HORA_INICIO: getVal('hora_inicio'),
+        HORA_FINAL: getVal('hora_final'), 
+        TIEMPO_NECESARIO: getVal('tiempo_necesario'),
+        TRABAJO_A_REALIZAR: getVal('trabajo_a_realizar'), 
+        RESPONSABLE: getVal('responsable'),
+        SUSTITUTO: getVal('sustituto'), 
+        ZONAS_AFECTADAS: getVal('zonas_afectadas'),
+        AREA_AFECTADA: getVal('area_afectada'), 
+        NOMBRE_DESPEJE: getVal('nombre_despeje'),
+        APEGOS_ENLACES: getVal('apegos_enlaces'), 
+        APEGO_DESPEJE: getVal('apego_despeje'),
+        MANTO_PROGRAMADO: document.getElementById('tipo_trabajo').value === 'PROGRAMADO' ? 'X' : '',
+        MANTO_EMERGENCIA: document.getElementById('tipo_trabajo').value === 'EMERGENCIA' ? 'X' : '',
+        MANTO_EQ_MEDICION: document.getElementById('tipo_trabajo').value === 'MEDICION' ? 'X' : '',
+        PROYECTO_EXPANSION: document.getElementById('tipo_trabajo').value === 'PROYECTO' ? 'X' : '',
+        MANTO_OTROS: document.getElementById('tipo_trabajo').value === 'OTROS' ? 'X' : '',
+        ODT_PROGRAMADA: getVal('odt_programada'), 
+        ODT_EMERGENCIA: getVal('odt_emergencia'),
+        ODT_OS: getVal('odt_os'), 
+        CODIGO_PROYECTO: getVal('codigo_proyecto'),
+        ODT_OTROS: getVal('odt_otros'), 
+        JUSTIFICACION: getVal('justificacion'),
+        OBSERVACIONES: getVal('observaciones'), 
+        SOLICITADO_POR: getVal('solicitado_por'),
+        CARGO_DEL_SOLICITANTE: getVal('cargo_del_solicitante'), 
+        APROBADO_POR: getVal('aprobado_por'),
+        SECTOR: sectorSesion, 
+        USUARIO: usuarioSesion
+    };
 
-// --- VALIDACIÓN DE ENTORNO ---
-if (typeof google !== 'undefined' && google.script) {
-    google.script.run
-        .withSuccessHandler(function(url) {
-            window.open(url, '_blank');
-            if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
-        })
-        .withFailureHandler(function(err) {
-            alert("Error desde el servidor: " + err);
-            if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
-        })
-        .generarDocumentoExcel(datos);
-} else {
-    // Modo simulación para edición local
-    console.warn("Estás en modo local. La comunicación con el servidor está desactivada.");
-    alert("Estás viendo una vista previa local. Para generar el Excel real, usa la URL de despliegue (/exec).");
-    if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
+    try {
+        // Petición directa utilizando tu constante global de configuración
+        const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify(datos)
+        });
+
+        const res = await response.json();
+
+        if (res.status === "ÉXITO") {
+            // Abre la pestaña de descarga directa del .xlsx generado
+            window.open(res.url, '_blank');
+        } else {
+            alert("Error en el servidor: " + (res.message || res.error));
+        }
+
+    } catch (err) {
+        console.error("Error de comunicación:", err);
+        alert("No se pudo establecer conexión con el servidor de Apps Script.");
+    } finally {
+        if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
+    }
 }
-} 
 
        
 
