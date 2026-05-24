@@ -7,11 +7,13 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="config.js"></script>
     <script>
+        // Esta variable se carga desde config.js para la conexión con el servidor
         const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
+        /* Variables globales de diseño */
         :root {
             --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
             --success-color: #27ae60; --text-color: #ffffff; --muted-text: #a0aec0;
@@ -19,7 +21,7 @@
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
         
-        /* Cabecera optimizada con Flexbox para centrado real */
+        /* Cabecera optimizada con Flexbox */
         header { 
             background-color: var(--card-color); 
             padding: 10px 20px; 
@@ -34,84 +36,39 @@
         .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: white; }
         
         .header-right { display: flex; align-items: center; gap: 15px; }
-        .btn-nav, .btn-logout { 
+        .btn-nav, .btn-logout, .btn_generar_excel { 
             display: flex; align-items: center; gap: 5px; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; color: white; 
         }
         .btn-nav { background: var(--accent-color); }
         .btn-logout { background: #e74c3c; }
+        .btn_generar_excel { background: var(--success-color); }
 
-        /* Contenedor principal */
+        /* Contenedor principal y tarjetas */
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         .card { background-color: var(--card-color); border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         
-        /* Se eliminó h2 del contenedor para evitar duplicidad */
+        /* Indicador de pasos (Stepper) */
+        .stepper { 
+            display: flex; justify-content: space-between; margin-bottom: 30px; padding: 20px;
+            background: var(--card-color); border-radius: 12px; border: 1px solid var(--border-color); position: relative;
+        }
+        .stepper::before {
+            content: ''; position: absolute; top: 35px; left: 10%; right: 10%; height: 2px;
+            background: var(--border-color); z-index: 0;
+        }
+        .step { 
+            flex: 1; text-align: center; font-size: 11px; font-weight: 700; color: var(--muted-text); 
+            transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1;
+        }
+        .step.active { color: white; }
+        .step .circle { 
+            width: 35px; height: 35px; line-height: 35px; margin-bottom: 8px;
+            border: 2px solid var(--border-color); border-radius: 50%; background: var(--bg-color); transition: all 0.3s ease;
+        }
+        .step.active .circle { background: var(--accent-color); border-color: var(--accent-color); color: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(0, 51, 102, 0.5); }
+        .step.completed .circle { background: var(--success-color); border-color: var(--success-color); color: white; }
         
-       /* Estilos del indicador de pasos (Stepper) mejorado */
-.stepper { 
-    display: flex; 
-    justify-content: space-between; 
-    margin-bottom: 30px; 
-    padding: 20px;
-    background: var(--card-color);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    position: relative;
-}
-
-/* Línea conectora entre círculos */
-.stepper::before {
-    content: '';
-    position: absolute;
-    top: 35px;
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    background: var(--border-color);
-    z-index: 0;
-}
-
-.step { 
-    flex: 1; 
-    text-align: center; 
-    font-size: 11px; 
-    font-weight: 700;
-    color: var(--muted-text); 
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-}
-
-.step.active { color: white; }
-
-.step .circle { 
-    width: 35px; 
-    height: 35px; 
-    line-height: 35px; 
-    margin-bottom: 8px;
-    border: 2px solid var(--border-color);
-    border-radius: 50%;
-    background: var(--bg-color); 
-    transition: all 0.3s ease;
-}
-
-.step.active .circle { 
-    background: var(--accent-color); 
-    border-color: var(--accent-color);
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(0, 51, 102, 0.5);
-}
-
-.step.completed .circle { 
-    background: var(--success-color); 
-    border-color: var(--success-color);
-    color: white;
-}
-        
-        /* Visibilidad de los pasos del formulario */
+        /* Estilos del formulario */
         .form-step { display: none; }
         .form-step.active { display: block; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -119,16 +76,12 @@
         .form-group { display: flex; flex-direction: column; margin-bottom: 5px; }
         .form-group.full-width { grid-column: span 2; }
         
-        /* Estilos de inputs */
         label { font-size: 13px; margin-bottom: 5px; color: var(--muted-text); font-weight: 500; }
         input, select, textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 9px; color: white; font-size: 14px; width: 100%; box-sizing: border-box;}
         .buttons-container { margin-top: 25px; display: flex; justify-content: space-between; }
         .btn { padding: 12px 25px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; }
         
-        /* Clase para ocultar elementos de forma forzada */
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -158,75 +111,53 @@
             <button class="btn-logout" onclick="cerrarSesion()">
                 <i class="material-icons" style="font-size: 14px;">exit_to_app</i> Salir
             </button>
-            <button type="button" onclick="generarExcelSolicitud()" class="btn_generar_excel">
-  <i class="material-icons">download</i> Descargar Excel
-</button>
+            <button type="button" id="btn_generar_excel" onclick="generarExcelSolicitud()" class="btn_generar_excel">
+                <i class="material-icons">download</i> Descargar Excel
+            </button>
         </div>
     </header>
- 
 
-<div class="container">
+    <div class="container">
         <div class="card">
             <div class="stepper">
-                <div class="step active" id="step1-tab">
-                    <div class="circle">1</div>Datos
-                </div>
-                <div class="step" id="step2-tab">
-                    <div class="circle">2</div>Trabajos
-                </div>
-                <div class="step" id="step3-tab">
-                    <div class="circle">3</div>Clasificación
-                </div>
-                <div class="step" id="step4-tab">
-                    <div class="circle">4</div>Aprobación
-                </div>
+                <div class="step active" id="step1-tab"><div class="circle">1</div>Datos</div>
+                <div class="step" id="step2-tab"><div class="circle">2</div>Trabajos</div>
+                <div class="step" id="step3-tab"><div class="circle">3</div>Clasificación</div>
+                <div class="step" id="step4-tab"><div class="circle">4</div>Aprobación</div>
             </div>
-
-            
 
             <form id="mainForm">
-           
-                   <div class="form-step active" id="step1">
-    <div class="form-grid">
-        <div class="form-group"><label>1. ID Solicitud</label><input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;"></div>
-        <div class="form-group"><label>2. Número de Despeje</label><input type="text" id="numero_despeje" placeholder="Ej: EEH-LCB-010"></div>
-        
-        <div class="form-group full-width">
-            <label>Tipo de Gestión</label>
-            <div class="toggle-group">
-                <button type="button" class="btn-toggle" id="btn-solicitud" onclick="seleccionarGestion('solicitud')">SOLICITUD</button>
-                <button type="button" class="btn-toggle" id="btn-apego" onclick="seleccionarGestion('apego')">APEGO</button>
-            </div>
-            <input type="hidden" id="solicitud" value=""><input type="hidden" id="apego" value="">
-        </div>
-        
-        <div class="form-group"><label>5. Fecha de Solicitud</label><input type="date" id="fecha_solicitud" class="date-input"></div>
-        <div class="form-group"><label>6. Subestación</label><input type="text" id="subestacion" readonly style="background: #2c3e50;"></div>
-        
-        <div class="form-group"><label>7. Circuito</label><select id="circuito" onchange="alCambiarCircuito()"><option value="">Cargando circuitos...</option></select></div>
-        <div class="form-group">
-            <label>8. Sección o Ramal</label>
-            <select id="seccion">
-                <option value="">Seleccione...</option><option value="RAMAL">RAMAL</option><option value="TRONCAL">TRONCAL</option>
-            </select>
-        </div>
-        
-        <div class="form-group"><label>9. Interruptor de Circuito</label><select id="interruptor_de_circuito" onchange="alCambiarEquipo()"><option value="">Seleccione Circuito...</option></select></div>
-        <div class="form-group"><label>10. Restaurador</label><select id="restaurador" onchange="alCambiarEquipo()"><option value="">Seleccione Circuito...</option></select></div>
-        
-        <div class="form-group full-width"><label>11. Otros Equipos</label><input type="text" id="otros_equipos"></div>
-        <div class="form-group full-width"><label>12. Ubicación del Equipo</label><input type="text" id="ubicacion_del_equipo"></div>
-        <div class="form-group full-width"><label>13. Ubicación del Trabajo</label><input type="text" id="ubicacion_del_trabajo"></div>
-        
-        <div class="form-group"><label>14. Fecha de Interrupción</label><input type="date" id="fecha_interrupcion" class="date-input" onchange="calcularDia()"></div>
-        <div class="form-group"><label>15. Día de la Semana</label><input type="text" id="dia_de_semana" readonly style="background: #2c3e50;"></div>
-        
-        <div class="form-group"><label>16. Hora de Inicio</label><input type="time" id="hora_inicio" onchange="calcularTiempo()"></div>
-        <div class="form-group"><label>17. Hora Final</label><input type="time" id="hora_final" onchange="calcularTiempo()"></div>
-        
-        <div class="form-group full-width"><label>18. Tiempo Necesario</label><input type="text" id="tiempo_necesario" readonly style="background: #2c3e50;"></div>
-    </div>
-</div>
+                <div class="form-step active" id="step1">
+                    <div class="form-grid">
+                        <div class="form-group"><label>1. ID Solicitud</label><input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;"></div>
+                        <div class="form-group"><label>2. Número de Despeje</label><input type="text" id="numero_despeje" placeholder="Ej: EEH-LCB-010"></div>
+                        <div class="form-group full-width">
+                            <label>Tipo de Gestión</label>
+                            <div class="toggle-group" style="display:flex; gap:10px;">
+                                <button type="button" class="btn-toggle" id="btn-solicitud" onclick="seleccionarGestion('solicitud')">SOLICITUD</button>
+                                <button type="button" class="btn-toggle" id="btn-apego" onclick="seleccionarGestion('apego')">APEGO</button>
+                            </div>
+                            <input type="hidden" id="solicitud" value=""><input type="hidden" id="apego" value="">
+                        </div>
+                        <div class="form-group"><label>5. Fecha de Solicitud</label><input type="date" id="fecha_solicitud" class="date-input"></div>
+                        <div class="form-group"><label>6. Subestación</label><input type="text" id="subestacion" readonly style="background: #2c3e50;"></div>
+                        <div class="form-group"><label>7. Circuito</label><select id="circuito" onchange="alCambiarCircuito()"><option value="">Cargando circuitos...</option></select></div>
+                        <div class="form-group">
+                            <label>8. Sección o Ramal</label>
+                            <select id="seccion"><option value="">Seleccione...</option><option value="RAMAL">RAMAL</option><option value="TRONCAL">TRONCAL</option></select>
+                        </div>
+                        <div class="form-group"><label>9. Interruptor de Circuito</label><select id="interruptor_de_circuito" onchange="alCambiarEquipo()"><option value="">Seleccione Circuito...</option></select></div>
+                        <div class="form-group"><label>10. Restaurador</label><select id="restaurador" onchange="alCambiarEquipo()"><option value="">Seleccione Circuito...</option></select></div>
+                        <div class="form-group full-width"><label>11. Otros Equipos</label><input type="text" id="otros_equipos"></div>
+                        <div class="form-group full-width"><label>12. Ubicación del Equipo</label><input type="text" id="ubicacion_del_equipo"></div>
+                        <div class="form-group full-width"><label>13. Ubicación del Trabajo</label><input type="text" id="ubicacion_del_trabajo"></div>
+                        <div class="form-group"><label>14. Fecha de Interrupción</label><input type="date" id="fecha_interrupcion" class="date-input" onchange="calcularDia()"></div>
+                        <div class="form-group"><label>15. Día de la Semana</label><input type="text" id="dia_de_semana" readonly style="background: #2c3e50;"></div>
+                        <div class="form-group"><label>16. Hora de Inicio</label><input type="time" id="hora_inicio" onchange="calcularTiempo()"></div>
+                        <div class="form-group"><label>17. Hora Final</label><input type="time" id="hora_final" onchange="calcularTiempo()"></div>
+                        <div class="form-group full-width"><label>18. Tiempo Necesario</label><input type="text" id="tiempo_necesario" readonly style="background: #2c3e50;"></div>
+                    </div>
+                </div>
 
                 <div class="form-step" id="step2">
                     <div class="form-grid">
@@ -275,28 +206,28 @@
                 <div class="buttons-container">
                     <button type="button" class="btn btn-prev" id="btnPrev" onclick="cambiar(-1)" style="visibility: hidden;">Atrás</button>
                     <button type="button" class="btn btn-next" id="btnNext" onclick="cambiar(1)">Siguiente</button>
-                    <button type="button" class="btn btn-submit" id="btnSubmit" onclick="guardarFormulario()">GUARDAR SOLICITUD</button>
+                    <button type="button" class="btn btn-submit" id="btnSubmit" onclick="guardarFormulario()" style="display:none;">GUARDAR SOLICITUD</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // Variables globales
+        // Variables globales para almacenar datos descargados de Google Sheets
         let baseCircuitos = [], baseEquipos = [], baseResponsables = [], baseIngenieros = [];
         const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
-        
         let currentStep = 1; 
         const totalSteps = 4;
 
-        // Iniciar página
+        // --- INICIALIZACIÓN ---
         window.onload = async function() {
             document.getElementById('lbl-usuario').innerText = usuarioSesion;
             document.getElementById('lbl-sector').innerText = sectorSesion;
             
             await descargarDatosGoogleSheets(); 
 
+            // Verificar si venimos a editar un registro
             const urlParams = new URLSearchParams(window.location.search);
             const idEdicion = urlParams.get('id');
             const modo = urlParams.get('modo');
@@ -310,14 +241,18 @@
             }
         };
 
-        // --- FUNCIONES DE NAVEGACIÓN Y UI ---
+        // Función para leer valores de forma segura (evita errores de nulos)
+        function getVal(id) {
+            const el = document.getElementById(id);
+            if (!el) { return ""; }
+            return el.value;
+        }
 
+        // --- NAVEGACIÓN ---
         function cambiar(paso) {
-            // Calcula nuevo paso
             let newStep = currentStep + paso;
             if (newStep < 1 || newStep > totalSteps) return;
 
-            // Ocultar actual
             document.getElementById('step' + currentStep).classList.remove('active');
             document.getElementById('step' + currentStep + '-tab').classList.remove('active');
             
@@ -327,12 +262,11 @@
                 document.getElementById('step' + newStep + '-tab').classList.remove('completed');
             }
 
-            // Mostrar nuevo
             currentStep = newStep;
             document.getElementById('step' + currentStep).classList.add('active');
             document.getElementById('step' + currentStep + '-tab').classList.add('active');
 
-            // Actualizar botones
+            // Control de botones
             document.getElementById('btnPrev').style.visibility = (currentStep === 1) ? 'hidden' : 'visible';
             if (currentStep === totalSteps) {
                 document.getElementById('btnNext').style.display = 'none';
@@ -344,13 +278,11 @@
         }
 
         function generarIDUnico() {
-            // Genera un ID estilo REQ-12345
             const id = Math.floor(Math.random() * 100000);
             document.getElementById('id_solicitud').value = "REQ-" + id;
         }
 
         function seleccionarGestion(tipo) {
-            // Maneja los botones de Solicitud vs Apego
             document.getElementById('btn-solicitud').classList.remove('active');
             document.getElementById('btn-apego').classList.remove('active');
             document.getElementById('solicitud').value = "";
@@ -365,140 +297,91 @@
             }
         }
 
-        // --- FUNCIONES DE CARGA Y AUTOCOMPLETADO ---
+        // --- CARGA DE DATOS ---
         async function cargarDatosEdicion(id) {
-    try {
-        document.getElementById('numero_despeje').placeholder = "Cargando datos...";
-        const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
-        const fila = await res.json(); 
+            try {
+                const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
+                const fila = await res.json(); 
 
-        console.log("Datos recibidos para editar:", fila);
+                if (fila && fila.length > 0 && !fila.error) {
+                    const setVal = (idHTML, valor) => {
+                        const el = document.getElementById(idHTML);
+                        if (el && valor !== undefined && valor !== null) {
+                            if (el.type === 'checkbox' || el.type === 'radio') { el.checked = (valor === 'X' || valor === true); } 
+                            else { el.value = valor; }
+                        }
+                    };
+                    const formatFecha = (iso) => (iso && iso.length >= 10 ? iso.substring(0, 10) : iso);
+                    const formatHora = (iso) => (iso && iso.includes('T') ? iso.split('T')[1].substring(0, 5) : iso);
 
-        if (fila && fila.length > 0 && !fila.error) {
-            
-            const setVal = (idHTML, valor) => {
-                const el = document.getElementById(idHTML);
-                if (el && valor !== undefined && valor !== null) {
-                    if (el.type === 'checkbox' || el.type === 'radio') {
-                        el.checked = (valor === 'X' || valor === true);
-                    } else {
-                        el.value = valor;
-                    }
+                    // Mapeo campo a campo
+                    setVal('id_solicitud', fila[0]); 
+                    setVal('numero_despeje', fila[1]);
+                    setVal('solicitud', fila[2]); 
+                    setVal('apego', fila[3]);     
+                    setVal('fecha_solicitud', formatFecha(fila[4])); 
+                    setVal('subestacion', fila[5]); 
+                    setVal('circuito', fila[6]); 
+                    if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
+                    setVal('seccion', fila[7]); 
+                    setVal('interruptor_de_circuito', fila[8]); 
+                    setVal('restaurador', fila[9]); 
+                    setVal('otros_equipos', fila[10]); 
+                    setVal('ubicacion_del_equipo', fila[11]); 
+                    setVal('ubicacion_del_trabajo', fila[12]); 
+                    setVal('fecha_interrupcion', formatFecha(fila[13])); 
+                    setVal('dia_de_semana', fila[14]); 
+                    setVal('hora_inicio', formatHora(fila[15])); 
+                    setVal('hora_final', formatHora(fila[16])); 
+                    setVal('tiempo_necesario', fila[17]); 
+                    setVal('trabajo_a_realizar', fila[18]); 
+                    setVal('responsable', fila[19]); 
+                    setVal('sustituto', fila[20]); 
+                    setVal('zonas_afectadas', fila[21]); 
+                    setVal('area_afectada', fila[22]); 
+                    setVal('nombre_despeje', fila[23]); 
+                    setVal('apegos_enlaces', fila[24]); 
+                    setVal('apego_despeje', fila[25]); 
+
+                    // Lógica para tipo de trabajo
+                    if (fila[26] === 'X') setVal('tipo_trabajo', 'PROGRAMADO');
+                    else if (fila[27] === 'X') setVal('tipo_trabajo', 'EMERGENCIA');
+                    else if (fila[28] === 'X') setVal('tipo_trabajo', 'MEDICION');
+                    else if (fila[29] === 'X') setVal('tipo_trabajo', 'PROYECTO');
+                    else if (fila[30] === 'X') setVal('tipo_trabajo', 'OTROS');
+
+                    // Forzar visibilidad post-carga
+                    setTimeout(() => {
+                        if (typeof manejarTipoTrabajo === "function") {
+                            manejarTipoTrabajo(document.getElementById('tipo_trabajo').value);
+                        }
+                    }, 100);
+
+                    setVal('odt_programada', fila[31]); 
+                    setVal('odt_emergencia', fila[32]); 
+                    setVal('odt_os', fila[33]); 
+                    setVal('codigo_proyecto', fila[34]); 
+                    setVal('odt_otros', fila[35]); 
+                    setVal('justificacion', fila[36]); 
+                    setVal('observaciones', fila[37]); 
+                    setVal('solicitado_por', fila[38]); 
+                    setVal('cargo_del_solicitante', fila[39]); 
+                    setVal('aprobado_por', fila[40]);
+
+                    setTimeout(dispararEventosAutocompletado, 500); 
                 }
-            };
-
-            const formatFecha = (isoString) => {
-                if (!isoString) return "";
-                return isoString.length >= 10 ? isoString.substring(0, 10) : isoString;
-            };
-
-            const formatHora = (isoString) => {
-                if (!isoString) return "";
-                if (isoString.includes('T')) return isoString.split('T')[1].substring(0, 5);
-                return isoString;
-            };
-
-            // ==========================================
-            // MAPEO EXACTO DE LOS 41+ CAMPOS 
-            // ==========================================
-            
-            // --- PASO 1 ---
-            setVal('id_solicitud', fila[0]); 
-            setVal('numero_despeje', fila[1]);
-            setVal('solicitud', fila[2]); 
-            setVal('apego', fila[3]);     
-            setVal('fecha_solicitud', formatFecha(fila[4])); 
-            
-            setVal('subestacion', fila[5]); 
-            setVal('circuito', fila[6]); 
-            
-            // Llenar equipos del circuito ANTES de asignar interruptor/restaurador
-            if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
-            
-            setVal('seccion', fila[7]); 
-            setVal('interruptor_de_circuito', fila[8]); 
-            setVal('restaurador', fila[9]); 
-            setVal('otros_equipos', fila[10]); 
-            setVal('ubicacion_del_equipo', fila[11]); 
-            setVal('ubicacion_del_trabajo', fila[12]); 
-            
-            setVal('fecha_interrupcion', formatFecha(fila[13])); 
-            setVal('dia_de_semana', fila[14]); 
-            setVal('hora_inicio', formatHora(fila[15])); 
-            setVal('hora_final', formatHora(fila[16])); 
-            setVal('tiempo_necesario', fila[17]); 
-            
-            // --- PASO 2 ---
-            setVal('trabajo_a_realizar', fila[18]); 
-            setVal('responsable', fila[19]); 
-            setVal('sustituto', fila[20]); 
-            setVal('zonas_afectadas', fila[21]); 
-            setVal('area_afectada', fila[22]); 
-            setVal('nombre_despeje', fila[23]); 
-            setVal('apegos_enlaces', fila[24]); 
-            setVal('apego_despeje', fila[25]); 
-
-            // --- PASO 3 (Lectura inteligente del Tipo de Trabajo) ---
-          // 1. Asignamos primero los valores al select de 'tipo_trabajo'
-if (fila[26] === 'X') setVal('tipo_trabajo', 'PROGRAMADO');
-else if (fila[27] === 'X') setVal('tipo_trabajo', 'EMERGENCIA');
-else if (fila[28] === 'X') setVal('tipo_trabajo', 'MEDICION');
-else if (fila[29] === 'X') setVal('tipo_trabajo','PROYECTO');
-else if (fila[30] === 'X') setVal('tipo_trabajo', 'OTROS');
-
-// 2. AHORA, después de asignar, disparamos la visibilidad.
-// Usamos un pequeño retraso (50ms) para asegurar que el navegador procesó el cambio en el SELECT
-setTimeout(() => {
-    if (typeof manejarTipoTrabajo === "function") {
-        const valorActual = document.getElementById('tipo_trabajo').value;
-        console.log("Forzando visibilidad para el tipo:", valorActual);
-        manejarTipoTrabajo(valorActual);
-    }
-}, 50);
-
-// 3. Cargamos el resto de los campos
-setVal('odt_programada', fila[31]); 
-setVal('odt_emergencia', fila[32]); 
-setVal('odt_os', fila[33]); 
-setVal('codigo_proyecto', fila[34]); 
-setVal('odt_otros', fila[35]); 
-
-// --- PASO 4 ---
-setVal('justificacion', fila[36]); 
-setVal('observaciones', fila[37]); 
-setVal('solicitado_por', fila[38]); 
-setVal('cargo_del_solicitante', fila[39]); 
-setVal('aprobado_por', fila[40]);
-
-            // Disparamos eventos gráficos finales (botones activos, cálculos extra)
-            setTimeout(dispararEventosAutocompletado, 500); 
-
-        } else {
-            alert("No se encontró la solicitud original.");
+            } catch (error) { console.error("Error:", error); }
         }
-    } catch (error) { 
-        console.error("Error cargando edición:", error); 
-        alert("Hubo un error cargando los datos.");
-    }
-}
 
+        // --- CÁLCULOS Y EVENTOS ---
         function dispararEventosAutocompletado() {
-            // 1. Guardamos en memoria los valores que acaba de cargar la base de datos
             const valInt = document.getElementById('interruptor_de_circuito').value;
             const valRes = document.getElementById('restaurador').value;
-
-            // 2. Disparamos la función del circuito
-            if (typeof alCambiarCircuito === "function") alCambiarCircuito();
-            
-            // 3. Restauramos los valores para que no se pierdan al regenerar la lista
+            if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
             if (valInt) document.getElementById('interruptor_de_circuito').value = valInt;
             if (valRes) document.getElementById('restaurador').value = valRes;
-
-            // 4. Disparamos el resto de eventos normales
             if (typeof calcularTiempo === "function") calcularTiempo();
             if (typeof calcularDia === "function") calcularDia();
-
-            // Activar botón de Solicitud/Apego visualmente si hay datos
             if(document.getElementById('solicitud').value === 'X') seleccionarGestion('solicitud');
             if(document.getElementById('apego').value === 'X') seleccionarGestion('apego');
         }
@@ -508,8 +391,7 @@ setVal('aprobado_por', fila[40]);
             if (fechaInput) {
                 const fecha = new Date(fechaInput + "T12:00:00"); 
                 const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
-                const campoDia = document.getElementById('dia_de_semana'); // ID Corregido
-                if (campoDia) campoDia.value = dias[fecha.getDay()];
+                document.getElementById('dia_de_semana').value = dias[fecha.getDay()];
             }
         }
 
@@ -517,7 +399,8 @@ setVal('aprobado_por', fila[40]);
             const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
             if (h1 && h2) {
                 const [hh1, mm1] = h1.split(':').map(Number), [hh2, mm2] = h2.split(':').map(Number);
-                let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); if (mins < 0) mins += 24 * 60; 
+                let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); 
+                if (mins < 0) mins += 24 * 60; 
                 document.getElementById('tiempo_necesario').value = `${Math.floor(mins / 60)} hrs ${mins % 60} min`;
             }
         }
@@ -530,7 +413,7 @@ setVal('aprobado_por', fila[40]);
                 baseResponsables = data.responsables; baseIngenieros = data.ingenieros;
                 poblarListaCircuitos();
                 poblarListasPersonal();
-            } catch(e) { console.error("Error cargando datos de Sheets", e); }
+            } catch(e) { console.error("Error:", e); }
         }
 
         function poblarListaCircuitos() {
@@ -548,6 +431,8 @@ setVal('aprobado_por', fila[40]);
         function poblarListasPersonal() {
             const sectorLimpio = sectorSesion.toString().trim().toUpperCase();
             const selResp = document.getElementById('responsable'), selSust = document.getElementById('sustituto');
+            const selSol = document.getElementById('solicitado_por'), selAprob = document.getElementById('aprobado_por');
+            
             for(let i=1; i<baseResponsables.length; i++){
                 let f = baseResponsables[i];
                 if(f[1] && f[1].toString().trim().toUpperCase() === sectorLimpio && f[0]){
@@ -555,7 +440,6 @@ setVal('aprobado_por', fila[40]);
                     selSust.innerHTML += `<option value="${f[0]}">${f[0]}</option>`;
                 }
             }
-            const selSol = document.getElementById('solicitado_por'), selAprob = document.getElementById('aprobado_por');
             for(let i=1; i<baseIngenieros.length; i++){
                 let f = baseIngenieros[i];
                 if(f[3] && f[3].toString().trim().toUpperCase() === sectorLimpio && f[0]){
@@ -596,180 +480,102 @@ setVal('aprobado_por', fila[40]);
             }
         }
 
-     function manejarTipoTrabajo(tipo) {
-    // Lista de todos los IDs
-    const campos = {
-        'PROGRAMADO': 'box_odt_programada',
-        'EMERGENCIA': 'box_odt_emergencia',
-        'MEDICION': 'box_odt_os',
-        'PROYECTO': 'box_codigo_proyecto',
-        'OTROS': 'box_odt_otros'
-    };
+        // Lógica para mostrar/ocultar campos ODT según el tipo de trabajo
+        function manejarTipoTrabajo(tipo) {
+            const campos = { 'PROGRAMADO': 'box_odt_programada', 'EMERGENCIA': 'box_odt_emergencia', 'MEDICION': 'box_odt_os', 'PROYECTO': 'box_codigo_proyecto', 'OTROS': 'box_odt_otros' };
+            Object.values(campos).forEach(id => { document.getElementById(id).classList.add('hidden'); });
+            if (campos[tipo]) { document.getElementById(campos[tipo]).classList.remove('hidden'); }
+        }
 
-    // 1. Ocultar todos
-    Object.values(campos).forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-    });
-
-    // 2. Mostrar solo el seleccionado
-    if (campos[tipo]) {
-        document.getElementById(campos[tipo]).classList.remove('hidden');
-    }
-}
         function alSeleccionarIngeniero(nombre) {
             document.getElementById('cargo_del_solicitante').value = "";
             const fila = baseIngenieros.find(f => f[0] && f[0].toString().trim() === nombre);
             if(fila) document.getElementById('cargo_del_solicitante').value = fila[1] || "";
         }
 
-        // --- FUNCIÓN DE ENVÍO ---
-
+        // --- ENVÍO DE DATOS ---
         async function guardarFormulario() {
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; 
-            btn.innerHTML = 'Enviando...';
-
+            btn.disabled = true; btn.innerHTML = 'Enviando...';
             const tipo = document.getElementById('tipo_trabajo').value;
-
+            
+            // Construcción del objeto JSON a enviar
             const payload = {
-                "ID_SOLICITUD": document.getElementById('id_solicitud').value,
-                "NUMERO_DESPEJE": document.getElementById('numero_despeje').value,
-                "SOLICITUD": document.getElementById('solicitud').value,
-                "APEGO": document.getElementById('apego').value,
-                "FECHA_SOLICITUD": document.getElementById('fecha_solicitud').value,
-                "SUBESTACION": document.getElementById('subestacion').value,
-                "CIRCUITO": document.getElementById('circuito').value,
-                "SECCION": document.getElementById('seccion').value,
-                "INTERRUPTOR_DE_CIRCUITO": document.getElementById('interruptor_de_circuito').value,
-                "RESTAURADOR": document.getElementById('restaurador').value,
-                "OTROS_EQUIPOS": document.getElementById('otros_equipos').value,
-                "UBICACION_DEL_EQUIPO": document.getElementById('ubicacion_del_equipo').value,
-                "UBICACION_DEL_TRABAJO": document.getElementById('ubicacion_del_trabajo').value,
-                "FECHA_INTERRUPCION": document.getElementById('fecha_interrupcion').value,
-                "DIA_DE_SEMANA": document.getElementById('dia_de_semana').value,
-                "HORA_INICIO": document.getElementById('hora_inicio').value,
-                "HORA_FINAL": document.getElementById('hora_final').value,
-                "TIEMPO_NECESARIO": document.getElementById('tiempo_necesario').value,
-                "TRABAJO_A_REALIZAR": document.getElementById('trabajo_a_realizar').value,
-                "RESPONSABLE": document.getElementById('responsable').value,
-                "SUSTITUTO": document.getElementById('sustituto').value,
-                "ZONAS_AFECTADAS": document.getElementById('zonas_afectadas').value,
-                "AREA_AFECTADA": document.getElementById('area_afectada').value,
-                "NOMBRE_DESPEJE": document.getElementById('nombre_despeje').value,
-                "APEGOS_ENLACES": document.getElementById('apegos_enlaces').value,
-                "APEGO_DESPEJE": document.getElementById('apego_despeje').value,
-                "MANTO_PROGRAMADO": tipo === 'PROGRAMADO' ? 'X' : '',
-                "MANTO_EMERGENCIA": tipo === 'EMERGENCIA' ? 'X' : '',
-                "MANTO_EQ_MEDICION": tipo === 'MEDICION' ? 'X' : '',
-                "PROYECTO_EXPANSION": tipo === 'PROYECTO' ? 'X' : '',
-                "MANTO_OTROS": tipo === 'OTROS' ? 'X' : '',
-                "ODT_PROGRAMADA": document.getElementById('odt_programada').value,
-                "ODT_EMERGENCIA": document.getElementById('odt_emergencia').value,
-                "ODT_OS": document.getElementById('odt_os').value,
-                "CODIGO_PROYECTO": document.getElementById('codigo_proyecto').value,
-                "ODT_OTROS": document.getElementById('odt_otros').value,
-                "JUSTIFICACION": document.getElementById('justificacion').value,
-                "OBSERVACIONES": document.getElementById('observaciones').value,
-                "SOLICITADO_POR": document.getElementById('solicitado_por').value,
-                "CARGO_DEL_SOLICITANTE": document.getElementById('cargo_del_solicitante').value,
-                "APROBADO_POR": document.getElementById('aprobado_por').value,
-                "SECTOR": sectorSesion,
-                "USUARIO": usuarioSesion
+                "ID_SOLICITUD": document.getElementById('id_solicitud').value, "NUMERO_DESPEJE": document.getElementById('numero_despeje').value,
+                "SOLICITUD": document.getElementById('solicitud').value, "APEGO": document.getElementById('apego').value,
+                "FECHA_SOLICITUD": document.getElementById('fecha_solicitud').value, "SUBESTACION": document.getElementById('subestacion').value,
+                "CIRCUITO": document.getElementById('circuito').value, "SECCION": document.getElementById('seccion').value,
+                "INTERRUPTOR_DE_CIRCUITO": document.getElementById('interruptor_de_circuito').value, "RESTAURADOR": document.getElementById('restaurador').value,
+                "OTROS_EQUIPOS": document.getElementById('otros_equipos').value, "UBICACION_DEL_EQUIPO": document.getElementById('ubicacion_del_equipo').value,
+                "UBICACION_DEL_TRABAJO": document.getElementById('ubicacion_del_trabajo').value, "FECHA_INTERRUPCION": document.getElementById('fecha_interrupcion').value,
+                "DIA_DE_SEMANA": document.getElementById('dia_de_semana').value, "HORA_INICIO": document.getElementById('hora_inicio').value,
+                "HORA_FINAL": document.getElementById('hora_final').value, "TIEMPO_NECESARIO": document.getElementById('tiempo_necesario').value,
+                "TRABAJO_A_REALIZAR": document.getElementById('trabajo_a_realizar').value, "RESPONSABLE": document.getElementById('responsable').value,
+                "SUSTITUTO": document.getElementById('sustituto').value, "ZONAS_AFECTADAS": document.getElementById('zonas_afectadas').value,
+                "AREA_AFECTADA": document.getElementById('area_afectada').value, "NOMBRE_DESPEJE": document.getElementById('nombre_despeje').value,
+                "APEGOS_ENLACES": document.getElementById('apegos_enlaces').value, "APEGO_DESPEJE": document.getElementById('apego_despeje').value,
+                "MANTO_PROGRAMADO": tipo === 'PROGRAMADO' ? 'X' : '', "MANTO_EMERGENCIA": tipo === 'EMERGENCIA' ? 'X' : '',
+                "MANTO_EQ_MEDICION": tipo === 'MEDICION' ? 'X' : '', "PROYECTO_EXPANSION": tipo === 'PROYECTO' ? 'X' : '',
+                "MANTO_OTROS": tipo === 'OTROS' ? 'X' : '', "ODT_PROGRAMADA": document.getElementById('odt_programada').value,
+                "ODT_EMERGENCIA": document.getElementById('odt_emergencia').value, "ODT_OS": document.getElementById('odt_os').value,
+                "CODIGO_PROYECTO": document.getElementById('codigo_proyecto').value, "ODT_OTROS": document.getElementById('odt_otros').value,
+                "JUSTIFICACION": document.getElementById('justificacion').value, "OBSERVACIONES": document.getElementById('observaciones').value,
+                "SOLICITADO_POR": document.getElementById('solicitado_por').value, "CARGO_DEL_SOLICITANTE": document.getElementById('cargo_del_solicitante').value,
+                "APROBADO_POR": document.getElementById('aprobado_por').value, "SECTOR": sectorSesion, "USUARIO": usuarioSesion
             };
-
             try {
                 await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("¡Solicitud registrada con éxito!");
-                window.location.reload(); 
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Ocurrió un error al enviar. Revisa tu conexión.");
-            } finally {
-                btn.disabled = false; 
-                btn.innerHTML = 'GUARDAR SOLICITUD';
-            }
+                alert("¡Solicitud registrada con éxito!"); window.location.reload();
+            } catch (error) { alert("Ocurrió un error al enviar."); } 
+            finally { btn.disabled = false; btn.innerHTML = 'GUARDAR SOLICITUD'; }
         }
-        function getVal(id) {
-    const el = document.getElementById(id);
-    if (!el) {
-        console.warn(`⚠️ Atención: El elemento con ID "${id}" no existe en el DOM.`);
-        return ""; // Devuelve vacío en lugar de romper el código
-    }
-    return el.value;
-}
-                async function generarExcelSolicitud() {
-async function generarExcelSolicitud() {
-    const btn = document.getElementById('btn_generar_excel');
-    if(btn) {
-        btn.disabled = true;
-        btn.innerHTML = 'Generando...';
-    }
 
-    // Usamos getVal para evitar el error de 'null'
-    const datos = {
-        id_solicitud: getVal('id_solicitud'),
-        numero_despeje: getVal('numero_despeje'),
-        solicitud: getVal('solicitud'),
-        apego: getVal('apego'),
-        fecha_solicitud: getVal('fecha_solicitud'),
-        subestacion: getVal('subestacion'),
-        circuito: getVal('circuito'),
-        seccion: getVal('seccion'),
-        interruptor_de_circuito: getVal('interruptor_de_circuito'),
-        restaurador: getVal('restaurador'),
-        otros_equipos: getVal('otros_equipos'),
-        ubicacion_del_equipo: getVal('ubicacion_del_equipo'),
-        ubicacion_del_trabajo: getVal('ubicacion_del_trabajo'),
-        fecha_interrupcion: getVal('fecha_interrupcion'),
-        dia_de_semana: getVal('dia_de_semana'),
-        hora_inicio: getVal('hora_inicio'),
-        hora_final: getVal('hora_final'),
-        tiempo_necesario: getVal('tiempo_necesario'),
-        trabajo_a_realizar: getVal('trabajo_a_realizar'),
-        responsable: getVal('responsable'),
-        sustituto: getVal('sustituto'),
-        zonas_afectadas: getVal('zonas_afectadas'),
-        area_afectada: getVal('area_afectada'),
-        nombre_despeje: getVal('nombre_despeje'),
-        apegos_enlaces: getVal('apegos_enlaces'),
-        apego_despeje: getVal('apego_despeje'),
-        manto_programado: getVal('manto_programado'),
-        manto_emergencia: getVal('manto_emergencia'),
-        manto_eq_medicion: getVal('manto_eq_medicion'),
-        proyecto_expansion: getVal('proyecto_expansion'),
-        manto_otros: getVal('manto_otros'),
-        odt_programada: getVal('odt_programada'),
-        odt_emergencia: getVal('odt_emergencia'),
-        odt_os: getVal('odt_os'),
-        codigo_proyecto: getVal('codigo_proyecto'),
-        odt_otros: getVal('odt_otros'),
-        justificacion: getVal('justificacion'),
-        observaciones: getVal('observaciones'),
-        solicitado_por: getVal('solicitado_por'),
-        cargo_del_solicitante: getVal('cargo_del_solicitante'),
-        aprobado_por: getVal('aprobado_por'),
-        sector: getVal('sector'),
-        usuario: getVal('usuario')
-    };
+        // --- EXCEL ---
+        async function generarExcelSolicitud() {
+            const btn = document.getElementById('btn_generar_excel');
+            if(btn) { btn.disabled = true; btn.innerHTML = 'Generando...'; }
+            
+            // Recolección de datos usando la función de seguridad getVal
+            const datos = {
+                id_solicitud: getVal('id_solicitud'), numero_despeje: getVal('numero_despeje'),
+                solicitud: getVal('solicitud'), apego: getVal('apego'),
+                fecha_solicitud: getVal('fecha_solicitud'), subestacion: getVal('subestacion'),
+                circuito: getVal('circuito'), seccion: getVal('seccion'),
+                interruptor_de_circuito: getVal('interruptor_de_circuito'), restaurador: getVal('restaurador'),
+                otros_equipos: getVal('otros_equipos'), ubicacion_del_equipo: getVal('ubicacion_del_equipo'),
+                ubicacion_del_trabajo: getVal('ubicacion_del_trabajo'), fecha_interrupcion: getVal('fecha_interrupcion'),
+                dia_de_semana: getVal('dia_de_semana'), hora_inicio: getVal('hora_inicio'),
+                hora_final: getVal('hora_final'), tiempo_necesario: getVal('tiempo_necesario'),
+                trabajo_a_realizar: getVal('trabajo_a_realizar'), responsable: getVal('responsable'),
+                sustituto: getVal('sustituto'), zonas_afectadas: getVal('zonas_afectadas'),
+                area_afectada: getVal('area_afectada'), nombre_despeje: getVal('nombre_despeje'),
+                apegos_enlaces: getVal('apegos_enlaces'), apego_despeje: getVal('apego_despeje'),
+                manto_programado: document.getElementById('tipo_trabajo').value === 'PROGRAMADO' ? 'X' : '',
+                manto_emergencia: document.getElementById('tipo_trabajo').value === 'EMERGENCIA' ? 'X' : '',
+                manto_eq_medicion: document.getElementById('tipo_trabajo').value === 'MEDICION' ? 'X' : '',
+                proyecto_expansion: document.getElementById('tipo_trabajo').value === 'PROYECTO' ? 'X' : '',
+                manto_otros: document.getElementById('tipo_trabajo').value === 'OTROS' ? 'X' : '',
+                odt_programada: getVal('odt_programada'), odt_emergencia: getVal('odt_emergencia'),
+                odt_os: getVal('odt_os'), codigo_proyecto: getVal('codigo_proyecto'),
+                odt_otros: getVal('odt_otros'), justificacion: getVal('justificacion'),
+                observaciones: getVal('observaciones'), solicitado_por: getVal('solicitado_por'),
+                cargo_del_solicitante: getVal('cargo_del_solicitante'), aprobado_por: getVal('aprobado_por'),
+                sector: sectorSesion, usuario: usuarioSesion
+            };
+            
+            // Llamada al script del servidor para procesar el Excel
+            google.script.run
+                .withSuccessHandler(function(url) {
+                    window.open(url, '_blank');
+                    if(btn) { btn.disabled = false; btn.innerHTML = '<i class="material-icons">download</i> Descargar Excel'; }
+                })
+                .withFailureHandler(function(err) {
+                    alert("Error al generar: " + err);
+                    if(btn) { btn.disabled = false; btn.innerHTML = '<i class="material-icons">download</i> Descargar Excel'; }
+                })
+                .generarDocumentoExcel(datos);
+        }
 
-    // 3. Llamada al servidor (Código.gs)
-    google.script.run
-        .withSuccessHandler(function(url) {
-            window.open(url, '_blank');
-            if(btn) {
-                btn.disabled = false;
-                btn.innerHTML = 'Descargar Excel';
-            }
-        })
-        .withFailureHandler(function(err) {
-            alert("Error al generar el documento: " + err);
-            if(btn) {
-                btn.disabled = false;
-                btn.innerHTML = 'Descargar Excel';
-            }
-        })
-        .generarDocumentoExcel(datos);
-}
         function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
 </body>
