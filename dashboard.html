@@ -395,10 +395,11 @@
                         </button>
                     </td>
                     <td class="archivos-td" style="text-align: center;">
-                        <button class="btn-accion btn-descargar" onclick='descargarExcelDashboard(this, ${JSON.stringify(solicitud)})' title="Descargar Excel">
+                         <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')" title="Descargar Excel">
                          <i class="fas fa-file-excel"></i> Excel
                     </button>
                     </td>
+                   
                 `;
                 tbody.appendChild(tr);
             });
