@@ -9,7 +9,7 @@
     <script>
         const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
     </script>
-    <style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         :root {
             --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
             --success-color: #27ae60; --text-color: #ffffff; --muted-text: #a0aec0;
@@ -156,6 +156,9 @@
             <button class="btn-logout" onclick="cerrarSesion()">
                 <i class="material-icons" style="font-size: 14px;">exit_to_app</i> Salir
             </button>
+            <button type="button" onclick="generarExcelSolicitud()" class="btn-descargar">
+  <i class="material-icons">download</i> Descargar Excel
+</button>
         </div>
     </header>
  
