@@ -181,11 +181,13 @@
 
     <header>
         <div class="logo-box" style="background: white; padding: 5px; border-radius:4px;">
-            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
+            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo"><h2 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: bold;">
+        MENÚ PRINCIPAL, MIS SOLICITUDES DE DESPEJES
+    </h2>
         </div>
         <div class="user-info">
             <span id="nombre-usuario"><i class="fas fa-user-circle"></i> Cargando...</span>
-            <button class="btn-logout" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            <button class="btn-logout" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesion</button>
         </div>
     </header>
 
@@ -235,6 +237,7 @@
                         <th>Circuito</th>
                         <th>Nombre del Despeje</th>
                         <th>Acciones</th>
+                        <th>Archivos</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
@@ -390,9 +393,11 @@
                         <button class="btn-accion btn-retornar" title="Maniobras a Retornar" onclick="abrirAccion('retornar', '${fila.id}')">
                             <i class="fas fa-arrow-circle-up"></i> M. Retornar
                         </button>
-                        <button class="btn-accion btn-descargar" title="Descargar Excel" onclick="descargarExcelDashboard(this, '${fila.id}')">
-                            <i class="fas fa-file-excel"></i> Excel
-                        </button>
+                    </td>
+                    <td class="archivos-td" style="text-align: center;">
+                        <button class="btn-accion btn-descargar" onclick='descargarExcelDashboard(this, ${JSON.stringify(solicitud)})' title="Descargar Excel">
+                         <i class="fas fa-file-excel"></i> Excel
+                    </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
