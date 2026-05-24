@@ -440,22 +440,15 @@ async function descargarExcelDashboard(boton, filaData) {
     boton.disabled = true;
     boton.innerHTML = 'Generando...';
 
-    // --- BLOQUE DE LIMPIEZA DE DATOS (SOLUCIÓN) ---
-    // Creamos un objeto limpio donde todo lo que sea nulo o indefinido se vuelve ""
-    const filaDataLimpia = {};
-    for (let key in filaData) {
-        let valor = filaData[key];
-        // Si el valor es null o undefined, lo convertimos en cadena vacía
-        filaDataLimpia[key] = (valor === undefined || valor === null) ? "" : valor;
-    }
-    // ----------------------------------------------
+    // Llamamos a la función centralizada en config.js
+    const datosListos = normalizarDatos(filaData);
 
     try {
-        // 2. Enviar los datos LIMPPIOS al servidor
+        // 2. Enviar los datos ya normalizados
         const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify(filaDataLimpia) // <--- USAMOS EL OBJETO LIMPIO
+            body: JSON.stringify(datosListos)
         });
 
         const res = await response.json();
@@ -478,10 +471,11 @@ async function descargarExcelDashboard(boton, filaData) {
         boton.innerHTML = textoOriginal;
     }
 }
-        function cerrarSesion() {
-            sessionStorage.clear();
-            window.location.href = "index.html";
-        }
+
+function cerrarSesion() {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+}
 
     </script>
 </body>
