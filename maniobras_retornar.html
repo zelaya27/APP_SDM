@@ -99,7 +99,6 @@
             <button type="submit" id="btn-guardar" class="btn-submit"><i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETORNAR</button>
         </form>
     </div>
-
     <script>
         const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
@@ -111,6 +110,8 @@
         if (idSol) {
             document.getElementById('id_solicitud').value = idSol;
             document.getElementById('usuario_info').value = usuarioSesion + " (" + sectorSesion + ")";
+            // Llamamos a la función para cargar los datos en cuanto detectamos el ID
+            cargarManiobrasExistentes();
         } else {
             alert("Error: No se detectó un ID de solicitud válido.");
             window.location.href = "dashboard.html";
@@ -118,16 +119,53 @@
 
         let contadorFilas = 1;
 
+        // --- 1. FUNCIÓN PARA CARGAR MANIOBRAS PREVIAS DESDE GOOGLE SHEETS ---
+        async function cargarManiobrasExistentes() {
+            try {
+                // Hacemos un GET al endpoint que configuramos en el backend
+                const urlConsulta = `${URL_APPS_SCRIPT}?action=getManiobras&id=${idSol}&tipo=retornar`;
+                const response = await fetch(urlConsulta);
+                const maniobras = await response.json();
+
+                if (maniobras && maniobras.length > 0) {
+                    const tbody = document.getElementById('tabla-body');
+                    tbody.innerHTML = ""; // Limpiamos la fila en blanco predeterminada
+                    
+                    // Actualizamos el contador a la cantidad de filas que vienen de la base
+                    contadorFilas = maniobras.length;
+
+                    maniobras.forEach(m => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><input type="number" class="m-sec" value="${m.secuencia}" required></td>
+                            <td><input type="text" class="m-man" value="${m.maniobra}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
+                            <td><input type="text" class="m-equ" value="${m.equipo}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()"></td>
+                            <td><input type="text" class="m-dir" value="${m.direccion}" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
+                            <td><input type="text" class="m-ope" value="${m.operacion_a_ejecutar}" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
+                            <td><input type="text" class="m-per" value="${m.personal_que_ejecutara}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+                            <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion}" required></td>
+                            <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                console.error("Error al cargar maniobras:", error);
+                // Si falla o no hay datos, se queda la fila original en blanco
+            }
+        }
+
+        // --- 2. FUNCIÓN PARA AGREGAR NUEVAS FILAS ---
         function agregarFila() {
             contadorFilas++;
             const tbody = document.getElementById('tabla-body');
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><input type="number" class="m-sec" value="${contadorFilas}" required></td>
-                <td><input type="text" class="m-man" placeholder="Ej. COLOCAR" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="text" class="m-man" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
                 <td><input type="text" class="m-equ" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()"></td>
                 <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-ope" placeholder="Ej. COLOCAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="text" class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
                 <td><input type="text" class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
                 <td><input type="time" class="m-hor" required></td>
                 <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
@@ -135,6 +173,7 @@
             tbody.appendChild(tr);
         }
 
+        // --- 3. FUNCIÓN PARA ELIMINAR FILAS ---
         function eliminarFila(btn) {
             const fila = btn.closest('tr');
             if(document.querySelectorAll('#tabla-body tr').length > 1) {
@@ -144,6 +183,7 @@
             }
         }
 
+        // --- 4. FUNCIÓN PARA GUARDAR EN LA HOJA DE CÁLCULO ---
         async function guardarManiobras(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-guardar');
@@ -166,7 +206,7 @@
             });
 
             const payload = {
-                action: "guardarRetornarMulti", 
+                action: "guardarRetornarMulti", // Acción de tu doPost
                 id_solicitud: idSol,
                 sector: sectorSesion,
                 usuario: usuarioSesion,
@@ -174,15 +214,32 @@
             };
 
             try {
-                await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("¡Secuencia de Maniobras a RETORNAR registrada con éxito!");
-                window.location.href = "dashboard.html";
+                // Importante: usamos 'cors' para leer la respuesta del servidor
+                const response = await fetch(URL_APPS_SCRIPT, { 
+                    method: 'POST', 
+                    mode: 'cors', 
+                    body: JSON.stringify(payload) 
+                });
+                
+                const resultadoTexto = await response.text();
+
+                if(resultadoTexto.includes("ÉXITO")) {
+                    alert("¡Secuencia de Maniobras a RETIRAR registrada y/o actualizada con éxito!");
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert("Error devuelto por el servidor: " + resultadoTexto);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETIRAR';
+                }
+
             } catch (error) {
-                alert("Ocurrió un error al guardar.");
+                console.error("Fallo la conexión:", error);
+                alert("Ocurrió un error de comunicación al guardar.");
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETORNAR';
+                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETIRAR';
             }
         }
     </script>
+  
 </body>
 </html>
