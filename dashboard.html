@@ -157,24 +157,38 @@
         tr:hover { background-color: #1a2a3a; }
 
         /* BOTONES DE ACCIÓN EN TABLA */
-        .acciones-td { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn-accion {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: white;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.2s;
-        }
-        .btn-form { background: var(--info-color); }
-        .btn-retirar { background: var(--success-color); }
-        .btn-retornar { background: var(--danger-color); }
-        .btn-descargar { background: #107c41; } /* Verde estilo Excel */
-        .btn-accion:hover { opacity: 0.8; }
+       /* Contenedor de botones en la celda */
+.acciones-td { 
+    display: flex; 
+    gap: 4px; 
+    flex-wrap: nowrap; /* Evita que se bajen a la siguiente fila */
+    width: 100%;
+    min-width: 220px; /* Aumenta este valor si necesitas que la columna sea más ancha */
+}
+
+/* Botones uniformes */
+.btn-accion {
+    flex: 1; /* Hace que todos los botones ocupen el mismo ancho */
+    padding: 6px 4px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-size: 11px; /* Ligeramente más pequeño para que quepa bien el texto */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centra el texto */
+    gap: 5px;
+    transition: 0.2s;
+    white-space: nowrap; /* Evita que el texto del botón se rompa en dos líneas */
+}
+
+/* Colores */
+.btn-form { background: var(--info-color); }
+.btn-retirar { background: var(--success-color); }
+.btn-retornar { background: var(--danger-color); }
+.btn-descargar { background: #107c41; }
+.btn-accion:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
