@@ -264,43 +264,76 @@
             return `${dia}/${mes}/${anio}`;
         }
        
-      // CARGAR CATÁLOGO DE CIRCUITOS DEL SECTOR (Ajustado a B y G)
-        async function inicializarFiltroCircuitos() {
-            try {
-                const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
-                const catalogos = await response.json();
+      // CARGAR CATÁLOGO DE CIRCUITOS DEL SECTOR
+       async function inicializarFiltroCircuitos() {
+    // 1. Verificación inicial de seguridad
+    const selectCircuito = document.getElementById('filtroCircuito');
+    if (!selectCircuito) {
+        console.error("ERROR: No se encontró el elemento <select id='filtroCircuito'> en el DOM.");
+        return;
+    }
 
-                if (catalogos && catalogos.circuitos) {
-                    const selectCircuito = document.getElementById('filtroCircuito');
-                    
-                    // Saltamos la fila 0 (encabezados)
-                    const datos = catalogos.circuitos.slice(1);
-                    
-                    // Limpiamos y filtramos
-                    // fila[1] = Columna B (Sector)
-                    // fila[6] = Columna G (Circuito)
-                    const circuitosDelSector = datos.filter(fila => {
-                        let sectorHoja = fila[1] ? fila[1].toString().trim().toUpperCase() : "";
-                        let miSector = sectorSesion ? sectorSesion.toString().trim().toUpperCase() : "";
-                        return sectorHoja === miSector;
-                    });
-
-                    // Agregamos al select solo los valores de la columna G
-                    circuitosDelSector.forEach(fila => {
-                        let nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
-                        
-                        if (nombreCircuito !== "") {
-                            const opt = document.createElement('option');
-                            opt.value = nombreCircuito;
-                            opt.textContent = nombreCircuito;
-                            selectCircuito.appendChild(opt);
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error("Error al cargar los circuitos:", error);
-            }
+    try {
+        console.log("Iniciando carga de circuitos...");
+        
+        // 2. Obtener sector de forma segura
+        const sectorSesion = sessionStorage.getItem("sector");
+        if (!sectorSesion) {
+            console.warn("ADVERTENCIA: sectorSesion está vacío. Revisa si el login funcionó.");
         }
+
+        const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const catalogos = await response.json();
+        console.log("Datos recibidos del servidor:", catalogos);
+
+        if (catalogos && catalogos.circuitos) {
+            // Limpiamos el select antes de llenarlo (para evitar duplicados)
+            selectCircuito.innerHTML = '<option value="">Seleccione un circuito</option>';
+            
+            // Saltamos la fila 0 (encabezados)
+            const datos = catalogos.circuitos.slice(1);
+            
+            // 3. Filtrado con log de depuración
+            const miSector = sectorSesion ? sectorSesion.toString().trim().toUpperCase() : "";
+            
+            const circuitosDelSector = datos.filter(fila => {
+                let sectorHoja = fila[1] ? fila[1].toString().trim().toUpperCase() : "";
+                // Log para comparar qué está comparando exactamente
+                // console.log(`Comparando Fila [${fila[1]}] con Sector Sesión [${miSector}]`);
+                return sectorHoja === miSector;
+            });
+
+            if (circuitosDelSector.length === 0) {
+                console.warn("No se encontraron circuitos para el sector:", miSector);
+            }
+
+            // 4. Llenar el select
+            circuitosDelSector.forEach(fila => {
+                let nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
+                
+                if (nombreCircuito !== "") {
+                    const opt = document.createElement('option');
+                    opt.value = nombreCircuito;
+                    opt.textContent = nombreCircuito;
+                    selectCircuito.appendChild(opt);
+                }
+            });
+            console.log("Circuitos cargados exitosamente.");
+        } else {
+            console.error("La estructura de 'catalogos' no es la esperada o no tiene 'circuitos'.");
+        }
+    } catch (error) {
+        console.error("Error crítico al cargar los circuitos:", error);
+        alert("Error al cargar la lista de circuitos. Revisa la consola (F12).");
+    }
+}
+
+// Asegúrate de llamar a esta función cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarFiltroCircuitos();
+});
 
         // CARGAR SOLICITUDES DESDE APPS SCRIPT
         async function cargarSolicitudes() {
