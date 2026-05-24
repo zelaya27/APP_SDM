@@ -6,9 +6,21 @@
     <title>Panel Principal - Solicitudes de Despeje</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="config.js"></script>
-    <script>
-        const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-    </script>
+<script>
+    const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
+
+    // --- AGREGA ESTO AQUÍ SI config.js FALLA AL CARGAR ---
+    function normalizarDatos(datos) {
+        if (!datos) return {};
+        const limpios = {};
+        for (let key in datos) {
+            const valor = datos[key];
+            limpios[key] = (valor === undefined || valor === null) ? "" : valor;
+        }
+        return limpios;
+    }
+    // ----------------------------------------------------
+</script>
     <style>
         :root {
             --bg-color: #0b141d; 
