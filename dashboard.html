@@ -434,23 +434,28 @@
                 window.location.href = `maniobras_retornar.html?id=${idSolicitud}`;
             }
         }
-
-        function cerrarSesion() {
-            sessionStorage.clear();
-            window.location.href = "index.html";
-        }
-        async function descargarExcelDashboard(boton, filaData) {
+async function descargarExcelDashboard(boton, filaData) {
     // 1. Cambiar estado visual del botón
     const textoOriginal = boton.innerHTML;
     boton.disabled = true;
     boton.innerHTML = 'Generando...';
 
+    // --- BLOQUE DE LIMPIEZA DE DATOS (SOLUCIÓN) ---
+    // Creamos un objeto limpio donde todo lo que sea nulo o indefinido se vuelve ""
+    const filaDataLimpia = {};
+    for (let key in filaData) {
+        let valor = filaData[key];
+        // Si el valor es null o undefined, lo convertimos en cadena vacía
+        filaDataLimpia[key] = (valor === undefined || valor === null) ? "" : valor;
+    }
+    // ----------------------------------------------
+
     try {
-        // 2. Enviar los datos recibidos (asegúrate de que filaData contenga todas las claves necesarias)
+        // 2. Enviar los datos LIMPPIOS al servidor
         const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify(filaData) 
+            body: JSON.stringify(filaDataLimpia) // <--- USAMOS EL OBJETO LIMPIO
         });
 
         const res = await response.json();
@@ -473,6 +478,11 @@
         boton.innerHTML = textoOriginal;
     }
 }
+        function cerrarSesion() {
+            sessionStorage.clear();
+            window.location.href = "index.html";
+        }
+
     </script>
 </body>
 </html>
