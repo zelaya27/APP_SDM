@@ -206,8 +206,12 @@
                 });
             });
 
+            // Recuerda que en maniobras_retornar.html la acción debe ser "guardarRetornarMulti"
+            const esRetirar = window.location.pathname.includes('retirar');
+            const accionMapeada = esRetirar ? "guardarRetirarMulti" : "guardarRetornarMulti";
+
             const payload = {
-                action: "guardarRetirarMulti", // Acción de tu doPost
+                action: accionMapeada, 
                 id_solicitud: idSol,
                 sector: sectorSesion,
                 usuario: usuarioSesion,
@@ -215,29 +219,29 @@
             };
 
             try {
-                // Importante: usamos 'cors' para leer la respuesta del servidor
                 const response = await fetch(URL_APPS_SCRIPT, { 
                     method: 'POST', 
                     mode: 'cors', 
                     body: JSON.stringify(payload) 
                 });
                 
-                const resultadoTexto = await response.text();
+                // CORREGIDO: Leemos la respuesta como JSON en lugar de texto plano
+                const res = await response.json();
 
-                if(resultadoTexto.includes("ÉXITO")) {
-                    alert("¡Secuencia de Maniobras a RETIRAR registrada y/o actualizada con éxito!");
+                if(res.status === "ÉXITO") {
+                    alert("¡Secuencia de Maniobras guardada y/o actualizada con éxito!");
                     window.location.href = "dashboard.html";
                 } else {
-                    alert("Error devuelto por el servidor: " + resultadoTexto);
+                    alert("Error devuelto por el servidor: " + (res.message || "No se pudo procesar."));
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETIRAR';
+                    btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA';
                 }
 
             } catch (error) {
                 console.error("Fallo la conexión:", error);
-                alert("Ocurrió un error de comunicación al guardar.");
+                alert("Ocurrió un error de comunicación al guardar. Revisa la consola del navegador.");
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETIRAR';
+                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA';
             }
         }
     </script>
