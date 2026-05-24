@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="config.js"></script>
     <script>
-        // En lugar de escribir la URL larga, usamos la variable del archivo config
         const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
     </script>
     <style>
@@ -54,26 +53,57 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
+        /* NUEVO DISEÑO DEL PANEL DE FILTROS */
         .header-panel {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
+            gap: 15px;
+            flex-wrap: wrap; /* Permite que los filtros bajen de línea en pantallas pequeñas */
             margin-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
         }
 
+        .filtros-grupo {
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: white;
+        }
+
+        .filtros-grupo label {
+            margin: 0; 
+            font-weight: 600; 
+            font-size: 13px; 
+            color: var(--muted-text);
+        }
+
+        .input-filtro {
+            padding: 6px 10px; 
+            border-radius: 5px; 
+            background: var(--bg-color); 
+            color: white; 
+            border: 1px solid var(--border-color); 
+            cursor: pointer; 
+            font-size: 13px;
+            outline: none;
+            color-scheme: dark; /* Hace que el calendario nativo sea oscuro */
+        }
+
         .btn-nueva {
             background: var(--success-color);
             color: white;
-            padding: 10px 20px;
+            padding: 8px 15px;
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
+            font-size: 13px;
             display: flex;
             align-items: center;
             gap: 8px;
             transition: 0.3s;
+            margin: 0;
         }
         .btn-nueva:hover { background: #219653; }
 
@@ -127,11 +157,11 @@
     </header>
 
    <div class="container">
-        <div class="header-panel" style="display: flex; justify-content: flex-end; align-items: center; gap: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
+        <div class="header-panel">
             
-            <div style="display: flex; align-items: center; gap: 10px; color: white;">
-                <label for="limitSelector" style="margin: 0; font-weight: 600; font-size: 14px;">Mostrar registros:</label>
-                <select id="limitSelector" onchange="renderizarTabla()" style="padding: 8px 12px; border-radius: 5px; background: var(--card-color); color: white; border: 1px solid #ccc; cursor: pointer; outline: none;">
+            <div class="filtros-grupo">
+                <label for="limitSelector">Mostrar:</label>
+                <select id="limitSelector" class="input-filtro" onchange="renderizarTabla()">
                     <option value="10" selected>Últimos 10</option>
                     <option value="20">Últimos 20</option>
                     <option value="30">Últimos 30</option>
@@ -139,11 +169,24 @@
                 </select>
             </div>
 
-            <a href="app.html" class="btn-nueva" style="margin: 0;"><i class="fas fa-plus"></i> Nueva Solicitud</a>
+            <div class="filtros-grupo">
+                <label for="filtroCircuito"><i class="fas fa-bolt" style="color: #f1c40f;"></i> Circuito:</label>
+                <select id="filtroCircuito" class="input-filtro" onchange="renderizarTabla()" style="min-width: 120px;">
+                    <option value="ALL">Todos</option>
+                </select>
+            </div>
+
+            <div class="filtros-grupo">
+                <label><i class="fas fa-calendar-alt"></i> Rango:</label>
+                <input type="date" id="fechaDesde" class="input-filtro" onchange="renderizarTabla()">
+                <span style="font-size: 12px; color: var(--muted-text);">a</span>
+                <input type="date" id="fechaHasta" class="input-filtro" onchange="renderizarTabla()">
+            </div>
+
+            <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
         </div>
 
         <div class="table-responsive">
-            
             <table>
                 <thead>
                     <tr>
@@ -163,25 +206,24 @@
     </div>
 
     <script>
-        // VARIABLE GLOBAL PARA ALMACENAR TODOS LOS DATOS
+        // VARIABLE GLOBAL
         let todosLosDatos = [];
 
-        // 1. Validar sesión al cargar
+        // Validar sesión al cargar
         const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
 
         if (!usuarioSesion) {
-            window.location.href = "index.html"; // Redirigir al login si no hay sesión
+            window.location.href = "index.html"; 
         } else {
             document.getElementById("nombre-usuario").innerHTML = `<i class="fas fa-user-circle"></i> ${usuarioSesion} (${sectorSesion})`;
-            cargarSolicitudes(); // Llamar a la base de datos
+            cargarSolicitudes(); 
+            inicializarFiltroCircuitos(); // Llamamos a la carga de circuitos
         }
 
-        // FUNCIÓN PARA FORMATEAR LA FECHA A DD/MM/AAAA
+        // FUNCIÓN PARA FORMATEAR LA FECHA A DD/MM/AAAA (Solo para visualización)
         function formatearFecha(fechaOriginal) {
             if (!fechaOriginal) return "Sin fecha";
-            
-            // Si la fecha ya viene en un formato corto que no es de sistema, evitamos romperla
             let fecha = new Date(fechaOriginal);
             if(isNaN(fecha.getTime())) return fechaOriginal; 
             
@@ -192,9 +234,35 @@
             return `${dia}/${mes}/${anio}`;
         }
 
+        // CARGAR CATÁLOGO DE CIRCUITOS DEL SECTOR
+        async function inicializarFiltroCircuitos() {
+            try {
+                const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+                const catalogos = await response.json();
+
+                if (catalogos && catalogos.circuitos) {
+                    const selectCircuito = document.getElementById('filtroCircuito');
+                    
+                    // Asumiendo que fila[0] es el Circuito y fila[1] es el Sector en la Google Sheet
+                    const circuitosDelSector = catalogos.circuitos.filter(fila => 
+                        fila[1] && fila[1].toString().toUpperCase() === sectorSesion.toUpperCase()
+                    );
+
+                    circuitosDelSector.forEach(fila => {
+                        const opt = document.createElement('option');
+                        opt.value = fila[0];
+                        opt.textContent = fila[0];
+                        selectCircuito.appendChild(opt);
+                    });
+                }
+            } catch (error) {
+                console.error("Error al cargar los circuitos:", error);
+            }
+        }
+
+        // CARGAR SOLICITUDES DESDE APPS SCRIPT
         async function cargarSolicitudes() {
-            const sector = sessionStorage.getItem("sector");
-            const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sector)}`;
+            const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sectorSesion)}`;
             
             try {
                 const response = await fetch(url);
@@ -202,16 +270,11 @@
                 
                 if (!Array.isArray(data)) {
                     document.getElementById("tabla-body").innerHTML = 
-                        `<tr><td colspan="6" style="text-align:center; color:red;">
-                          Error: ${data.error || "No se recibieron datos válidos"}
-                        </td></tr>`;
+                        `<tr><td colspan="6" style="text-align:center; color:red;">Error: ${data.error || "No se recibieron datos"}</td></tr>`;
                     return;
                 }
 
-                // GUARDAMOS LOS DATOS EN LA VARIABLE GLOBAL
                 todosLosDatos = data;
-                
-                // LLAMAMOS A LA FUNCIÓN QUE DIBUJA (Con el filtro de 10 por defecto)
                 renderizarTabla();
 
             } catch (error) {
@@ -221,30 +284,50 @@
             }
         }
 
-        // FUNCIÓN QUE FILTRA, ORDENA Y DIBUJA LA TABLA
+        // FUNCIÓN QUE FILTRA Y DIBUJA LA TABLA
         function renderizarTabla() {
             const tbody = document.getElementById("tabla-body");
-            tbody.innerHTML = ""; // Limpiar tabla
+            tbody.innerHTML = ""; 
 
             if (todosLosDatos.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
                 return;
             }
 
-            // A. Leer qué límite seleccionó el usuario
-            let limiteSeleccionado = document.getElementById("limitSelector").value;
+            // 1. Obtener valores de los filtros
+            const limite = document.getElementById("limitSelector").value;
+            const circuitoBuscado = document.getElementById("filtroCircuito").value;
+            const fechaDesde = document.getElementById("fechaDesde").value;
+            const fechaHasta = document.getElementById("fechaHasta").value;
 
-            // B. Ordenar de más reciente a más antiguo
-            let datosOrdenados = [...todosLosDatos].reverse();
+            // 2. Aplicar filtros combinados
+            let datosFiltrados = todosLosDatos.filter(fila => {
+                // Validación Circuito
+                let cumpleCircuito = (circuitoBuscado === "ALL" || fila.circuito === circuitoBuscado);
+                
+                // Validación Fechas (Comparación de cadenas YYYY-MM-DD funciona nativamente)
+                let cumpleDesde = (!fechaDesde || fila.fecha >= fechaDesde);
+                let cumpleHasta = (!fechaHasta || fila.fecha <= fechaHasta);
 
-            // C. Filtrar la cantidad de registros
-            let datosAMostrar = datosOrdenados;
-            if (limiteSeleccionado !== "ALL") {
-                datosAMostrar = datosOrdenados.slice(0, parseInt(limiteSeleccionado));
+                return cumpleCircuito && cumpleDesde && cumpleHasta;
+            });
+
+            // 3. Ordenar de más reciente a más antiguo
+            let datosOrdenados = datosFiltrados.reverse();
+
+            // 4. Aplicar límite de registros
+            if (limite !== "ALL") {
+                datosOrdenados = datosOrdenados.slice(0, parseInt(limite));
             }
 
-            // D. Dibujar los registros
-            datosAMostrar.forEach(fila => {
+            // 5. Validar si la búsqueda quedó vacía
+            if (datosOrdenados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
+                return;
+            }
+
+            // 6. Dibujar los registros finales
+            datosOrdenados.forEach(fila => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td><strong>${fila.id}</strong></td>
@@ -271,7 +354,6 @@
             });
         }
 
-        // Función para redirigir según el botón presionado
         function abrirAccion(accion, idSolicitud) {
             if (accion === 'editar' || accion === 'formulario') {
                 window.location.href = `app.html?id=${idSolicitud}&modo=${accion}`;
