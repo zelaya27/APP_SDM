@@ -263,8 +263,7 @@
             
             return `${dia}/${mes}/${anio}`;
         }
-
-        // CARGAR CATÁLOGO DE CIRCUITOS DEL SECTOR
+            // CARGAR CATÁLOGO DE CIRCUITOS DEL SECTOR (BLINDADO CONTRA ESPACIOS)
         async function inicializarFiltroCircuitos() {
             try {
                 const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
@@ -273,15 +272,29 @@
                 if (catalogos && catalogos.circuitos) {
                     const selectCircuito = document.getElementById('filtroCircuito');
                     
-                    const circuitosDelSector = catalogos.circuitos.filter(fila => 
-                        fila[1] && fila[1].toString().toUpperCase() === sectorSesion.toUpperCase()
-                    );
+                    // Saltamos la fila 0 por si son los encabezados ("CIRCUITO", "SECTOR")
+                    const datosLimpios = catalogos.circuitos.slice(1);
+                    
+                    // --- ATENCIÓN A LAS COLUMNAS ---
+                    // fila[0] = Columna A (Debe ser el CIRCUITO)
+                    // fila[1] = Columna B (Debe ser el SECTOR)
+                    // Si en tu hoja están al revés, cambia fila[1] por fila[0] en la validación de abajo:
+                    
+                    const circuitosDelSector = datosLimpios.filter(fila => {
+                        let sectorHoja = fila[1] ? fila[1].toString().trim().toUpperCase() : "";
+                        let sectorActual = sectorSesion ? sectorSesion.toString().trim().toUpperCase() : "";
+                        return sectorHoja === sectorActual;
+                    });
 
                     circuitosDelSector.forEach(fila => {
                         const opt = document.createElement('option');
-                        opt.value = fila[0];
-                        opt.textContent = fila[0];
-                        selectCircuito.appendChild(opt);
+                        let nombreCircuito = fila[0] ? fila[0].toString().trim().toUpperCase() : "";
+                        
+                        if(nombreCircuito !== "") {
+                            opt.value = nombreCircuito;
+                            opt.textContent = nombreCircuito;
+                            selectCircuito.appendChild(opt);
+                        }
                     });
                 }
             } catch (error) {
