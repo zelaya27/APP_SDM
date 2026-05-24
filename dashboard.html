@@ -417,101 +417,103 @@
             }
         }
 
-        // =========================================================================
-        // NUEVA FUNCIÓN PARA DESCARGAR EXCEL DESDE EL DASHBOARD
-        // =========================================================================
-        async function descargarExcelDashboard(boton, idSolicitud) {
-            const textoOriginal = boton.innerHTML;
-            boton.disabled = true;
-            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+// NUEVA FUNCIÓN PARA DESCARGAR EXCEL DESDE EL DASHBOARD (Corregida)
+// =========================================================================
+async function descargarExcelDashboard(boton, idSolicitud) {
+    const textoOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
 
-            try {
-                // 1. OBTENER LA SOLICITUD COMPLETA
-                // Necesitamos hacer esto porque la tabla solo muestra 5 campos, 
-                // pero el Excel requiere los 43 campos.
-                const resData = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${idSolicitud}`);
-                const solicitudCompleta = await resData.json();
+    try {
+        // 1. OBTENER LA SOLICITUD COMPLETA (Viene como un Arreglo/Fila de Excel)
+        const resData = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${idSolicitud}`);
+        const solicitudCompleta = await resData.json();
 
-                if(solicitudCompleta.error) {
-                    alert("No se pudo obtener el detalle de la solicitud: " + solicitudCompleta.error);
-                    return;
-                }
-
-                // 2. CONSTRUIR EL OBJETO EXACTO PARA EL EXCEL (Claves en MAYÚSCULAS)
-                const datosParaExcel = {
-                    ID_SOLICITUD: solicitudCompleta.id_solicitud || idSolicitud, 
-                    NUMERO_DESPEJE: solicitudCompleta.numero_despeje || solicitudCompleta.no_despeje || "",
-                    SOLICITUD: solicitudCompleta.solicitud || "", 
-                    APEGO: solicitudCompleta.apego || "",
-                    FECHA_SOLICITUD: solicitudCompleta.fecha_solicitud || solicitudCompleta.fecha || "", 
-                    SUBESTACION: solicitudCompleta.subestacion || "",
-                    CIRCUITO: solicitudCompleta.circuito || "", 
-                    SECCION: solicitudCompleta.seccion || "",
-                    INTERRUPTOR_DE_CIRCUITO: solicitudCompleta.interruptor_de_circuito || "", 
-                    RESTAURADOR: solicitudCompleta.restaurador || "",
-                    OTROS_EQUIPOS: solicitudCompleta.otros_equipos || "", 
-                    UBICACION_DEL_EQUIPO: solicitudCompleta.ubicacion_del_equipo || "",
-                    UBICACION_DEL_TRABAJO: solicitudCompleta.ubicacion_del_trabajo || "", 
-                    FECHA_INTERRUPCION: solicitudCompleta.fecha_interrupcion || "",
-                    DIA_DE_SEMANA: solicitudCompleta.dia_de_semana || "", 
-                    HORA_INICIO: solicitudCompleta.hora_inicio || "",
-                    HORA_FINAL: solicitudCompleta.hora_final || "", 
-                    TIEMPO_NECESARIO: solicitudCompleta.tiempo_necesario || "",
-                    TRABAJO_A_REALIZAR: solicitudCompleta.trabajo_a_realizar || "", 
-                    RESPONSABLE: solicitudCompleta.responsable || "",
-                    SUSTITUTO: solicitudCompleta.sustituto || "", 
-                    ZONAS_AFECTADAS: solicitudCompleta.zonas_afectadas || "",
-                    AREA_AFECTADA: solicitudCompleta.area_afectada || "", 
-                    NOMBRE_DESPEJE: solicitudCompleta.nombre_despeje || "",
-                    APEGOS_ENLACES: solicitudCompleta.apegos_enlaces || "", 
-                    APEGO_DESPEJE: solicitudCompleta.apego_despeje || "",
-                    MANTO_PROGRAMADO: solicitudCompleta.manto_programado || "",
-                    MANTO_EMERGENCIA: solicitudCompleta.manto_emergencia || "",
-                    MANTO_EQ_MEDICION: solicitudCompleta.manto_eq_medicion || "",
-                    PROYECTO_EXPANSION: solicitudCompleta.proyecto_expansion || "",
-                    MANTO_OTROS: solicitudCompleta.manto_otros || "",
-                    ODT_PROGRAMADA: solicitudCompleta.odt_programada || "", 
-                    ODT_EMERGENCIA: solicitudCompleta.odt_emergencia || "",
-                    ODT_OS: solicitudCompleta.odt_os || "", 
-                    CODIGO_PROYECTO: solicitudCompleta.codigo_proyecto || "",
-                    ODT_OTROS: solicitudCompleta.odt_otros || "", 
-                    JUSTIFICACION: solicitudCompleta.justificacion || "",
-                    OBSERVACIONES: solicitudCompleta.observaciones || "", 
-                    SOLICITADO_POR: solicitudCompleta.solicitado_por || "",
-                    CARGO_DEL_SOLICITANTE: solicitudCompleta.cargo_del_solicitante || "", 
-                    APROBADO_POR: solicitudCompleta.aprobado_por || "",
-                    SECTOR: sectorSesion || "", 
-                    USUARIO: usuarioSesion || ""
-                };
-
-                // 3. ENVIAR A GENERAR EL EXCEL
-                const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
-                    method: 'POST',
-                    mode: 'cors',
-                    body: JSON.stringify(datosParaExcel)
-                });
-
-                const res = await response.json();
-
-                if (res.status === "ÉXITO") {
-                    // Forzar la descarga
-                    const enlaceDescarga = document.createElement('a');
-                    enlaceDescarga.href = res.url;
-                    document.body.appendChild(enlaceDescarga);
-                    enlaceDescarga.click();
-                    document.body.removeChild(enlaceDescarga);
-                } else {
-                    alert("Error en el servidor: " + (res.message || res.error));
-                }
-
-            } catch (err) {
-                console.error("Error de comunicación:", err);
-                alert("No se pudo conectar con el servidor para generar el Excel.");
-            } finally {
-                boton.disabled = false;
-                boton.innerHTML = textoOriginal;
-            }
+        if(!solicitudCompleta || solicitudCompleta.error) {
+            alert("No se pudo obtener el detalle de la solicitud.");
+            return;
         }
+
+        // 2. CONSTRUIR EL OBJETO PARA EL EXCEL USANDO LOS ÍNDICES DE LAS COLUMNAS
+        // Nota: [0] es la Columna A, [1] es la B, [2] es la C, etc.
+        const datosParaExcel = {
+            ID_SOLICITUD: solicitudCompleta[0] || idSolicitud, 
+            NUMERO_DESPEJE: solicitudCompleta[1] || "",
+            SOLICITUD: solicitudCompleta[2] || "", 
+            APEGO: solicitudCompleta[3] || "",
+            FECHA_SOLICITUD: solicitudCompleta[4] || "", 
+            SUBESTACION: solicitudCompleta[5] || "",
+            CIRCUITO: solicitudCompleta[6] || "", 
+            SECCION: solicitudCompleta[7] || "",
+            INTERRUPTOR_DE_CIRCUITO: solicitudCompleta[8] || "", 
+            RESTAURADOR: solicitudCompleta[9] || "",
+            OTROS_EQUIPOS: solicitudCompleta[10] || "", 
+            UBICACION_DEL_EQUIPO: solicitudCompleta[11] || "",
+            UBICACION_DEL_TRABAJO: solicitudCompleta[12] || "", 
+            FECHA_INTERRUPCION: solicitudCompleta[13] || "",
+            DIA_DE_SEMANA: solicitudCompleta[14] || "", 
+            HORA_INICIO: solicitudCompleta[15] || "",
+            HORA_FINAL: solicitudCompleta[16] || "", 
+            TIEMPO_NECESARIO: solicitudCompleta[17] || "",
+            TRABAJO_A_REALIZAR: solicitudCompleta[18] || "", 
+            RESPONSABLE: solicitudCompleta[19] || "",
+            SUSTITUTO: solicitudCompleta[20] || "", 
+            ZONAS_AFECTADAS: solicitudCompleta[21] || "",
+            AREA_AFECTADA: solicitudCompleta[22] || "", 
+            NOMBRE_DESPEJE: solicitudCompleta[23] || "",
+            APEGOS_ENLACES: solicitudCompleta[24] || "", 
+            APEGO_DESPEJE: solicitudCompleta[25] || "",
+            
+            // LOS CAMPOS DEL TIPO DE TRABAJO (Desde la Columna 27 en adelante)
+            MANTO_PROGRAMADO: solicitudCompleta[26] || "",
+            MANTO_EMERGENCIA: solicitudCompleta[27] || "",
+            MANTO_EQ_MEDICION: solicitudCompleta[28] || "",
+            PROYECTO_EXPANSION: solicitudCompleta[29] || "",
+            MANTO_OTROS: solicitudCompleta[30] || "",
+            
+            // LAS ODTs
+            ODT_PROGRAMADA: solicitudCompleta[31] || "", 
+            ODT_EMERGENCIA: solicitudCompleta[32] || "",
+            ODT_OS: solicitudCompleta[33] || "", 
+            CODIGO_PROYECTO: solicitudCompleta[34] || "",
+            ODT_OTROS: solicitudCompleta[35] || "", 
+            
+            JUSTIFICACION: solicitudCompleta[36] || "",
+            OBSERVACIONES: solicitudCompleta[37] || "", 
+            SOLICITADO_POR: solicitudCompleta[38] || "",
+            CARGO_DEL_SOLICITANTE: solicitudCompleta[39] || "", 
+            APROBADO_POR: solicitudCompleta[40] || "",
+            SECTOR: sectorSesion || solicitudCompleta[41] || "", 
+            USUARIO: usuarioSesion || solicitudCompleta[42] || ""
+        };
+
+        // 3. ENVIAR A GENERAR EL EXCEL
+        const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify(datosParaExcel)
+        });
+
+        const res = await response.json();
+
+        if (res.status === "ÉXITO") {
+            const enlaceDescarga = document.createElement('a');
+            enlaceDescarga.href = res.url;
+            document.body.appendChild(enlaceDescarga);
+            enlaceDescarga.click();
+            document.body.removeChild(enlaceDescarga);
+        } else {
+            alert("Error en el servidor al generar: " + (res.message || res.error));
+        }
+
+    } catch (err) {
+        console.error("Error de comunicación:", err);
+        alert("No se pudo conectar con el servidor para generar el Excel.");
+    } finally {
+        boton.disabled = false;
+        boton.innerHTML = textoOriginal;
+    }
+}
 
         function cerrarSesion() {
             sessionStorage.clear();
