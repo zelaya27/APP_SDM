@@ -429,29 +429,36 @@
             setVal('apego_despeje', fila[25]); 
 
             // --- PASO 3 (Lectura inteligente del Tipo de Trabajo) ---
-            if (fila[26] === 'X') setVal('tipo_trabajo', 'PROGRAMADO');
-            else if (fila[27] === 'X') setVal('tipo_trabajo', 'EMERGENCIA');
-            else if (fila[28] === 'X') setVal('tipo_trabajo', 'MEDICION');
-            else if (fila[29] === 'X') setVal('tipo_trabajo', 'PROYECTO');
-            else if (fila[30] === 'X') setVal('tipo_trabajo', 'OTROS');
+          // 1. Asignamos primero los valores al select de 'tipo_trabajo'
+if (fila[26] === 'X') setVal('tipo_trabajo', 'PROGRAMADO');
+else if (fila[27] === 'X') setVal('tipo_trabajo', 'EMERGENCIA');
+else if (fila[28] === 'X') setVal('tipo_trabajo', 'MEDICION');
+else if (fila[29] === 'X') setVal('PROYECTO');
+else if (fila[30] === 'X') setVal('tipo_trabajo', 'OTROS');
 
-            // Disparamos la visibilidad de las cajas ODT según lo que se seleccionó arriba
-            if (typeof manejarTipoTrabajo === "function") {
-                manejarTipoTrabajo(document.getElementById('tipo_trabajo').value);
-            }
+// 2. AHORA, después de asignar, disparamos la visibilidad.
+// Usamos un pequeño retraso (50ms) para asegurar que el navegador procesó el cambio en el SELECT
+setTimeout(() => {
+    if (typeof manejarTipoTrabajo === "function") {
+        const valorActual = document.getElementById('tipo_trabajo').value;
+        console.log("Forzando visibilidad para el tipo:", valorActual);
+        manejarTipoTrabajo(valorActual);
+    }
+}, 50);
 
-            setVal('odt_programada', fila[31]); 
-            setVal('odt_emergencia', fila[32]); 
-            setVal('odt_os', fila[33]); 
-            setVal('codigo_proyecto', fila[34]); 
-            setVal('odt_otros', fila[35]); 
+// 3. Cargamos el resto de los campos
+setVal('odt_programada', fila[31]); 
+setVal('odt_emergencia', fila[32]); 
+setVal('odt_os', fila[33]); 
+setVal('codigo_proyecto', fila[34]); 
+setVal('odt_otros', fila[35]); 
 
-            // --- PASO 4 ---
-            setVal('justificacion', fila[36]); 
-            setVal('observaciones', fila[37]); 
-            setVal('solicitado_por', fila[38]); 
-            setVal('cargo_del_solicitante', fila[39]); 
-            setVal('aprobado_por', fila[40]); 
+// --- PASO 4 ---
+setVal('justificacion', fila[36]); 
+setVal('observaciones', fila[37]); 
+setVal('solicitado_por', fila[38]); 
+setVal('cargo_del_solicitante', fila[39]); 
+setVal('aprobado_por', fila[40]);
 
             // Disparamos eventos gráficos finales (botones activos, cálculos extra)
             setTimeout(dispararEventosAutocompletado, 500); 
