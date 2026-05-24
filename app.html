@@ -689,68 +689,73 @@ setVal('aprobado_por', fila[40]);
                 btn.innerHTML = 'GUARDAR SOLICITUD';
             }
         }
+        function getVal(id) {
+    const el = document.getElementById(id);
+    if (!el) {
+        console.warn(`⚠️ Atención: El elemento con ID "${id}" no existe en el DOM.`);
+        return ""; // Devuelve vacío en lugar de romper el código
+    }
+    return el.value;
+}
                 async function generarExcelSolicitud() {
-    // 1. Obtener referencia del botón para feedback visual
-    const btn = document.getElementById('btn_generar_excel'); // Asegúrate que tu botón tenga este ID
+async function generarExcelSolicitud() {
+    const btn = document.getElementById('btn_generar_excel');
     if(btn) {
         btn.disabled = true;
         btn.innerHTML = 'Generando...';
     }
 
-    // 2. Construir el objeto con todos los datos del formulario
+    // Usamos getVal para evitar el error de 'null'
     const datos = {
-        id_solicitud: document.getElementById('id_solicitud').value,
-        numero_despeje: document.getElementById('numero_despeje').value,
-        solicitud: document.getElementById('solicitud').value,
-        apego: document.getElementById('apego').value,
-        fecha_solicitud: document.getElementById('fecha_solicitud').value,
-        subestacion: document.getElementById('subestacion').value,
-        circuito: document.getElementById('circuito').value,
-        seccion: document.getElementById('seccion').value,
-        interruptor_de_circuito: document.getElementById('interruptor_de_circuito').value,
-        restaurador: document.getElementById('restaurador').value,
-        otros_equipos: document.getElementById('otros_equipos').value,
-        ubicacion_del_equipo: document.getElementById('ubicacion_del_equipo').value,
-        ubicacion_del_trabajo: document.getElementById('ubicacion_del_trabajo').value,
-        fecha_interrupcion: document.getElementById('fecha_interrupcion').value,
-        dia_de_semana: document.getElementById('dia_de_semana').value,
-        hora_inicio: document.getElementById('hora_inicio').value,
-        hora_final: document.getElementById('hora_final').value,
-        tiempo_necesario: document.getElementById('tiempo_necesario').value,
-        trabajo_a_realizar: document.getElementById('trabajo_a_realizar').value,
-        responsable: document.getElementById('responsable').value,
-        sustituto: document.getElementById('sustituto').value,
-        zonas_afectadas: document.getElementById('zonas_afectadas').value,
-        area_afectada: document.getElementById('area_afectada').value,
-        nombre_despeje: document.getElementById('nombre_despeje').value,
-        apegos_enlaces: document.getElementById('apegos_enlaces').value,
-        apego_despeje: document.getElementById('apego_despeje').value,
-        manto_programado: document.getElementById('manto_programado').value,
-        manto_emergencia: document.getElementById('manto_emergencia').value,
-        manto_eq_medicion: document.getElementById('manto_eq_medicion').value,
-        proyecto_expansion: document.getElementById('proyecto_expansion').value,
-        manto_otros: document.getElementById('manto_otros').value,
-        odt_programada: document.getElementById('odt_programada').value,
-        odt_emergencia: document.getElementById('odt_emergencia').value,
-        odt_os: document.getElementById('odt_os').value,
-        codigo_proyecto: document.getElementById('codigo_proyecto').value,
-        odt_otros: document.getElementById('odt_otros').value,
-        justificacion: document.getElementById('justificacion').value,
-        observaciones: document.getElementById('observaciones').value,
-        solicitado_por: document.getElementById('solicitado_por').value,
-        cargo_del_solicitante: document.getElementById('cargo_del_solicitante').value,
-        aprobado_por: document.getElementById('aprobado_por').value,
-        sector: document.getElementById('sector').value,
-        usuario: document.getElementById('usuario').value
+        id_solicitud: getVal('id_solicitud'),
+        numero_despeje: getVal('numero_despeje'),
+        solicitud: getVal('solicitud'),
+        apego: getVal('apego'),
+        fecha_solicitud: getVal('fecha_solicitud'),
+        subestacion: getVal('subestacion'),
+        circuito: getVal('circuito'),
+        seccion: getVal('seccion'),
+        interruptor_de_circuito: getVal('interruptor_de_circuito'),
+        restaurador: getVal('restaurador'),
+        otros_equipos: getVal('otros_equipos'),
+        ubicacion_del_equipo: getVal('ubicacion_del_equipo'),
+        ubicacion_del_trabajo: getVal('ubicacion_del_trabajo'),
+        fecha_interrupcion: getVal('fecha_interrupcion'),
+        dia_de_semana: getVal('dia_de_semana'),
+        hora_inicio: getVal('hora_inicio'),
+        hora_final: getVal('hora_final'),
+        tiempo_necesario: getVal('tiempo_necesario'),
+        trabajo_a_realizar: getVal('trabajo_a_realizar'),
+        responsable: getVal('responsable'),
+        sustituto: getVal('sustituto'),
+        zonas_afectadas: getVal('zonas_afectadas'),
+        area_afectada: getVal('area_afectada'),
+        nombre_despeje: getVal('nombre_despeje'),
+        apegos_enlaces: getVal('apegos_enlaces'),
+        apego_despeje: getVal('apego_despeje'),
+        manto_programado: getVal('manto_programado'),
+        manto_emergencia: getVal('manto_emergencia'),
+        manto_eq_medicion: getVal('manto_eq_medicion'),
+        proyecto_expansion: getVal('proyecto_expansion'),
+        manto_otros: getVal('manto_otros'),
+        odt_programada: getVal('odt_programada'),
+        odt_emergencia: getVal('odt_emergencia'),
+        odt_os: getVal('odt_os'),
+        codigo_proyecto: getVal('codigo_proyecto'),
+        odt_otros: getVal('odt_otros'),
+        justificacion: getVal('justificacion'),
+        observaciones: getVal('observaciones'),
+        solicitado_por: getVal('solicitado_por'),
+        cargo_del_solicitante: getVal('cargo_del_solicitante'),
+        aprobado_por: getVal('aprobado_por'),
+        sector: getVal('sector'),
+        usuario: getVal('usuario')
     };
 
     // 3. Llamada al servidor (Código.gs)
     google.script.run
         .withSuccessHandler(function(url) {
-            // Abrir el archivo generado en una nueva pestaña
             window.open(url, '_blank');
-            
-            // Restaurar botón
             if(btn) {
                 btn.disabled = false;
                 btn.innerHTML = 'Descargar Excel';
@@ -765,7 +770,6 @@ setVal('aprobado_por', fila[40]);
         })
         .generarDocumentoExcel(datos);
 }
-
         function cerrarSesion() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
 </body>
