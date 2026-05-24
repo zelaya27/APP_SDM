@@ -160,10 +160,9 @@
             gap: 5px;
             transition: 0.2s;
         }
-        .btn-editar { background: var(--warning-color); color: #000; font-weight:bold;}
         .btn-form { background: var(--info-color); }
-        .btn-retirar { background: var(--danger-color); }
-        .btn-retornar { background: var(--success-color); }
+        .btn-retirar { background: var(--success-color); }
+        .btn-retornar { background: var(--danger-color); }
         .btn-accion:hover { opacity: 0.8; }
         
     </style>
@@ -394,10 +393,8 @@
                     <td>${fila.circuito || '-'}</td>
                     <td>${fila.nombre || '-'}</td>
                     <td class="acciones-td">
-                        <button class="btn-accion btn-editar" title="Editar Solicitud" onclick="abrirAccion('editar', '${fila.id}')">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn-accion btn-form" title="Ver Formulario" onclick="abrirAccion('formulario', '${fila.id}')">
+                        
+                        <button class="btn-accion btn-form" title="Ver Solicitud" onclick="abrirAccion('formulario', '${fila.id}')">
                             <i class="fas fa-file-alt"></i> Formulario
                         </button>
                         <button class="btn-accion btn-retirar" title="Maniobras a Retirar" onclick="abrirAccion('retirar', '${fila.id}')">
