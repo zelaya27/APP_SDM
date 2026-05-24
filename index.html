@@ -15,14 +15,14 @@
 </head>
 <body>
     <div id="login-container">
-        <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" style="width: 150px; margin-bottom: 20px;">
-        <input type="text" id="user" placeholder="Usuario">
-        <div style="position: relative;">
-            <input type="password" id="pass" placeholder="Contraseña">
-            <button type="button" onclick="togglePassword()" style="position: absolute; right: 10px; top: 15px; border:none; background:none; cursor:pointer; color: gray;"><i class="fas fa-eye"></i></button>
-        </div>
-        <button class="btn-enviar" onclick="iniciarSesion()">INICIAR SESIÓN</button>
+    <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" style="width: 150px; margin-bottom: 20px; filter: brightness(0) invert(1);">
+    <input type="text" id="user" placeholder="Usuario">
+    <div style="position: relative;">
+        <input type="password" id="pass" placeholder="Contraseña">
+        <button type="button" onclick="togglePassword()" style="position: absolute; right: 10px; top: 15px; border:none; background:none; cursor:pointer; color: gray;"><i class="fas fa-eye"></i></button>
     </div>
+    <button class="btn-enviar" onclick="iniciarSesion()">INICIAR SESIÓN</button>
+</div>
 
     <script>
         function togglePassword() {
