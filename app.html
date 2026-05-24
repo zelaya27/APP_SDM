@@ -564,24 +564,24 @@
             };
            
 
-    // --- VALIDACIÓN DE ENTORNO ---
- if (typeof google !== 'undefined' && google.script) {
-        google.script.run
-            .withSuccessHandler(function(url) {
-                // Éxito: abre el archivo generado en Drive
-                window.open(url, '_blank');
-                if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
-            })
-            .withFailureHandler(function(err) {
-                alert("Error desde el servidor: " + err);
-                if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
-            })
-            .generarDocumentoExcel(datos);
-    } else {
-        // Esto se ejecutará si abres el archivo localmente
-        alert("ERROR: La aplicación no está conectada con el servidor de Google. Asegúrate de abrirla desde la URL de despliegue (/exec).");
-        if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
-    }
+// --- VALIDACIÓN DE ENTORNO ---
+if (typeof google !== 'undefined' && google.script) {
+    google.script.run
+        .withSuccessHandler(function(url) {
+            window.open(url, '_blank');
+            if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
+        })
+        .withFailureHandler(function(err) {
+            alert("Error desde el servidor: " + err);
+            if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
+        })
+        .generarDocumentoExcel(datos);
+} else {
+    // Modo simulación para edición local
+    console.warn("Estás en modo local. La comunicación con el servidor está desactivada.");
+    alert("Estás viendo una vista previa local. Para generar el Excel real, usa la URL de despliegue (/exec).");
+    if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
+}
 } 
 
        
