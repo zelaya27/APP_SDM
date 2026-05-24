@@ -593,9 +593,17 @@ async function generarExcelSolicitud() {
 
         const res = await response.json();
 
-        if (res.status === "ÉXITO") {
-            // Abre la pestaña de descarga directa del .xlsx generado
-            window.open(res.url, '_blank');
+       if (res.status === "ÉXITO") {
+            // CORREGIDO: Fuerza la descarga directa en la carpeta local de Descargas
+            const enlaceDescarga = document.createElement('a');
+            enlaceDescarga.href = res.url;
+            
+            // Añadimos el enlace temporalmente al documento para ejecutar el clic
+            document.body.appendChild(enlaceDescarga);
+            enlaceDescarga.click();
+            
+            // Lo removemos inmediatamente para mantener limpio el HTML
+            document.body.removeChild(enlaceDescarga);
         } else {
             alert("Error en el servidor: " + (res.message || res.error));
         }
