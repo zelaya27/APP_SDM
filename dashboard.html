@@ -126,22 +126,23 @@
         </div>
     </header>
 
-    <div class="container">
-        <div class="header-panel">
-            <h2><i class="fas fa-list-alt"></i> Mis Solicitudes de Despeje</h2>
-            <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
-        </div>
-
-        <div class="table-responsive">
-            <div style="margin-bottom: 15px; text-align: right; color: white;">
-                <label for="limitSelector">Mostrar registros: </label>
-                <select id="limitSelector" onchange="renderizarTabla()" style="padding: 5px; border-radius: 5px; background: var(--card-color); color: white; border: 1px solid #ccc;">
+   <div class="container">
+        <div class="header-panel" style="display: flex; justify-content: flex-end; align-items: center; gap: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
+            
+            <div style="display: flex; align-items: center; gap: 10px; color: white;">
+                <label for="limitSelector" style="margin: 0; font-weight: 600; font-size: 14px;">Mostrar registros:</label>
+                <select id="limitSelector" onchange="renderizarTabla()" style="padding: 8px 12px; border-radius: 5px; background: var(--card-color); color: white; border: 1px solid #ccc; cursor: pointer; outline: none;">
                     <option value="10" selected>Últimos 10</option>
                     <option value="20">Últimos 20</option>
                     <option value="30">Últimos 30</option>
                     <option value="ALL">Todos</option>
                 </select>
             </div>
+
+            <a href="app.html" class="btn-nueva" style="margin: 0;"><i class="fas fa-plus"></i> Nueva Solicitud</a>
+        </div>
+
+        <div class="table-responsive">
             
             <table>
                 <thead>
