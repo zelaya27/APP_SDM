@@ -351,7 +351,7 @@
             }
         }
 
-        // FUNCIÓN QUE FILTRA Y DIBUJA LA TABLA
+     // FUNCIÓN QUE FILTRA Y DIBUJA LA TABLA
         function renderizarTabla() {
             const tbody = document.getElementById("tabla-body");
             tbody.innerHTML = ""; 
@@ -386,6 +386,9 @@
             }
 
             datosOrdenados.forEach(fila => {
+                // AQUÍ ESTABA EL ERROR: Faltaba definir esta variable
+                const filaJson = JSON.stringify(fila).replace(/"/g, '&quot;');
+                
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td><strong>${fila.id}</strong></td>
@@ -394,8 +397,7 @@
                     <td>${fila.circuito || '-'}</td>
                     <td>${fila.nombre || '-'}</td>
                     <td class="acciones-td">
-                        
-                        <button class="btn-accion btn-form" title="Ver Formulario" onclick="abrirAccion('formulario', '${fila.id}')">
+                        <button class="btn-accion btn-form" title="Ver Solicitud" onclick="abrirAccion('formulario', '${fila.id}')">
                             <i class="fas fa-file-alt"></i> Solicitud
                         </button>
                         <button class="btn-accion btn-retirar" title="Maniobras a Retirar" onclick="abrirAccion('retirar', '${fila.id}')">
@@ -404,8 +406,8 @@
                         <button class="btn-accion btn-retornar" title="Maniobras a Retornar" onclick="abrirAccion('retornar', '${fila.id}')">
                             <i class="fas fa-arrow-circle-up"></i> M. Retornar
                         </button>
-                        <button class="btn-accion btn-descargar" title="Descargar Excel" onclick="descargarExcelDashboard(this, ${filaJson})">
-                        <i class="fas fa-file-excel"></i> Excel
+                        <button class="btn-accion btn-descargar" title="Descargar Excel" onclick='descargarExcelDashboard(this, ${JSON.stringify(fila)})'>
+                            <i class="fas fa-file-excel"></i> Excel
                         </button>
                     </td>
                 `;
