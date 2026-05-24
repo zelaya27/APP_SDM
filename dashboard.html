@@ -53,16 +53,24 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        /* NUEVO DISEÑO DEL PANEL DE FILTROS */
+        /* PANEL DE FILTROS REORGANIZADO */
         .header-panel {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between; /* Distribuye el botón a la izquierda y filtros a la derecha */
             align-items: center;
             gap: 15px;
-            flex-wrap: wrap; /* Permite que los filtros bajen de línea en pantallas pequeñas */
+            flex-wrap: wrap; 
             margin-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
+        }
+
+        /* Contenedor secundario para agrupar solo los selectores y las fechas */
+        .filtros-contenedor {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .filtros-grupo {
@@ -88,8 +96,24 @@
             cursor: pointer; 
             font-size: 13px;
             outline: none;
-            color-scheme: dark; /* Hace que el calendario nativo sea oscuro */
+            color-scheme: dark; 
         }
+
+        /* BOTÓN DE LIMPIAR FILTROS */
+        .btn-limpiar {
+            background: #34495e;
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+        .btn-limpiar:hover { background: var(--danger-color); border-color: var(--danger-color); }
 
         .btn-nueva {
             background: var(--success-color);
@@ -159,31 +183,37 @@
    <div class="container">
         <div class="header-panel">
             
-            <div class="filtros-grupo">
-                <label for="limitSelector">Mostrar:</label>
-                <select id="limitSelector" class="input-filtro" onchange="renderizarTabla()">
-                    <option value="10" selected>Últimos 10</option>
-                    <option value="20">Últimos 20</option>
-                    <option value="30">Últimos 30</option>
-                    <option value="ALL">Todos</option>
-                </select>
-            </div>
-
-            <div class="filtros-grupo">
-                <label for="filtroCircuito"><i class="fas fa-bolt" style="color: #f1c40f;"></i> Circuito:</label>
-                <select id="filtroCircuito" class="input-filtro" onchange="renderizarTabla()" style="min-width: 120px;">
-                    <option value="ALL">Todos</option>
-                </select>
-            </div>
-
-            <div class="filtros-grupo">
-                <label><i class="fas fa-calendar-alt"></i> Rango:</label>
-                <input type="date" id="fechaDesde" class="input-filtro" onchange="renderizarTabla()">
-                <span style="font-size: 12px; color: var(--muted-text);">a</span>
-                <input type="date" id="fechaHasta" class="input-filtro" onchange="renderizarTabla()">
-            </div>
-
             <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
+
+            <div class="filtros-contenedor">
+                <div class="filtros-grupo">
+                    <label for="limitSelector">Mostrar:</label>
+                    <select id="limitSelector" class="input-filtro" onchange="renderizarTabla()">
+                        <option value="10" selected>Últimos 10</option>
+                        <option value="20">Últimos 20</option>
+                        <option value="30">Últimos 30</option>
+                        <option value="ALL">Todos</option>
+                    </select>
+                </div>
+
+                <div class="filtros-grupo">
+                    <label for="filtroCircuito"><i class="fas fa-bolt" style="color: #f1c40f;"></i> Circuito:</label>
+                    <select id="filtroCircuito" class="input-filtro" onchange="renderizarTabla()" style="min-width: 120px;">
+                        <option value="ALL">Todos</option>
+                    </select>
+                </div>
+
+                <div class="filtros-grupo">
+                    <label><i class="fas fa-calendar-alt"></i> Rango:</label>
+                    <input type="date" id="fechaDesde" class="input-filtro" onchange="renderizarTabla()">
+                    <span style="font-size: 12px; color: var(--muted-text);">a</span>
+                    <input type="date" id="fechaHasta" class="input-filtro" onchange="renderizarTabla()">
+                </div>
+
+                <button type="button" class="btn-limpiar" title="Quitar todos los filtros" onclick="limpiarFiltros()">
+                    <i class="fas fa-times-circle"></i> Limpiar
+                </button>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -218,10 +248,10 @@
         } else {
             document.getElementById("nombre-usuario").innerHTML = `<i class="fas fa-user-circle"></i> ${usuarioSesion} (${sectorSesion})`;
             cargarSolicitudes(); 
-            inicializarFiltroCircuitos(); // Llamamos a la carga de circuitos
+            inicializarFiltroCircuitos(); 
         }
 
-        // FUNCIÓN PARA FORMATEAR LA FECHA A DD/MM/AAAA (Solo para visualización)
+        // FUNCIÓN PARA FORMATEAR LA FECHA A DD/MM/AAAA
         function formatearFecha(fechaOriginal) {
             if (!fechaOriginal) return "Sin fecha";
             let fecha = new Date(fechaOriginal);
@@ -243,7 +273,6 @@
                 if (catalogos && catalogos.circuitos) {
                     const selectCircuito = document.getElementById('filtroCircuito');
                     
-                    // Asumiendo que fila[0] es el Circuito y fila[1] es el Sector en la Google Sheet
                     const circuitosDelSector = catalogos.circuitos.filter(fila => 
                         fila[1] && fila[1].toString().toUpperCase() === sectorSesion.toUpperCase()
                     );
@@ -294,39 +323,30 @@
                 return;
             }
 
-            // 1. Obtener valores de los filtros
             const limite = document.getElementById("limitSelector").value;
             const circuitoBuscado = document.getElementById("filtroCircuito").value;
             const fechaDesde = document.getElementById("fechaDesde").value;
             const fechaHasta = document.getElementById("fechaHasta").value;
 
-            // 2. Aplicar filtros combinados
             let datosFiltrados = todosLosDatos.filter(fila => {
-                // Validación Circuito
                 let cumpleCircuito = (circuitoBuscado === "ALL" || fila.circuito === circuitoBuscado);
-                
-                // Validación Fechas (Comparación de cadenas YYYY-MM-DD funciona nativamente)
                 let cumpleDesde = (!fechaDesde || fila.fecha >= fechaDesde);
                 let cumpleHasta = (!fechaHasta || fila.fecha <= fechaHasta);
 
                 return cumpleCircuito && cumpleDesde && cumpleHasta;
             });
 
-            // 3. Ordenar de más reciente a más antiguo
             let datosOrdenados = datosFiltrados.reverse();
 
-            // 4. Aplicar límite de registros
             if (limite !== "ALL") {
                 datosOrdenados = datosOrdenados.slice(0, parseInt(limite));
             }
 
-            // 5. Validar si la búsqueda quedó vacía
             if (datosOrdenados.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
                 return;
             }
 
-            // 6. Dibujar los registros finales
             datosOrdenados.forEach(fila => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
@@ -352,6 +372,16 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        // NUEVA FUNCIÓN PARA BORRAR LOS FILTROS SELECCIONADOS
+        function limpiarFiltros() {
+            document.getElementById("filtroCircuito").value = "ALL";
+            document.getElementById("fechaDesde").value = "";
+            document.getElementById("fechaHasta").value = "";
+            document.getElementById("limitSelector").value = "10"; // Vuelve a mostrar los últimos 10
+            
+            renderizarTabla(); // Refresca la cuadrícula de forma inmediata
         }
 
         function abrirAccion(accion, idSolicitud) {
