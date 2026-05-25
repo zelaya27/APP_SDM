@@ -2,110 +2,88 @@
 <html>
 <head>
     <base target="_top">
+    <meta charset="UTF-8">
     <style>
-        :root {
-            --bg-color: #0b141d;
-            --card-color: #14212d;
-            --text-color: #ffffff;
-            --accent-color: #3498db;
-            --success-color: #27ae60;
-            --border-color: #2c3e50;
-        }
-
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
-        
-        .card { background-color: var(--card-color); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); max-width: 500px; margin: auto; }
-        
-        h3 { margin-top: 0; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
-        
-        .btn-back { background-color: #7f8c8d; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-size: 14px; }
-        .btn-back:hover { background-color: #95a5a6; }
-
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #bdc3c7; }
-        
-        input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); box-sizing: border-box; background-color: #1c2a38; color: white; font-size: 16px; }
-        
-        .readonly { background-color: #1a2733; color: #7f8c8d; border: 1px solid #2c3e50; cursor: not-allowed; }
-        
-        button#btnDuplicar { background-color: var(--success-color); color: white; padding: 15px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; margin-top: 10px; }
-        button#btnDuplicar:hover { opacity: 0.9; }
-        button:disabled { background-color: #555; }
-        
-        #resultado { margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        :root { --bg-color: #0b141d; --card-color: #14212d; --text-color: #ffffff; --accent: #3498db; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: sans-serif; padding: 20px; }
+        .card { background: var(--card-color); padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: var(--bg-color); border: 1px solid #555; color: white; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 10px; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-buscar { background: var(--accent); }
+        .btn-duplicar { background: #27ae60; display: none; }
+        .info-label { color: #aaa; font-size: 0.9em; margin-bottom: 5px; }
+        .info-val { color: #fff; margin-bottom: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="card">
-        <button class="btn-back" onclick="google.script.host.close()">⬅ Volver al Panel</button>
         <h3>Duplicar Solicitud</h3>
+        <input type="text" id="inputID" placeholder="Ingresa ID_SOLICITUD a duplicar...">
+        <button class="btn-buscar" onclick="buscarSolicitud()">Buscar Solicitud</button>
         
-        <div class="form-group">
-            <label>Ingrese ID de Solicitud:</label>
-            <input type="text" id="inputID" placeholder="Ej: REQ-12345" onchange="buscarSolicitud()">
-        </div>
-
-        <div id="resultado" style="display:none;">
-            <div class="form-group"><label>No. Despeje:</label><input type="text" id="no_despeje" class="readonly" readonly></div>
-            <div class="form-group"><label>Fecha:</label><input type="text" id="fecha" class="readonly" readonly></div>
-            <div class="form-group"><label>Circuito:</label><input type="text" id="circuito" class="readonly" readonly></div>
-            <button id="btnDuplicar" onclick="confirmarDuplicacion()">DUPLICAR SOLICITUD</button>
+        <div id="resultado" style="display:none; margin-top:20px;">
+            <div class="info-label">No. Despeje:</div> <div id="res_num" class="info-val"></div>
+            <div class="info-label">Fecha:</div> <div id="res_fecha" class="info-val"></div>
+            <div class="info-label">Circuito:</div> <div id="res_circuito" class="info-val"></div>
+            <div class="info-label">Nombre:</div> <div id="res_nombre" class="info-val"></div>
+            
+            <button id="btnDuplicar" class="btn-duplicar" onclick="confirmarDuplicacion()">Duplicar Solicitud</button>
         </div>
     </div>
 
     <script>
-        // Asegúrate de que CONFIG.URL_APPS_SCRIPT esté bien definido en tu entorno
-        const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT; 
+        // Tu configuración
+        const CONFIG = {
+            URL_APPS_SCRIPT: 'https://script.google.com/macros/s/AKfycbxkBdH0AXNapeoDA3Oc1qkMGnEG9gEJP0uoNBY1t1F3CRfgrBDqLs-ZkljOLGWa7dC7/exec'
+        };
 
         async function buscarSolicitud() {
             const id = document.getElementById('inputID').value;
-            if (!id) return;
+            if(!id) return alert("Por favor ingresa un ID.");
             
-            // Feedback visual de carga
-            const input = document.getElementById('inputID');
-            input.style.borderColor = "var(--accent-color)";
-            
-            const res = await fetch(`${URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`);
-            const data = await res.json();
-            
-            if (data.error) {
-                alert("No se encontró la solicitud con ese ID.");
-                document.getElementById('resultado').style.display = 'none';
-            } else {
-                document.getElementById('no_despeje').value = data.no_despeje;
-                document.getElementById('fecha').value = data.fecha;
-                document.getElementById('circuito').value = data.circuito;
-                document.getElementById('resultado').style.display = 'block';
+            try {
+                const res = await fetch(`${CONFIG.URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`);
+                const data = await res.json();
+                
+                if(data.error) {
+                    alert("No se encontró la solicitud: " + id);
+                } else {
+                    document.getElementById('res_num').innerText = data.no_despeje;
+                    document.getElementById('res_fecha').innerText = data.fecha;
+                    document.getElementById('res_circuito').innerText = data.circuito;
+                    document.getElementById('res_nombre').innerText = data.nombre_despeje;
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('btnDuplicar').style.display = 'block';
+                }
+            } catch(e) {
+                console.error(e);
+                alert("Error conectando con el servidor");
             }
         }
 
         async function confirmarDuplicacion() {
-            const idSolicitud = document.getElementById('inputID').value;
-            if (confirm("¿Está seguro de duplicar la solicitud " + idSolicitud + "?")) {
-                const btn = document.getElementById('btnDuplicar');
-                btn.disabled = true;
-                btn.innerHTML = 'Procesando...';
+            const id = document.getElementById('inputID').value;
+            if(!confirm(`¿Está seguro de duplicar la solicitud ${id}?`)) return;
+            
+            const btn = document.getElementById('btnDuplicar');
+            btn.disabled = true;
+            btn.innerText = 'Procesando...';
+            
+            try {
+                const res = await fetch(CONFIG.URL_APPS_SCRIPT, {
+                    method: 'POST',
+                    mode: 'no-cors', // O 'cors' dependiendo de tu despliegue actual
+                    body: JSON.stringify({ action: 'duplicar', idOriginal: id })
+                });
                 
-                try {
-                    const res = await fetch(URL_APPS_SCRIPT, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'duplicar', idOriginal: idSolicitud })
-                    });
-                    const result = await res.json();
-                    
-                    if (result.status === "ÉXITO") {
-                        alert("Solicitud duplicada correctamente: " + result.nuevoId);
-                        google.script.host.close();
-                    } else {
-                        alert("Error al duplicar: " + result.message);
-                        btn.disabled = false;
-                        btn.innerHTML = 'DUPLICAR SOLICITUD';
-                    }
-                } catch(e) {
-                    alert("Error de conexión con el servidor.");
-                    btn.disabled = false;
-                    btn.innerHTML = 'DUPLICAR SOLICITUD';
-                }
+                // Nota: si usas no-cors, la respuesta será opaca.
+                // Si el servidor responde OK, asumimos éxito o manejamos errores desde el backend
+                alert("Solicitud procesada. (Verifica en el Dashboard)");
+                window.close(); 
+            } catch(e) {
+                alert("Error de red");
+                btn.disabled = false;
+                btn.innerText = 'Duplicar Solicitud';
             }
         }
     </script>
