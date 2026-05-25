@@ -3,6 +3,7 @@
 <head>
     <base target="_top">
     <meta charset="UTF-8">
+    <title>Duplicar Solicitud</title>
     <style>
         :root { 
             --bg-color: #0b141d; 
@@ -42,24 +43,27 @@
 
         <button class="btn-back" onclick="window.location.href='dashboard.html'">Volver al Dashboard</button>
     </div>
-       <script src="config.js"></script>
+
+    <script src="config.js"></script>
     <script>
-        // Esta variable se carga desde config.js para la conexión con el servidor
-        const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
+        // Verificación de seguridad por si config.js tarda en cargar
+        const URL_APPS_SCRIPT = typeof CONFIG !== 'undefined' ? CONFIG.URL_APPS_SCRIPT : '';
     </script>
-  <script>
+    
+    <script>
         async function buscarSolicitud() {
             const id = document.getElementById('inputID').value;
             if(!id) return alert("Por favor ingresa un ID.");
             
             try {
-                const url = `${CONFIG.URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`;
+                const url = `${URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`;
                 const res = await fetch(url);
                 const data = await res.json();
                 
                 if(data.error) {
                     alert("No se encontró la solicitud: " + id);
                     document.getElementById('resultado').style.display = 'none';
+                    document.getElementById('btnDuplicar').style.display = 'none';
                 } else {
                     document.getElementById('res_num').innerText = data.datos[1] || "N/A";
                     document.getElementById('res_fecha').innerText = data.datos[4] || "N/A";
@@ -71,7 +75,7 @@
                 }
             } catch(e) {
                 console.error(e);
-                alert("Error conectando con el servidor. Verifica tu URL.");
+                alert("Error conectando con el servidor. Verifica tu conexión o la URL en config.js.");
             }
         }
 
@@ -81,10 +85,10 @@
             
             const btn = document.getElementById('btnDuplicar');
             btn.disabled = true;
-            btn.innerText = 'Procesando...';
+            btn.innerText = 'Procesando duplicación...';
             
             try {
-                const res = await fetch(CONFIG.URL_APPS_SCRIPT, {
+                const res = await fetch(URL_APPS_SCRIPT, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'duplicar', idOriginal: id })
                 });
@@ -92,16 +96,16 @@
                 const data = await res.json();
                 
                 if (data.status === "ÉXITO") {
-                    alert("Solicitud duplicada exitosamente. Nuevo ID: " + data.nuevoId);
+                    alert("Solicitud duplicada exitosamente.\nNuevo ID asignado: " + data.nuevoId);
                     window.location.href = 'dashboard.html';
                 } else {
-                    alert("Error: " + (data.message || "No se pudo procesar la duplicación"));
+                    alert("Error: " + (data.message || data.error || "No se pudo procesar la duplicación"));
                     btn.disabled = false;
                     btn.innerText = 'Duplicar Solicitud';
                 }
             } catch(e) {
                 console.error(e);
-                alert("Error de red");
+                alert("Error de red al intentar duplicar.");
                 btn.disabled = false;
                 btn.innerText = 'Duplicar Solicitud';
             }
