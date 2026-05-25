@@ -1,1 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #0b141d; color: white; }
+        .form-group { margin-bottom: 15px; }
+        input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+        .readonly { background-color: #2c3e50; color: #bdc3c7; }
+        button { background-color: #27ae60; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        button:disabled { background-color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <h3>Duplicar Solicitud</h3>
+    <div class="form-group">
+        <label>Ingrese ID de Solicitud:</label>
+        <input type="text" id="inputID" placeholder="Ej: REQ-12345" onchange="buscarSolicitud()">
+    </div>
+    <div id="resultado" style="display:none;">
+        <div class="form-group"><label>No. Despeje:</label><input type="text" id="no_despeje" class="readonly" readonly></div>
+        <div class="form-group"><label>Fecha:</label><input type="text" id="fecha" class="readonly" readonly></div>
+        <div class="form-group"><label>Circuito:</label><input type="text" id="circuito" class="readonly" readonly></div>
+        <button id="btnDuplicar" onclick="confirmarDuplicacion()">Duplicar Solicitud</button>
+    </div>
 
+    <script>
+        const URL_APPS_SCRIPT = 'TU_URL_DE_DESPLIEGUE_AQUI'; // <--- PEGA AQUÍ TU URL
+
+        async function buscarSolicitud() {
+            const id = document.getElementById('inputID').value;
+            if (!id) return;
+            
+            const res = await fetch(`${URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`);
+            const data = await res.json();
+            
+            if (data.error) {
+                alert("No se encontró la solicitud.");
+                document.getElementById('resultado').style.display = 'none';
+            } else {
+                document.getElementById('no_despeje').value = data.no_despeje;
+                document.getElementById('fecha').value = data.fecha;
+                document.getElementById('circuito').value = data.circuito;
+                document.getElementById('resultado').style.display = 'block';
+            }
+        }
+
+        async function confirmarDuplicacion() {
+            if (confirm("¿Está seguro de duplicar la solicitud " + document.getElementById('inputID').value + "?")) {
+                const btn = document.getElementById('btnDuplicar');
+                btn.disabled = true;
+                btn.innerHTML = 'Procesando...';
+                
+                const res = await fetch(URL_APPS_SCRIPT, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'duplicar', idOriginal: document.getElementById('inputID').value })
+                });
+                const result = await res.json();
+                
+                if (result.status === "ÉXITO") {
+                    alert("Solicitud duplicada correctamente: " + result.nuevoId);
+                    google.script.host.close();
+                } else {
+                    alert("Error al duplicar: " + result.message);
+                    btn.disabled = false;
+                    btn.innerHTML = 'Duplicar Solicitud';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
