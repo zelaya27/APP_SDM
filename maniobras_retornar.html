@@ -100,16 +100,26 @@
         </form>
     </div>
     <script>
+    // --- INICIO DEL SCRIPT ---
         const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
         if (!usuarioSesion) window.location.href = "index.html";
 
+        // Declaramos urlParams y obtenemos los datos SOLO UNA VEZ
         const urlParams = new URLSearchParams(window.location.search);
         const idSol = urlParams.get('id');
+        const circuito = urlParams.get('circuito') || "No especificado";
+        const despeje = urlParams.get('despeje') || "No especificado";
         
         if (idSol) {
             document.getElementById('id_solicitud').value = idSol;
+            
+            // Llenamos los nuevos campos
+            document.getElementById('circuito_info').value = circuito;
+            document.getElementById('despeje_info').value = despeje;
+            
             document.getElementById('usuario_info').value = usuarioSesion + " (" + sectorSesion + ")";
+            
             // Llamamos a la función para cargar los datos en cuanto detectamos el ID
             cargarManiobrasExistentes();
         } else {
