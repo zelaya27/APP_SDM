@@ -409,12 +409,13 @@ datosOrdenados.forEach(fila => {
             </button>
             <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
                 <i class="fas fa-arrow-circle-up"></i> M. Retornar
+             </td>  
         <td class="archivos-td">
              </button>
             <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
                 <i class="fas fa-file-excel"></i> Excel
             </button>
-        </td>
+            </td>
     `;
     tbody.appendChild(tr);
 });
