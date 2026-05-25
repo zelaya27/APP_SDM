@@ -21,7 +21,7 @@
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
         header { background-color: var(--card-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
-        .container { max-width: 1900px; margin: 30px auto; background: var(--card-color); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow-x: auto;}
+        .container { max-width: 1700px; margin: 30px auto; background: var(--card-color); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow-x: auto;}
         h2 { margin-top: 0; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
         
         .header-info { display: flex; gap: 20px; margin-bottom: 20px; background: #1a2a3a; padding: 15px; border-radius: 5px; }
@@ -49,15 +49,14 @@
         <div class="logo-box" style="background: white; padding: 5px; border-radius:4px;">
             <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
         </div>
-        <a href="dashboard.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
-    </header>
-
-    <div class="container">
-        <h2>
+          <h2>
             <span><i class="fas fa-arrow-circle-down" style="color:#3CE764;"></i> Secuencia de Maniobras a Retirar</span>
             <button type="button" class="btn-add" onclick="agregarFila()"><i class="fas fa-plus"></i> Agregar Paso</button>
         </h2>
+        <button type="submit" id="btn-guardar" class="btn-submit"><i class="fas fa-save"></i> GUARDAR</button>
+        <a href="dashboard.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
         
+    </header>        
          <div class="header-info">
     <div>
         <label>ID Solicitud</label>
@@ -106,7 +105,6 @@
                 </tbody>
             </table>
 
-            <button type="submit" id="btn-guardar" class="btn-submit"><i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETIRAR</button>
         </form>
     </div>
     <script>
