@@ -102,7 +102,20 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
         </a>
     </div>
 </header>
-        
+        <datalist id="lista-maniobras">
+    <option value="ABRIR Y BLOQUEAR"></option>
+    <option value="DESBLOQUEAR Y CERRAR"></option>
+    <option value="ABRIR"></option>
+    <option value="CERRAR"></option>
+    <option value="BLOQUEAR"></option>
+    <option value="COLOCAR TARJETA DE PROTECCION"></option>
+    <option value="RETIRAR TARJETA DE PROTECCION"></option>
+    <option value="SACAR DE LINEA GENERACION"></option>
+    <option value="ENTRAR A LINEA GENERACION"></option>
+</datalist>
+
+<datalist id="lista-equipos"></datalist>
+
         <form id="form-maniobra" onsubmit="guardarManiobras(event)">
             <table>
                 <thead>
@@ -121,8 +134,8 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
                 <tbody id="tabla-body">
                     <tr>
                         <td><input type="number" class="m-sec" value="1" required></td>
-                        <td><input type="text" class="m-man" placeholder="Ej. ABRIR" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-equ" placeholder="Ej. INT-01" required oninput="this.value = this.value.toUpperCase()"></td>
+                        <td><input type="text" class="m-man" list="lista-maniobras" placeholder="Ej. ABRIR" required oninput="this.value = this.value.toUpperCase()"></td>
+                        <td><input type="text" class="m-equ" list="lista-equipos" placeholder="Ej. 32L" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
                         <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACION" required oninput="this.value = this.value.toUpperCase()"></td>
                         <td><input type="text" class="m-ope" placeholder="Ej. ABRIR CUCHILLAS" required oninput="this.value = this.value.toUpperCase()"></td>
                         <td><input type="text" class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
@@ -303,6 +316,65 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
                 alert("Ocurrió un error de comunicación al guardar. Revisa la consola del navegador.");
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA';
+            }
+        }
+        // --- 5. LÓGICA DE CATÁLOGOS Y AUTOCOMPLETADO ---
+        let mapaEquipos = {}; // Guardará la relación Equipo (Col N) -> Dirección (Col L)
+
+        async function cargarCatalogos() {
+            try {
+                // Usamos la misma función getDatos que ya tienes en tu Apps Script
+                const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+                const data = await response.json();
+                
+                if (data && data.equipos) {
+                    const datalistEquipos = document.getElementById('lista-equipos');
+                    datalistEquipos.innerHTML = ""; // Limpiamos la lista
+                    
+                    // Iteramos saltando la fila 0 (encabezados)
+                    for (let i = 1; i < data.equipos.length; i++) {
+                        const fila = data.equipos[i];
+                        
+                        // Asegurarnos de que la fila tenga al menos 14 columnas (hasta la N que es índice 13)
+                        if (fila && fila.length > 13) {
+                            // Columna D es índice 3 (Sector)
+                            const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : "";
+                            const miSector = sectorSesion ? sectorSesion.toString().trim().toUpperCase() : "";
+                            
+                            // Validar Sector
+                            if (sectorHoja === miSector) {
+                                // Columna N es índice 13 (Equipo)
+                                const equipoN = fila[13] ? fila[13].toString().trim().toUpperCase() : "";
+                                // Columna L es índice 11 (Dirección)
+                                const direccionL = fila[11] ? fila[11].toString().trim().toUpperCase() : "";
+                                
+                                if (equipoN) {
+                                    // 1. Añadir al dropdown de sugerencias
+                                    const option = document.createElement('option');
+                                    option.value = equipoN;
+                                    datalistEquipos.appendChild(option);
+                                    
+                                    // 2. Guardar en memoria para el autocompletado
+                                    mapaEquipos[equipoN] = direccionL;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar equipos:", error);
+            }
+        }
+
+        function autocompletarDireccion(inputEquipo) {
+            const equipoElegido = inputEquipo.value.trim().toUpperCase();
+            // Buscar la fila (tr) donde se escribió este equipo
+            const fila = inputEquipo.closest('tr');
+            const inputDireccion = fila.querySelector('.m-dir'); // Encontrar el campo de dirección en esa misma fila
+            
+            // Si el equipo escrito existe en nuestra memoria, autocompletamos
+            if (mapaEquipos[equipoElegido] !== undefined && inputDireccion) {
+                inputDireccion.value = mapaEquipos[equipoElegido];
             }
         }
     </script>
