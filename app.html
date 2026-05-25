@@ -87,6 +87,11 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 15px; /* o el espacio que prefieras entre inputs */
         }
+         .form-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px; /* o el espacio que prefieras entre inputs */
+        }
     </style>
 </head>
 <body>
@@ -132,38 +137,40 @@
             </div>
 
             <form id="mainForm">
-               <div class="form-step active" id="step1">
-    <div class="form-grid-3">   
-        <div class="form-group">
-            <label>1. ID Solicitud</label>
-            <input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;">
-        </div>
-        <div class="form-group">
-            <label>2. Número de Despeje</label>
-            <input type="text" id="numero_despeje" placeholder="Ej: UTCD-SECTOR-0010">
-        </div>
-        <div class="form-group">
-            <label for="select-gestion">3/4. Tipo de Gestión</label>
-            <select id="select-gestion" class="form-control" onchange="manejarCambioGestion(this.value)">
-                <option value="">Seleccione...</option>
-                <option value="solicitud">SOLICITUD</option>
-                <option value="apego">APEGO</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>5. Fecha de Solicitud</label>
-            <input type="date" id="fecha_solicitud" class="date-input">
-        </div>
-        <div class="form-group">
-            <label>6. Subestación</label>
-            <input type="text" id="subestacion" readonly style="background: #2c3e50;">
-        </div>
-        <div class="form-group">
-            <label>7. Circuito</label>
-            <select id="circuito" onchange="alCambiarCircuito()">
-                <option value="">Cargando circuitos...</option>
-            </select>
-             </div>
+ <div class="form-step active" id="step1">
+            <div class="form-grid-3">   
+                    <div class="form-group">
+                        <label>1. ID Solicitud</label>
+                        <input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;">
+                    </div>
+                    <div class="form-group">
+                        <label>2. Número de Despeje</label>
+                        <input type="text" id="numero_despeje" placeholder="Ej: UTCD-SECTOR-0010">
+                    </div>
+                    <div class="form-group">
+                        <label for="select-gestion">3/4. Tipo de Gestión</label>
+                        <select id="select-gestion" class="form-control" onchange="manejarCambioGestion(this.value)">
+                            <option value="">Seleccione...</option>
+                            <option value="solicitud">SOLICITUD</option>
+                            <option value="apego">APEGO</option>
+                        </select>
+                    </div>
+                         <div class="form-group">
+                        <label>5. Fecha de Solicitud</label>
+                        <input type="date" id="fecha_solicitud" class="date-input">
+                    </div>
+                 
+                   <div class="form-group">
+                        <label>Circuito</label>
+                        <select id="circuito" onchange="alCambiarCircuito()">
+                            <option value="">Cargando circuitos...</option>
+                        </select>
+                         </div>
+                    <div class="form-group">
+                        <label>6.Subestación</label>
+                        <input type="text" id="subestacion" readonly style="background: #2c3e50;">
+                    </div>
+          </div>/* cierre form-grid 3 */
         <div class="form-group">
             <label>8. Sección o Ramal</label>
             <select id="seccion">
@@ -172,6 +179,7 @@
                 <option value="TRONCAL">TRONCAL</option>
             </select>
         </div>
+       <div class="form-grid-2">
         <div class="form-group">
             <label>9. Interruptor de Circuito</label>
             <select id="interruptor_de_circuito" onchange="alCambiarEquipo()">
@@ -184,6 +192,7 @@
                 <option value="">Seleccione Circuito...</option>
             </select>
         </div>
+        </div>/* cierre form-grid 2 */
         <div class="form-group">
             <label>11. Otros Equipos</label>
             <input type="text" id="otros_equipos">
@@ -196,6 +205,7 @@
             <label>13. Ubicación del Trabajo</label>
             <input type="text" id="ubicacion_del_trabajo">
         </div>
+      <div class="form-grid-2">
         <div class="form-group">
             <label>14. Fecha de Interrupción</label>
             <input type="date" id="fecha_interrupcion" class="date-input" onchange="calcularDia()">
@@ -204,6 +214,8 @@
             <label>15. Día de la Semana</label>
             <input type="text" id="dia_de_semana" readonly style="background: #2c3e50;">
         </div>
+          </div>/* cierre form-grid 2 */
+         <div class="form-grid-3">  
         <div class="form-group">
             <label>16. Hora de Inicio</label>
             <input type="time" id="hora_inicio" onchange="calcularTiempo()">
@@ -216,7 +228,7 @@
             <label>18. Tiempo Necesario</label>
             <input type="text" id="tiempo_necesario" readonly style="background: #2c3e50;">
         </div>
-
+   </div>/* cierre form-grid 3 */
     </div> </div> 
 
                 <div class="form-step" id="step2">
