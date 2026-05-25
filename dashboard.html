@@ -182,7 +182,7 @@
 .btn-descargar { background-color: #2c3e50; }
 
 /* 3. CONTENEDOR (Alineación en celda) */
-.acciones-td {
+.acciones-td, .archivos-td {
     display: flex;
     justify-content: center; /* Alinea los botones al centro de la celda */
     align-items: center;
@@ -409,7 +409,8 @@ datosOrdenados.forEach(fila => {
             </button>
             <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
                 <i class="fas fa-arrow-circle-up"></i> M. Retornar
-            </button>
+        <td class="archivos-td">
+             </button>
             <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
                 <i class="fas fa-file-excel"></i> Excel
             </button>
