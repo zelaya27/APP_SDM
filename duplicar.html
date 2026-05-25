@@ -4,19 +4,25 @@
     <base target="_top">
     <meta charset="UTF-8">
     <style>
-        :root { --bg-color: #0b141d; --card-color: #14212d; --text-color: #ffffff; --accent: #3498db; }
+        :root { 
+            --bg-color: #0b141d; 
+            --card-color: #14212d; 
+            --text-color: #ffffff; 
+            --accent: #3498db; 
+            --success: #27ae60; 
+            --border-color: #333; 
+        }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: sans-serif; padding: 20px; }
-        .card { background: var(--card-color); padding: 20px; border-radius: 10px; border: 1px solid #333; max-width: 500px; margin: auto; }
-        input { width: 100%; padding: 10px; margin: 10px 0; background: var(--bg-color); border: 1px solid #555; color: white; border-radius: 5px; box-sizing: border-box; }
+        .card { background: var(--card-color); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); max-width: 500px; margin: auto; }
+        h3 { text-align: center; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: var(--bg-color); border: 1px solid #555; color: white; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; margin-top: 10px; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-buscar { background: var(--accent); }
-        .btn-duplicar { background: #27ae60; display: none; }
-        /* Nuevo estilo para el botón de regreso */
+        .btn-duplicar { background: var(--success); display: none; }
         .btn-back { background: #7f8c8d; margin-top: 20px; }
         .btn-back:hover { background: #95a5a6; }
-        
-        .info-label { color: #aaa; font-size: 0.9em; margin-bottom: 5px; }
-        .info-val { color: #fff; margin-bottom: 15px; font-weight: bold; }
+        .info-label { color: #aaa; font-size: 0.9em; margin-bottom: 2px; }
+        .info-val { color: #fff; margin-bottom: 15px; font-weight: bold; font-size: 1.1em; }
     </style>
 </head>
 <body>
@@ -38,8 +44,9 @@
     </div>
 
     <script>
+        // CONFIGURACIÓN: Asegúrate de que esta URL sea la correcta de tu despliegue
         const CONFIG = {
-            URL_APPS_SCRIPT: 'https://script.google.com/macros/s/AKfycbxkBdH0AXNapeoDA3Oc1qkMGnEG9gEJP0uoNBY1t1F3CRfgrBDqLs-ZkljOLGWa7dC7/exec'
+            URL_APPS_SCRIPT: 'TU_URL_AQUI_EJEMPLO_HTTPS_SCRIPT_GOOGLE_COM_...'
         };
 
         async function buscarSolicitud() {
@@ -47,22 +54,25 @@
             if(!id) return alert("Por favor ingresa un ID.");
             
             try {
-                const res = await fetch(`${CONFIG.URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`);
+                const url = `${CONFIG.URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`;
+                const res = await fetch(url);
                 const data = await res.json();
                 
                 if(data.error) {
                     alert("No se encontró la solicitud: " + id);
+                    document.getElementById('resultado').style.display = 'none';
                 } else {
-                    document.getElementById('res_num').innerText = data.no_despeje;
-                    document.getElementById('res_fecha').innerText = data.fecha;
-                    document.getElementById('res_circuito').innerText = data.circuito;
-                    document.getElementById('res_nombre').innerText = data.nombre_despeje;
+                    document.getElementById('res_num').innerText = data.datos[1] || "N/A";
+                    document.getElementById('res_fecha').innerText = data.datos[4] || "N/A";
+                    document.getElementById('res_circuito').innerText = data.datos[6] || "N/A";
+                    document.getElementById('res_nombre').innerText = data.datos[23] || "N/A";
+                    
                     document.getElementById('resultado').style.display = 'block';
                     document.getElementById('btnDuplicar').style.display = 'block';
                 }
             } catch(e) {
                 console.error(e);
-                alert("Error conectando con el servidor");
+                alert("Error conectando con el servidor. Verifica tu URL.");
             }
         }
 
@@ -77,13 +87,21 @@
             try {
                 const res = await fetch(CONFIG.URL_APPS_SCRIPT, {
                     method: 'POST',
-                    mode: 'no-cors',
                     body: JSON.stringify({ action: 'duplicar', idOriginal: id })
                 });
                 
-                alert("Solicitud procesada. (Verifica en el Dashboard)");
-                window.location.href = 'dashboard.html'; // Cambiado de window.close() a redirección
+                const data = await res.json();
+                
+                if (data.status === "ÉXITO") {
+                    alert("Solicitud duplicada exitosamente. Nuevo ID: " + data.nuevoId);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert("Error: " + (data.message || "No se pudo procesar la duplicación"));
+                    btn.disabled = false;
+                    btn.innerText = 'Duplicar Solicitud';
+                }
             } catch(e) {
+                console.error(e);
                 alert("Error de red");
                 btn.disabled = false;
                 btn.innerText = 'Duplicar Solicitud';
