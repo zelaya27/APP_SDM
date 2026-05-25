@@ -156,39 +156,37 @@
         th { background-color: var(--accent-color); color: white; font-weight: 600; }
         tr:hover { background-color: #1a2a3a; }
 
-        /* BOTONES DE ACCIÓN EN TABLA */
-       /* Contenedor de botones en la celda */
-.acciones-td { 
-    display: flex; 
-    gap: 4px; 
-    flex-wrap: nowrap; /* Evita que se bajen a la siguiente fila */
-    width: 100%;
-    min-width: 220px; /* Aumenta este valor si necesitas que la columna sea más ancha */
-}
-
-/* Botones uniformes */
+        /* BOTONES TABLA */
+/* 1. CLASE GEOMÉTRICA (Controla el tamaño de TODOS) */
 .btn-accion {
-    flex: 1; /* Hace que todos los botones ocupen el mismo ancho */
-    padding: 6px 4px;
+    height: 38px;           /* Todos miden lo mismo */
+    padding: 0 12px;        /* Padding uniforme */
+    box-sizing: border-box; /* Crucial para que el padding no cambie el alto */
     border: none;
     border-radius: 4px;
     cursor: pointer;
     color: white;
-    font-size: 11px; /* Ligeramente más pequeño para que quepa bien el texto */
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Centra el texto */
+    font-size: 11px;
+    display: inline-flex;   /* Importante para alinear iconos */
+    align-items: center;    /* Centra verticalmente */
+    justify-content: center;
     gap: 5px;
-    transition: 0.2s;
-    white-space: nowrap; /* Evita que el texto del botón se rompa en dos líneas */
+    margin: 0 2px;          /* Espacio entre botones */
+    white-space: nowrap;
 }
 
-/* Colores */
-.btn-form { background: var(--info-color); }
-.btn-retirar { background: var(--success-color); }
-.btn-retornar { background: var(--danger-color); }
-.btn-descargar { background: #107c41; }
-.btn-accion:hover { opacity: 0.8; }
+/* 2. CLASES DE COLOR (SOLO COLORES, NADA DE TAMAÑOS) */
+.btn-form { background-color: #3498db; }
+.btn-retirar { background-color: #e67e22; }
+.btn-retornar { background-color: #27ae60; }
+.btn-descargar { background-color: #2c3e50; }
+
+/* 3. CONTENEDOR (Alineación en celda) */
+.acciones-td {
+    display: flex;
+    justify-content: center; /* Alinea los botones al centro de la celda */
+    align-items: center;
+}
     </style>
 </head>
 <body>
@@ -392,37 +390,33 @@
                 return;
             }
 
-            datosOrdenados.forEach(fila => {
-                // Preparamos los datos para que no rompan el HTML del botón
-                const filaJson = JSON.stringify(fila).replace(/"/g, '&quot;');
-                
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong>${fila.id}</strong></td>
-                    <td>${fila.no_despeje || '-'}</td>
-                    <td>${formatearFecha(fila.fecha)}</td>
-                    <td>${fila.circuito || '-'}</td>
-                    <td>${fila.nombre || '-'}</td>
-                    <td class="acciones-td">
-                        <button class="btn-accion btn-form" title="Ver Solicitud" onclick="abrirAccion('formulario', '${fila.id}')">
-                            <i class="fas fa-file-alt"></i> Solicitud
-                        </button>
-                        <button class="btn-accion btn-retirar" title="Maniobras a Retirar" onclick="abrirAccion('retirar', '${fila.id}')">
-                            <i class="fas fa-arrow-circle-down"></i> M. Retirar
-                        </button>
-                        <button class="btn-accion btn-retornar" title="Maniobras a Retornar" onclick="abrirAccion('retornar', '${fila.id}')">
-                            <i class="fas fa-arrow-circle-up"></i> M. Retornar
-                        </button>
-                    </td>
-                    <td class="archivos-td" style="text-align: center;">
-                         <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')" title="Descargar Excel">
-                         <i class="fas fa-file-excel"></i> Excel
-                    </button>
-                    </td>
-                   
-                `;
-                tbody.appendChild(tr);
-            });
+            // Dentro de tu función renderizarTabla()
+datosOrdenados.forEach(fila => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td><strong>${fila.id}</strong></td>
+        <td>${fila.no_despeje || '-'}</td>
+        <td>${formatearFecha(fila.fecha)}</td>
+        <td>${fila.circuito || '-'}</td>
+        <td>${fila.nombre || '-'}</td>
+        
+        <td class="acciones-td">
+            <button class="btn-accion btn-form" onclick="abrirAccion('formulario', '${fila.id}')">
+                <i class="fas fa-file-alt"></i> Solicitud
+            </button>
+            <button class="btn-accion btn-retirar" onclick="abrirAccion('retirar', '${fila.id}')">
+                <i class="fas fa-arrow-circle-down"></i> M. Retirar
+            </button>
+            <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
+                <i class="fas fa-arrow-circle-up"></i> M. Retornar
+            </button>
+            <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
+                <i class="fas fa-file-excel"></i> Excel
+            </button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+});
         }
 
         function limpiarFiltros() {
