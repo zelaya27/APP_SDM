@@ -4,45 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Principal - Solicitudes de Despeje</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="config.js"></script>
-    <script>
-        const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
 
-        // Función auxiliar por si config.js tarda en cargar
-        function normalizarDatos(datos) {
-            if (!datos) return {};
-            const limpios = {};
-            for (let key in datos) {
-                const valor = datos[key];
-                limpios[key] = (valor === undefined || valor === null) ? "" : valor;
-            }
-            return limpios;
-        }
-    </script>
     <style>
+        /* 1. PALETA DE COLORES PRINCIPAL */
+        /* Cambia estos códigos para alterar los colores de toda la página */
         :root {
-            --bg-color: #0b141d; 
-            --card-color: #14212d; 
-            --accent-color: #003366;
-            --success-color: #27ae60; 
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --info-color: #3498db;
-            --text-color: #ffffff; 
-            --muted-text: #a0aec0;
-            --border-color: #2c3e50;
+            --bg-color: #0b141d;        /* Color del fondo general (muy oscuro) */
+            --card-color: #14212d;      /* Color de las cajas/tarjetas (oscuro) */
+            --accent-color: #003366;    /* Azul institucional para resaltar */
+            --success-color: #27ae60;   /* Verde para acciones positivas */
+            --warning-color: #f39c12;   /* Naranja para advertencias */
+            --danger-color: #e74c3c;    /* Rojo para salir o cancelar */
+            --info-color: #3498db;      /* Azul claro para información */
+            --text-color: #ffffff;      /* Texto principal blanco */
+            --muted-text: #a0aec0;      /* Texto secundario grisáceo */
+            --border-color: #2c3e50;    /* Color de las líneas separadoras */
         }
 
+        /* 2. DISEÑO GENERAL DE LA PÁGINA */
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; 
         }
         
-        /* HEADER */
+        /* 3. ENCABEZADO (Menú superior) */
         header { 
             background-color: var(--card-color); 
             padding: 10px 20px; 
@@ -52,11 +43,10 @@
             border-bottom: 1px solid var(--border-color); 
         }
         .user-info { display: flex; align-items: center; gap: 15px; }
-        .btn-logout { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
         
-        /* CONTENEDOR PRINCIPAL */
+        /* 4. CONTENEDOR PRINCIPAL (La caja central) */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 30px auto;
             padding: 20px;
             background: var(--card-color);
@@ -64,159 +54,76 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        /* PANEL DE FILTROS REORGANIZADO */
+        /* 5. ZONA DE FILTROS */
         .header-panel {
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap; 
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; 
+            align-items: center; gap: 15px; flex-wrap: wrap; 
+            margin-bottom: 20px; border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
         }
-
-        .filtros-contenedor {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .filtros-grupo {
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            color: white;
-        }
-
-        .filtros-grupo label {
-            margin: 0; 
-            font-weight: 600; 
-            font-size: 13px; 
-            color: var(--muted-text);
-        }
-
+        .filtros-contenedor { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .filtros-grupo { display: flex; align-items: center; gap: 8px; color: white; }
+        .filtros-grupo label { margin: 0; font-weight: 600; font-size: 13px; color: var(--muted-text); }
         .input-filtro {
-            padding: 6px 10px; 
-            border-radius: 5px; 
-            background: var(--bg-color); 
-            color: white; 
+            padding: 6px 10px; border-radius: 5px; 
+            background: var(--bg-color); color: white; 
             border: 1px solid var(--border-color); 
-            cursor: pointer; 
-            font-size: 13px;
-            outline: none;
-            color-scheme: dark; 
+            cursor: pointer; font-size: 13px; outline: none; color-scheme: dark; 
         }
 
-        /* BOTÓN DE LIMPIAR FILTROS */
-        .btn-limpiar {
-            background: #34495e;
-            color: white;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.2s;
-        }
-        .btn-limpiar:hover { background: var(--danger-color); border-color: var(--danger-color); }
-
-        .btn-nueva {
-            background: var(--success-color);
-            color: white;
-            padding: 8px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-            margin: 0;
-        }
-        .btn-nueva:hover { background: #219653; }
-
-        /* TABLA DE DATOS */
+        /* 6. ESTILOS DE TABLA */
         .table-responsive { overflow-x: auto; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
         th { background-color: var(--accent-color); color: white; font-weight: 600; }
-        tr:hover { background-color: #1a2a3a; }
+        tr:hover { background-color: #1a2a3a; } /* Efecto al pasar el mouse */
 
-        /* BOTONES TABLA */
-/* 1. CLASE GEOMÉTRICA (Controla el tamaño de TODOS) */
-.btn-accion {
-    height: 38px;           /* Todos miden lo mismo */
-    padding: 0 12px;        /* Padding uniforme */
-    box-sizing: border-box; /* Crucial para que el padding no cambie el alto */
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-    font-size: 11px;
-    display: inline-flex;   /* Importante para alinear iconos */
-    align-items: center;    /* Centra verticalmente */
-    justify-content: center;
-    gap: 6px;
-    margin: 0 2px;          /* Espacio entre botones */
-    white-space: nowrap;
-}
+        /* 7. ESTILOS DE BOTONES */
+        .btn-limpiar { background: #34495e; color: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-limpiar:hover { background: var(--danger-color); border-color: var(--danger-color); }
+        
+        .btn-nueva { background: var(--success-color); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .btn-nueva:hover { background: #219653; }
+        .btn-logout { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
 
-/* 2. CLASES DE COLOR (SOLO COLORES, NADA DE TAMAÑOS) */
-.btn-form { background-color: #3498db; }
-.btn-retirar { background-color: #e67e22; }
-.btn-retornar { background-color: #27ae60; }
-.btn-descargar { background-color: #2c3e50; }
-
-/* 3. CONTENEDOR (Alineación en celda) */
-.acciones-td, .archivos-td {
-    display: flex;
-    justify-content: center; /* Alinea los botones al centro de la celda */
-    align-items: center;
-}
+        /* Botones dentro de la tabla (Acciones) */
+        .btn-accion {
+            height: 38px; padding: 0 12px; border: none; border-radius: 4px;
+            cursor: pointer; color: white; font-size: 11px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin: 0 2px;
+        }
+        .btn-form { background-color: #3498db; }
+        .btn-retirar { background-color: #e67e22; }
+        .btn-retornar { background-color: #27ae60; }
+        .btn-descargar { background-color: #2c3e50; }
+        .acciones-td, .archivos-td { display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
     <header>
-       <div class="header-container" style="display: flex; align-items: center; gap: 20px; background: var(--bg-color); padding: 10px 20px; border-bottom: 1px solid var(--border-color);">
-    
-    <div class="logo-box" style="background: white; padding: 5px 10px; border-radius: 4px; display: flex; align-items: center;">
-        <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
-    </div>
-
-    <h2 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: bold; flex-grow: 1;">
-        PANEL PRINCIPAL, MIS SOLICITUDES DE DESPEJES
-    </h2>
-    
-</div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="background: white; padding: 5px 10px; border-radius: 4px; display: flex;">
+                <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo UTCD">
+            </div>
+            <h2 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: bold;">
+                PANEL PRINCIPAL, MIS SOLICITUDES DE DESPEJES
+            </h2>
+        </div>
+        
         <div class="user-info">
             <span id="nombre-usuario"><i class="fas fa-user-circle"></i> Cargando...</span>
-            <button class="btn-logout" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesion</button>
+            <button class="btn-logout" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
         </div>
     </header>
 
-   <div class="container">
+    <div class="container">
         <div class="header-panel">
-            
             <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
 
             <div class="filtros-contenedor">
                 <div class="filtros-grupo">
-                    <label for="limitSelector">Mostrar:</label>
+                    <label>Mostrar:</label>
                     <select id="limitSelector" class="input-filtro" onchange="renderizarTabla()">
                         <option value="10" selected>Últimos 10</option>
                         <option value="20">Últimos 20</option>
@@ -226,8 +133,8 @@
                 </div>
 
                 <div class="filtros-grupo">
-                    <label for="filtroCircuito"><i class="fas fa-bolt" style="color: #f1c40f;"></i> Circuito:</label>
-                    <select id="filtroCircuito" class="input-filtro" onchange="renderizarTabla()" style="min-width: 120px;">
+                    <label><i class="fas fa-bolt" style="color: #f1c40f;"></i> Circuito:</label>
+                    <select id="filtroCircuito" class="input-filtro" onchange="renderizarTabla()">
                         <option value="ALL">Todos</option>
                     </select>
                 </div>
@@ -239,7 +146,7 @@
                     <input type="date" id="fechaHasta" class="input-filtro" onchange="renderizarTabla()">
                 </div>
 
-                <button type="button" class="btn-limpiar" title="Quitar todos los filtros" onclick="limpiarFiltros()">
+                <button class="btn-limpiar" onclick="limpiarFiltros()" title="Borrar filtros">
                     <i class="fas fa-times-circle"></i> Limpiar
                 </button>
             </div>
@@ -251,7 +158,7 @@
                     <tr>
                         <th>ID Solicitud</th>
                         <th>No. Despeje</th>
-                        <th>Fecha de Solicitud</th>
+                        <th>Fecha</th>
                         <th>Circuito</th>
                         <th>Nombre del Despeje</th>
                         <th>Acciones</th>
@@ -259,29 +166,35 @@
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
-                    <tr><td colspan="6" style="text-align:center;">Cargando solicitudes...</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">Cargando información, por favor espera...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <script>
-        // VARIABLE GLOBAL
-        let todosLosDatos = [];
 
-        // Validar sesión al cargar
+    <script>
+        // 1. VARIABLES GLOBALES (Datos compartidos)
+        const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT; // Trae la URL desde config.js
+        let todosLosDatos = []; // Aquí guardaremos todo lo que llegue del servidor
+
+        // 2. SEGURIDAD Y SESIÓN
+        // Verificamos quién entró. Si no hay sesión, lo expulsamos al login.
         const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
 
         if (!usuarioSesion) {
             window.location.href = "index.html"; 
         } else {
+            // Si el usuario es válido, mostramos su nombre y cargamos los datos
             document.getElementById("nombre-usuario").innerHTML = `<i class="fas fa-user-circle"></i> ${usuarioSesion} (${sectorSesion})`;
             cargarSolicitudes(); 
             inicializarFiltroCircuitos(); 
         }
 
-        // FUNCIÓN PARA FORMATEAR LA FECHA
+        // 3. FUNCIONES DE AYUDA (Herramientas)
+        
+        // Esta función convierte la fecha fea de la base de datos a un formato bonito (DD/MM/AAAA)
         function formatearFecha(fechaOriginal) {
             if (!fechaOriginal) return "Sin fecha";
             let fecha = new Date(fechaOriginal);
@@ -293,134 +206,132 @@
             
             return `${dia}/${mes}/${anio}`;
         }
-       
-      // CARGAR CATÁLOGO DE CIRCUITOS DEL SECTOR
-      async function inicializarFiltroCircuitos() {
-        const selectCircuito = document.getElementById('filtroCircuito');
-        if (!selectCircuito) return;
 
-        const INDICE_SECTOR = 3; 
-        const INDICE_CIRCUITO = 6; 
+        // 4. FUNCIONES PRINCIPALES DE CARGA DE DATOS
 
-        try {
-            const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
-            const catalogos = await response.json();
-            
-            if (catalogos && catalogos.circuitos) {
-                selectCircuito.innerHTML = '<option value="ALL">Todos</option>';
+        // Carga la lista de circuitos según el sector del usuario para llenar el filtro
+        async function inicializarFiltroCircuitos() {
+            const selectCircuito = document.getElementById('filtroCircuito');
+            if (!selectCircuito) return;
+
+            try {
+                const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+                const catalogos = await response.json();
                 
-                const miSector = sectorSesion.trim().toUpperCase();
+                if (catalogos && catalogos.circuitos) {
+                    const miSector = sectorSesion.trim().toUpperCase();
+                    // Filtramos para que solo vea los circuitos de SU sector (Columna 3)
+                    const circuitosFiltrados = catalogos.circuitos.slice(1).filter(fila => {
+                        const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : "";
+                        return sectorHoja === miSector;
+                    });
 
-                const circuitosFiltrados = catalogos.circuitos.slice(1).filter(fila => {
-                    const valRaw = fila[INDICE_SECTOR];
-                    const sectorHoja = valRaw ? valRaw.toString().trim().toUpperCase() : "";
-                    return sectorHoja === miSector;
-                });
-
-                circuitosFiltrados.forEach(fila => {
-                    const nombreCircuito = fila[INDICE_CIRCUITO] ? fila[INDICE_CIRCUITO].toString().trim() : "";
-                    if (nombreCircuito) {
-                        const opt = document.createElement('option');
-                        opt.value = nombreCircuito;
-                        opt.textContent = nombreCircuito;
-                        selectCircuito.appendChild(opt);
-                    }
-                });
+                    // Agregamos las opciones al menú desplegable
+                    circuitosFiltrados.forEach(fila => {
+                        const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
+                        if (nombreCircuito) {
+                            selectCircuito.innerHTML += `<option value="${nombreCircuito}">${nombreCircuito}</option>`;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error al cargar circuitos:", error);
             }
-        } catch (error) {
-            console.error("Error al cargar circuitos:", error);
         }
-    }
 
-        // CARGAR SOLICITUDES
+        // Se conecta al servidor y trae TODAS las solicitudes del sector
         async function cargarSolicitudes() {
             const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sectorSesion)}`;
-            
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
+                // Si el servidor falla, mostramos el error
                 if (!Array.isArray(data)) {
-                    document.getElementById("tabla-body").innerHTML = 
-                        `<tr><td colspan="6" style="text-align:center; color:red;">Error: ${data.error || "No se recibieron datos"}</td></tr>`;
+                    document.getElementById("tabla-body").innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error de datos</td></tr>`;
                     return;
                 }
 
+                // Guardamos los datos y mandamos a dibujar la tabla
                 todosLosDatos = data;
                 renderizarTabla();
-
             } catch (error) {
-                console.error("Error de conexión:", error);
-                document.getElementById("tabla-body").innerHTML = 
-                    `<tr><td colspan="6" style="text-align:center;">Error al conectar con la base de datos.</td></tr>`;
+                document.getElementById("tabla-body").innerHTML = `<tr><td colspan="7" style="text-align:center;">Error al conectar al servidor.</td></tr>`;
             }
         }
 
-        // RENDERIZAR LA TABLA
+        // 5. FUNCIÓN PARA DIBUJAR LA TABLA EN PANTALLA
+        // Toma los datos, aplica los filtros y dibuja fila por fila
         function renderizarTabla() {
             const tbody = document.getElementById("tabla-body");
-            tbody.innerHTML = ""; 
+            tbody.innerHTML = ""; // Limpiamos la tabla antes de volver a dibujar
 
             if (todosLosDatos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
                 return;
             }
 
+            // Leemos qué filtros seleccionó el usuario
             const limite = document.getElementById("limitSelector").value;
             const circuitoBuscado = document.getElementById("filtroCircuito").value;
             const fechaDesde = document.getElementById("fechaDesde").value;
             const fechaHasta = document.getElementById("fechaHasta").value;
 
+            // Filtramos la información
             let datosFiltrados = todosLosDatos.filter(fila => {
                 let cumpleCircuito = (circuitoBuscado === "ALL" || fila.circuito === circuitoBuscado);
                 let cumpleDesde = (!fechaDesde || fila.fecha >= fechaDesde);
                 let cumpleHasta = (!fechaHasta || fila.fecha <= fechaHasta);
-
                 return cumpleCircuito && cumpleDesde && cumpleHasta;
             });
 
+            // Ordenamos de más reciente a más antiguo
             let datosOrdenados = datosFiltrados.reverse();
 
+            // Aplicamos el límite (Ej: Mostrar solo los últimos 10)
             if (limite !== "ALL") {
                 datosOrdenados = datosOrdenados.slice(0, parseInt(limite));
             }
 
             if (datosOrdenados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
                 return;
             }
 
-            // Dentro de tu función renderizarTabla()
-datosOrdenados.forEach(fila => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-        <td><strong>${fila.id}</strong></td>
-        <td>${fila.no_despeje || '-'}</td>
-        <td>${formatearFecha(fila.fecha)}</td>
-        <td>${fila.circuito || '-'}</td>
-        <td>${fila.nombre || '-'}</td>
-        
-        <td class="acciones-td">
-            <button class="btn-accion btn-form" onclick="abrirAccion('formulario', '${fila.id}')">
-                <i class="fas fa-file-alt"></i> Solicitud
-            </button>
-            <button class="btn-accion btn-retirar" onclick="abrirAccion('retirar', '${fila.id}')">
-                <i class="fas fa-arrow-circle-down"></i> M. Retirar
-            </button>
-            <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
-                <i class="fas fa-arrow-circle-up"></i> M. Retornar
-             </td>  
-        <td class="archivos-td">
-             </button>
-            <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
-                <i class="fas fa-file-excel"></i> Excel
-            </button>
-            </td>
-    `;
-    tbody.appendChild(tr);
-});
+            // Dibujamos el HTML por cada fila encontrada
+            datosOrdenados.forEach(fila => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${fila.id}</strong></td>
+                    <td>${fila.no_despeje || '-'}</td>
+                    <td>${formatearFecha(fila.fecha)}</td>
+                    <td>${fila.circuito || '-'}</td>
+                    <td>${fila.nombre || '-'}</td>
+                    
+                    <td class="acciones-td">
+                        <button class="btn-accion btn-form" onclick="abrirAccion('formulario', '${fila.id}')">
+                            <i class="fas fa-file-alt"></i> Solicitud
+                        </button>
+                        <button class="btn-accion btn-retirar" onclick="abrirAccion('retirar', '${fila.id}')">
+                            <i class="fas fa-arrow-circle-down"></i> M. Retirar
+                        </button>
+                        <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
+                            <i class="fas fa-arrow-circle-up"></i> M. Retornar
+                        </button>
+                    </td>  
+                    <td class="archivos-td">
+                        <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
+        // 6. FUNCIONES DE INTERACCIÓN DEL USUARIO
+
+        // Reinicia todos los filtros a su estado original
         function limpiarFiltros() {
             document.getElementById("filtroCircuito").value = "ALL";
             document.getElementById("fechaDesde").value = "";
@@ -429,6 +340,7 @@ datosOrdenados.forEach(fila => {
             renderizarTabla();
         }
 
+        // Redirige al usuario a la pantalla correspondiente según el botón que presionó
         function abrirAccion(accion, idSolicitud) {
             if (accion === 'editar' || accion === 'formulario') {
                 window.location.href = `app.html?id=${idSolicitud}&modo=${accion}`;
@@ -439,26 +351,27 @@ datosOrdenados.forEach(fila => {
             }
         }
 
-// NUEVA FUNCIÓN PARA DESCARGAR EXCEL DESDE EL DASHBOARD (Corregida)
-// =========================================================================
-async function descargarExcelDashboard(boton, idSolicitud) {
-    const textoOriginal = boton.innerHTML;
-    boton.disabled = true;
-    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        // Genera y descarga el Excel
+        async function descargarExcelDashboard(boton, idSolicitud) {
+            // Cambiamos el botón para que diga "Procesando..." y nadie haga doble clic
+            const textoOriginal = boton.innerHTML;
+            boton.disabled = true;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
 
-    try {
-        // 1. OBTENER LA SOLICITUD COMPLETA (Viene como un Arreglo/Fila de Excel)
-        const resData = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${idSolicitud}`);
-        const solicitudCompleta = await resData.json();
+            try {
+                // 1. Buscamos todos los datos completos de ese ID
+                const resData = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${idSolicitud}`);
+                const solicitudCompleta = await resData.json();
 
-        if(!solicitudCompleta || solicitudCompleta.error) {
-            alert("No se pudo obtener el detalle de la solicitud.");
-            return;
-        }
+                if(!solicitudCompleta || solicitudCompleta.error) {
+                    alert("No se pudo obtener el detalle de la solicitud.");
+                    return;
+                }
 
-        // 2. CONSTRUIR EL OBJETO PARA EL EXCEL USANDO LOS ÍNDICES DE LAS COLUMNAS
+                // 2. Empaquetamos los datos en un "Paquete" ordenado
+                const datosParaExcel = {
+                    LOS ÍNDICES DE LAS COLUMNAS
         // Nota: [0] es la Columna A, [1] es la B, [2] es la C, etc.
-        const datosParaExcel = {
             ID_SOLICITUD: solicitudCompleta[0] || idSolicitud, 
             NUMERO_DESPEJE: solicitudCompleta[1] || "",
             SOLICITUD: solicitudCompleta[2] || "", 
@@ -485,21 +398,16 @@ async function descargarExcelDashboard(boton, idSolicitud) {
             NOMBRE_DESPEJE: solicitudCompleta[23] || "",
             APEGOS_ENLACES: solicitudCompleta[24] || "", 
             APEGO_DESPEJE: solicitudCompleta[25] || "",
-            
-            // LOS CAMPOS DEL TIPO DE TRABAJO (Desde la Columna 27 en adelante)
             MANTO_PROGRAMADO: solicitudCompleta[26] || "",
             MANTO_EMERGENCIA: solicitudCompleta[27] || "",
             MANTO_EQ_MEDICION: solicitudCompleta[28] || "",
             PROYECTO_EXPANSION: solicitudCompleta[29] || "",
             MANTO_OTROS: solicitudCompleta[30] || "",
-            
-            // LAS ODTs
             ODT_PROGRAMADA: solicitudCompleta[31] || "", 
             ODT_EMERGENCIA: solicitudCompleta[32] || "",
             ODT_OS: solicitudCompleta[33] || "", 
             CODIGO_PROYECTO: solicitudCompleta[34] || "",
             ODT_OTROS: solicitudCompleta[35] || "", 
-            
             JUSTIFICACION: solicitudCompleta[36] || "",
             OBSERVACIONES: solicitudCompleta[37] || "", 
             SOLICITADO_POR: solicitudCompleta[38] || "",
@@ -507,36 +415,35 @@ async function descargarExcelDashboard(boton, idSolicitud) {
             APROBADO_POR: solicitudCompleta[40] || "",
             SECTOR: sectorSesion || solicitudCompleta[41] || "", 
             USUARIO: usuarioSesion || solicitudCompleta[42] || ""
-        };
+                };
 
-        // 3. ENVIAR A GENERAR EL EXCEL
-        const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(datosParaExcel)
-        });
+                // 3. Mandamos el paquete a Google Apps Script para que cree el Excel
+                const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
+                    method: 'POST', mode: 'cors', body: JSON.stringify(datosParaExcel)
+                });
+                const res = await response.json();
 
-        const res = await response.json();
+                // 4. Si fue un éxito, obligamos al navegador a descargar el archivo
+                if (res.status === "ÉXITO") {
+                    const enlaceDescarga = document.createElement('a');
+                    enlaceDescarga.href = res.url;
+                    document.body.appendChild(enlaceDescarga);
+                    enlaceDescarga.click();
+                    document.body.removeChild(enlaceDescarga);
+                } else {
+                    alert("Error en el servidor: " + (res.message || res.error));
+                }
 
-        if (res.status === "ÉXITO") {
-            const enlaceDescarga = document.createElement('a');
-            enlaceDescarga.href = res.url;
-            document.body.appendChild(enlaceDescarga);
-            enlaceDescarga.click();
-            document.body.removeChild(enlaceDescarga);
-        } else {
-            alert("Error en el servidor al generar: " + (res.message || res.error));
+            } catch (err) {
+                alert("No se pudo conectar con el servidor para generar el Excel.");
+            } finally {
+                // Devolvemos el botón a la normalidad
+                boton.disabled = false;
+                boton.innerHTML = textoOriginal;
+            }
         }
 
-    } catch (err) {
-        console.error("Error de comunicación:", err);
-        alert("No se pudo conectar con el servidor para generar el Excel.");
-    } finally {
-        boton.disabled = false;
-        boton.innerHTML = textoOriginal;
-    }
-}
-
+        // Cierra la sesión borrando la llave y mandando a la pantalla de entrada
         function cerrarSesion() {
             sessionStorage.clear();
             window.location.href = "index.html";
