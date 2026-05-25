@@ -17,8 +17,8 @@
         :root {
             --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
             --success-color: #27ae60; --danger-color: #e74c3c; --info-color: #3498db;
-            --text-color: #ffffff; --muted-text: #a0aec0; --border-color: #2c3e50;
-        }
+            --text-color: #ffffff; --muted-text: #a0aec0; --border-color: #2c3e50;--verde-claro: #73F527;--verde-menta:#27F59F;--azul-cielo:#27E0F5;
+            --azul-oscuro:#110EC9;--rojo:#C90E21;--rosado:#F75EE2;--amarrillo:#E1F549;--naranja:#E39F14;--negro:#000000;  }
      /* =========================================
    ESTILOS GENERALES
    ========================================= */
@@ -33,7 +33,7 @@ header {   background-color: var(--card-color);  padding: 15px 20px;   display: 
 .header-left {    display: flex;  align-items: center;gap: 15px;}
 
 /* Ajusta el título del header */
-.header-title { margin: 0;padding: 0; border: none; font-size: 20px;}
+.header-title { margin: 10px;padding: 0; border: none; font-size: 24px;}
 
 /* Agrupa los botones a la derecha */
 .header-actions { display: flex;align-items: center;   gap: 10px;}
@@ -61,12 +61,12 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
         th { background-color: var(--accent-color); color: white; font-size: 13px;}
         td input { width: 100%; padding: 8px; background-color: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 13px;}
         
-        .btn-add { background: var(--success-color); color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;}
+        .btn-add { background: var(--azul-cielo); color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;}
         .btn-remove { background: var(--danger-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
         
         .btn-submit { background: var(--success-color); color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;}
         .btn-submit:disabled { background: #555; cursor: not-allowed; }
-        .btn-volver { background: transparent; color: var(--muted-text); border: 1px solid var(--border-color); padding: 8px 15px; text-decoration: none; border-radius: 4px; }
+        .btn-volver { background: transparent; color: var(--amarrillo); border: 1px solid var(--border-color); padding: 8px 15px; text-decoration: none; border-radius: 4px; }
     </style>
 </head>
 <body>  
@@ -76,7 +76,7 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
             <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
         </div>
         <h2 class="header-title">
-            <i class="fas fa-arrow-circle-down" style="color:#3CE764;"></i> Secuencia a Retirar
+            <i class="fas fa-arrow-circle-down" style="color:#3CE764;"></i>  Secuencia a Retirar
         </h2>
     </div>
 
@@ -102,7 +102,7 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
                         <th style="width: 70px;">Secuencia</th>
                         <th style="width: 200px;">Maniobra</th>
                         <th style="width: 300px;">Equipo</th> 
-                        <th style="width: 400px;">Dirección</th> 
+                        <th style="width: 300px;">Dirección</th> 
                         <th style="width: 400px;">Operación a Ejecutar</th>
                         <th style="width: 100px;">Personal</th>
                         <th style="width: 70px;">Hora</th>
