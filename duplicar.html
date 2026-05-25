@@ -6,11 +6,15 @@
     <style>
         :root { --bg-color: #0b141d; --card-color: #14212d; --text-color: #ffffff; --accent: #3498db; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: sans-serif; padding: 20px; }
-        .card { background: var(--card-color); padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        .card { background: var(--card-color); padding: 20px; border-radius: 10px; border: 1px solid #333; max-width: 500px; margin: auto; }
         input { width: 100%; padding: 10px; margin: 10px 0; background: var(--bg-color); border: 1px solid #555; color: white; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; margin-top: 10px; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-buscar { background: var(--accent); }
         .btn-duplicar { background: #27ae60; display: none; }
+        /* Nuevo estilo para el botón de regreso */
+        .btn-back { background: #7f8c8d; margin-top: 20px; }
+        .btn-back:hover { background: #95a5a6; }
+        
         .info-label { color: #aaa; font-size: 0.9em; margin-bottom: 5px; }
         .info-val { color: #fff; margin-bottom: 15px; font-weight: bold; }
     </style>
@@ -29,10 +33,11 @@
             
             <button id="btnDuplicar" class="btn-duplicar" onclick="confirmarDuplicacion()">Duplicar Solicitud</button>
         </div>
+
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">Volver al Dashboard</button>
     </div>
 
     <script>
-        // Tu configuración
         const CONFIG = {
             URL_APPS_SCRIPT: 'https://script.google.com/macros/s/AKfycbxkBdH0AXNapeoDA3Oc1qkMGnEG9gEJP0uoNBY1t1F3CRfgrBDqLs-ZkljOLGWa7dC7/exec'
         };
@@ -72,14 +77,12 @@
             try {
                 const res = await fetch(CONFIG.URL_APPS_SCRIPT, {
                     method: 'POST',
-                    mode: 'no-cors', // O 'cors' dependiendo de tu despliegue actual
+                    mode: 'no-cors',
                     body: JSON.stringify({ action: 'duplicar', idOriginal: id })
                 });
                 
-                // Nota: si usas no-cors, la respuesta será opaca.
-                // Si el servidor responde OK, asumimos éxito o manejamos errores desde el backend
                 alert("Solicitud procesada. (Verifica en el Dashboard)");
-                window.close(); 
+                window.location.href = 'dashboard.html'; // Cambiado de window.close() a redirección
             } catch(e) {
                 alert("Error de red");
                 btn.disabled = false;
