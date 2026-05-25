@@ -1,104 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maniobras a Retirar - APP_SDM</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script src="config.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0b141d;
+            --card-color: #14212d;
+            --accent-color: #003366;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --text-color: #ffffff;
+            --muted-text: #a0aec0;
+            --border-color: #2c3e50;
+            --verde-claro: #73F527;
+            --verde-menta: #27F59F;
+            --azul-cielo: #27E0F5;
+            --azul-oscuro: #110EC9;
+            --rojo: #C90E21;
+            --rosado: #F75EE2;
+            --amarrillo: #E1F549;
+            --naranja: #E39F14;
+            --negro: #000000;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--card-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title {
+            margin: 10px;
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 30px 0;
+            background: var(--card-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1590px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 13px;
+        }
+
+        td input {
+            width: 100%;
+            padding: 8px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        .btn-add {
+            background: var(--azul-cielo);
+            color: #000;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-remove {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background: var(--success-color);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-volver {
+            background: #fff;
+            color: #000;
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-left">
+            <div class="logo-box" style="background:white;padding:5px;border-radius:4px;">
+                <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30">
+            </div>
+            <h2 class="header-title"><i class="fas fa-arrow-circle-down"></i> Secuencia a Retirar</h2>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-add" onclick="agregarFila()">
+                <i class="fas fa-plus"></i> Agregar Paso
+            </button>
+
+            <button id="btn-guardar" class="btn-submit" form="form-maniobra">
+                <i class="fas fa-save"></i> GUARDAR
+            </button>
+
+            <a href="dashboard.html" class="btn-volver">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <form id="form-maniobra" onsubmit="guardarManiobras(event)">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Secuencia</th>
+                        <th>Maniobra</th>
+                        <th>Equipo</th>
+                        <th>Dirección</th>
+                        <th>Operación</th>
+                        <th>Personal</th>
+                        <th>Hora</th>
+                        <th>Quitar</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabla-body">
+                    <tr>
+                        <td><input type="number" class="m-sec" value="1" required></td>
+                        <td><input type="text" class="m-man" required></td>
+                        <td><input type="text" class="m-equ" required></td>
+                        <td><input type="text" class="m-dir" required></td>
+                        <td><input type="text" class="m-ope" required></td>
+                        <td><input type="text" class="m-per" required></td>
+                        <td><input type="time" class="m-hor" required></td>
+                        <td><button type="button" class="btn-remove" onclick="eliminarFila(this)">
+                            <i class="fas fa-trash"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+
+    </div>
+
 <script>
-/* =========================================================
-   CONFIGURACIÓN GENERAL
-   =========================================================
-   Aquí se guarda la URL del Google Apps Script que conecta
-   esta aplicación con la base de datos (Google Sheets).
-========================================================= */
 let URL_APPS_SCRIPT = "";
 
-/* Lee el archivo config.js y obtiene la URL */
 function initConfig() {
     if (typeof CONFIG !== "undefined") {
         URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-    } else {
-        console.error("No se encontró CONFIG");
     }
 }
 initConfig();
 
-
-/* =========================================================
-   VARIABLES GLOBALES
-   =========================================================
-   Estas variables se usan en varias partes del sistema.
-========================================================= */
 let contadorFilas = 1;
+
 let idSol = "";
 let usuarioSesion = "";
 let sectorSesion = "";
 
-
-/* =========================================================
-   INICIO DE LA APLICACIÓN
-   =========================================================
-   Esta función se ejecuta cuando la página ya cargó.
-   Aquí validamos usuario y cargamos datos iniciales.
-========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Obtener datos del usuario que inició sesión
     usuarioSesion = sessionStorage.getItem("usuario");
     sectorSesion = sessionStorage.getItem("sector");
 
-    // Si no hay usuario, lo regresamos al login
     if (!usuarioSesion) {
         window.location.href = "index.html";
         return;
     }
 
-    // Obtener el ID de la maniobra desde la URL
     const params = new URLSearchParams(window.location.search);
     idSol = params.get("id");
 
-    // Si no hay ID válido, regresamos al panel
     if (!idSol) {
-        alert("No se encontró una solicitud válida");
+        alert("ID no válido");
         window.location.href = "dashboard.html";
         return;
     }
 
-    // Cargar información del encabezado
     cargarEncabezado(idSol);
-
-    // Cargar maniobras ya existentes (si hay)
     cargarManiobrasExistentes();
 });
 
-
-/* =========================================================
-   CARGAR ENCABEZADO
-   =========================================================
-   Trae información general de la maniobra como:
-   - Circuito
-   - Despeje
-========================================================= */
 async function cargarEncabezado(id) {
     try {
         const res = await fetch(`${URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`);
         const data = await res.json();
 
         if (data?.datos) {
+            const c = document.getElementById("circuito_info");
+            const d = document.getElementById("despeje_info");
 
-            const circuito = document.getElementById("circuito_info");
-            const despeje = document.getElementById("despeje_info");
-
-            if (circuito) circuito.value = data.datos[6] || "";
-            if (despeje) despeje.value = data.datos[23] || "";
+            if (c) c.value = data.datos[6] || "";
+            if (d) d.value = data.datos[23] || "";
         }
-
-    } catch (error) {
-        console.error("Error cargando encabezado:", error);
+    } catch (e) {
+        console.error(e);
     }
 }
 
-
-/* =========================================================
-   CARGAR MANIOBRAS EXISTENTES
-   =========================================================
-   Esta función consulta la base de datos y trae las maniobras
-   ya registradas para mostrarlas en la tabla.
-========================================================= */
 async function cargarManiobrasExistentes() {
     try {
         const res = await fetch(`${URL_APPS_SCRIPT}?action=getManiobras&id=${idSol}&tipo=retirar`);
@@ -107,14 +269,11 @@ async function cargarManiobrasExistentes() {
         if (!Array.isArray(data)) return;
 
         const tbody = document.getElementById("tabla-body");
-
-        // Usamos fragmento para que cargue más rápido (mejor rendimiento)
         const fragment = document.createDocumentFragment();
 
         contadorFilas = data.length;
 
         data.forEach(m => {
-
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
@@ -126,30 +285,20 @@ async function cargarManiobrasExistentes() {
                 <td><input type="text" class="m-per" value="${m.personal_que_ejecutara}" required></td>
                 <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion}" required></td>
                 <td><button type="button" class="btn-remove" onclick="eliminarFila(this)">
-                    <i class="fas fa-trash"></i>
-                </button></td>
+                    <i class="fas fa-trash"></i></button></td>
             `;
-
             fragment.appendChild(tr);
         });
 
-        // Limpiamos la tabla y colocamos los datos nuevos
         tbody.innerHTML = "";
         tbody.appendChild(fragment);
 
-    } catch (error) {
-        console.error("Error al cargar maniobras:", error);
+    } catch (e) {
+        console.error(e);
     }
 }
 
-
-/* =========================================================
-   AGREGAR NUEVA FILA
-   =========================================================
-   Permite al usuario agregar una nueva maniobra manualmente.
-========================================================= */
 function agregarFila() {
-
     contadorFilas++;
 
     const tr = document.createElement("tr");
@@ -163,45 +312,27 @@ function agregarFila() {
         <td><input type="text" class="m-per" required></td>
         <td><input type="time" class="m-hor" required></td>
         <td><button type="button" class="btn-remove" onclick="eliminarFila(this)">
-            <i class="fas fa-trash"></i>
-        </button></td>
+            <i class="fas fa-trash"></i></button></td>
     `;
 
     document.getElementById("tabla-body").appendChild(tr);
 }
 
-
-/* =========================================================
-   ELIMINAR FILA
-   =========================================================
-   Borra una fila de la tabla.
-   Evita que el usuario deje la tabla vacía.
-========================================================= */
 function eliminarFila(btn) {
-
     const filas = document.querySelectorAll("#tabla-body tr");
 
     if (filas.length <= 1) {
-        alert("Debe haber al menos una maniobra registrada.");
+        alert("Debe haber al menos una fila");
         return;
     }
 
     btn.closest("tr").remove();
 }
 
-
-/* =========================================================
-   GUARDAR MANIOBRAS
-   =========================================================
-   Esta función envía toda la información al servidor
-   (Google Apps Script) para guardarla en la hoja de cálculo.
-========================================================= */
-async function guardarManiobras(event) {
-
-    event.preventDefault();
+async function guardarManiobras(e) {
+    e.preventDefault();
 
     const btn = document.getElementById("btn-guardar");
-
     btn.disabled = true;
     btn.innerHTML = "Guardando...";
 
@@ -209,7 +340,6 @@ async function guardarManiobras(event) {
 
     const maniobras = [];
 
-    // Convertimos cada fila de la tabla en un objeto
     filas.forEach(fila => {
         maniobras.push({
             secuencia: fila.querySelector(".m-sec").value,
@@ -222,12 +352,10 @@ async function guardarManiobras(event) {
         });
     });
 
-    // Definimos qué acción se enviará al servidor
     const payload = {
         action: window.location.pathname.includes("retirar")
             ? "guardarRetirarMulti"
             : "guardarRetornarMulti",
-
         id_solicitud: idSol,
         sector: sectorSesion,
         usuario: usuarioSesion,
@@ -235,12 +363,9 @@ async function guardarManiobras(event) {
     };
 
     try {
-
         const res = await fetch(URL_APPS_SCRIPT, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
 
@@ -250,17 +375,16 @@ async function guardarManiobras(event) {
             alert("Guardado exitoso");
             window.location.href = "dashboard.html";
         } else {
-            throw new Error("Error en servidor");
+            throw new Error("Error");
         }
 
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Error al guardar la información");
-
+    } catch (e) {
+        alert("Error al guardar");
         btn.disabled = false;
         btn.innerHTML = "GUARDAR";
     }
 }
 </script>
+
+</body>
+</html>
