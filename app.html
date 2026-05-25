@@ -15,10 +15,26 @@
     <style>
         /* Variables globales de diseño */
         :root {
-            --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
-            --success-color: #27ae60; --text-color: #ffffff; --muted-text: #a0aec0;
-            --border-color: #2c3e50;
-        }
+    /* Tema Principal */
+    --bg-color: #0b141d; 
+    --card-color: #14212d; 
+    --accent-color: #003366;
+    --success-color: #27ae60; 
+    --text-color: #ffffff; 
+    --muted-text: #a0aec0;
+    --border-color: #2c3e50;
+    /* Colores Adicionales */
+    --verde-claro: #73F527;
+    --verde-menta: #27F59F;
+    --azul-cielo: #27E0F5;
+    --azul-oscuro: #110EC9;
+    --rojo: #C90E21;
+    --rosado: #F75EE2;
+    --amarillo: #E1F549;
+    --naranja: #E39F14;
+    --negro: #000000;
+    --blanco: #FFFFFF;
+}
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
         
         /* Cabecera optimizada con Flexbox */
@@ -36,11 +52,10 @@
         .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: white; }
         
         .header-right { display: flex; align-items: center; gap: 15px; }
-        .btn-nav, .btn-logout, .btn_generar_excel { 
+        .btn-nav, .btn_generar_excel { 
             display: flex; align-items: center; gap: 5px; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; color: white; 
         }
-        .btn-nav { background: var(--accent-color); }
-        .btn-logout { background: #e74c3c; }
+        .btn-nav { background: var(--rojo); }
         .btn_generar_excel { background: var(--success-color); }
 
         /* Contenedor principal y tarjetas */
@@ -129,9 +144,6 @@
             </div>
             <button class="btn-nav" onclick="window.location.href='dashboard.html'">
                 <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel
-            </button>
-            <button class="btn-logout" onclick="cerrarSesion()">
-                <i class="material-icons" style="font-size: 14px;">exit_to_app</i> Salir
             </button>
             <button type="button" id="btn_generar_excel" onclick="generarExcelSolicitud()" class="btn_generar_excel">
                 <i class="material-icons">download</i>Excel
