@@ -164,6 +164,8 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
             
             // 2. Llamamos a tu función original para cargar la tabla
             cargarManiobrasExistentes();
+            // 3. Llamamos a los equipos
+            cargarCatalogos();
         } else {
             alert("Error: No se detectó un ID de solicitud válido.");
             window.location.href = "dashboard.html";
