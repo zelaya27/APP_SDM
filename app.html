@@ -91,6 +91,18 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px; /* o el espacio que prefieras entre inputs */
+
+             #trabajo_a_realizar {
+        min-height: 120px; /* Altura para Trabajo a Realizar */
+        resize: vertical;  /* Permite al usuario estirar la caja solo hacia abajo */
+        padding: 8px;      /* Espacio interno para que el texto no quede pegado al borde */
+    }
+
+    #zonas_afectadas {
+        min-height: 100px; /* Altura para Zonas Afectadas */
+        resize: vertical;
+        padding: 8px;
+    }
         }
     </style>
 </head>
@@ -231,18 +243,48 @@
    </div>
 </div>
 
-                <div class="form-step" id="step2">
-                    <div class="form-grid">
-                        <div class="form-group full-width"><label>19. Trabajo a Realizar</label><textarea id="trabajo_a_realizar"></textarea></div>
-                        <div class="form-group"><label>20. Responsable</label><select id="responsable"><option value="">Seleccione...</option></select></div>
-                        <div class="form-group"><label>21. Sustituto</label><select id="sustituto"><option value="">Seleccione...</option></select></div>
-                        <div class="form-group full-width"><label>22. Zonas Afectadas</label><textarea id="zonas_afectadas"></textarea></div>
-                        <div class="form-group full-width"><label>23. Área Afectada</label><input type="text" id="area_afectada" oninput="this.value = this.value.toUpperCase()"></div>
-                        <div class="form-group"><label>24. Nombre del Despeje</label><input type="text" id="nombre_despeje" oninput="this.value = this.value.toUpperCase()"></div>
-                        <div class="form-group"><label>25. Apegos Enlaces</label><input type="text" id="apegos_enlaces" oninput="this.value = this.value.toUpperCase()"></div>
-                        <div class="form-group"><label>26. Apego Despeje</label><input type="text" id="apego_despeje" oninput="this.value = this.value.toUpperCase()"></div>
-                    </div>
-                </div>
+            <div class="form-step" id="step2">
+    <div class="form-grid">
+        <div class="form-group full-width">
+            <label>19. Trabajo a Realizar</label>
+            <textarea id="trabajo_a_realizar"></textarea>
+        </div>
+        <div class="form-grid-2">
+        <div class="form-group">
+            <label>20. Responsable</label>
+            <select id="responsable">
+                <option value="">Seleccione...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>21. Sustituto</label>
+            <select id="sustituto">
+                <option value="">Seleccione...</option>
+            </select>
+        </div>
+                  </div>
+        <div class="form-group full-width">
+            <label>22. Zonas Afectadas</label>
+            <textarea id="zonas_afectadas"></textarea>
+        </div>
+        <div class="form-group full-width">
+            <label>23. Área Afectada</label>
+            <input type="text" id="area_afectada" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="form-group">
+            <label>24. Nombre del Despeje</label>
+            <input type="text" id="nombre_despeje" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="form-group">
+            <label>25. Apegos Enlaces</label>
+            <input type="text" id="apegos_enlaces" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="form-group">
+            <label>26. Apego Despeje</label>
+            <input type="text" id="apego_despeje" oninput="this.value = this.value.toUpperCase()">
+        </div>
+    </div>
+</div>
 
                 <div class="form-step" id="step3">
                     <div class="form-grid">
