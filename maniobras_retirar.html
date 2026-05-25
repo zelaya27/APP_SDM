@@ -41,8 +41,16 @@ header {   background-color: var(--card-color);  padding: 15px 20px;   display: 
 /* =========================================
    CONTENEDOR PRINCIPAL
    ========================================= */
-.container { max-width: 1500px;   margin: 30px auto;  background: var(--card-color);  padding: 30px;  border-radius: 8px; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);  overflow-x: auto;}
+.container {
+    width: 100%;              /* usa todo el ancho */
+    max-width: 100%;          /* elimina límite */
+    margin: 30px 0;          /* sin auto-centro estrecho */
+    background: var(--card-color);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    overflow-x: auto;         /* scroll si hace falta */
+}
 
 h2 {  margin-top: 0;  border-bottom: 2px solid var(--accent-color);  padding-bottom: 10px;   display: flex; 
     justify-content: space-between;  align-items: center;}
