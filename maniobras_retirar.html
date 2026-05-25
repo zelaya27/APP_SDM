@@ -58,24 +58,25 @@
             <button type="button" class="btn-add" onclick="agregarFila()"><i class="fas fa-plus"></i> Agregar Paso</button>
         </h2>
         
-     <div class="header-info">
-            <div>
-                <label>ID Solicitud</label>
-                <input type="text" id="id_solicitud" class="id-input" readonly>
-            </div>
-            <div>
-                <label>Circuito</label>
-                <input type="text" id="circuito_info" class="id-input" readonly>
-            </div>
-            <div>
-                <label>Nombre del Despeje</label>
-                <input type="text" id="despeje_info" class="id-input" readonly>
-            </div>
-            <div>
-                <label>Usuario Registra</label>
-                <input type="text" id="usuario_info" class="id-input" readonly>
-            </div>
-        </div>
+         <div class="header-info">
+    <div>
+        <label>ID Solicitud</label>
+        <input type="text" id="id_solicitud" class="id-input" readonly>
+    </div>
+    <div>
+        <label>Circuito</label>
+        <input type="text" id="circuito_info" class="id-input" readonly>
+    </div>
+    <div>
+        <label>Nombre del Despeje</label>
+        <input type="text" id="despeje_info" class="id-input" readonly>
+    </div>
+    <div>
+        <label>Usuario Registra</label>
+        <input type="text" id="usuario_info" class="id-input" readonly>
+    </div>
+</div>
+        
         <form id="form-maniobra" onsubmit="guardarManiobras(event)">
             <table>
                 <thead>
@@ -108,31 +109,51 @@
         </form>
     </div>
     <script>
-        const usuarioSesion = sessionStorage.getItem("usuario");
+     const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
         if (!usuarioSesion) window.location.href = "index.html";
 
         const urlParams = new URLSearchParams(window.location.search);
         const idSol = urlParams.get('id');
         
-       const urlParams = new URLSearchParams(window.location.search);
-        const idSol = urlParams.get('id');
-        const circuito = urlParams.get('circuito') || "No especificado";
-        const despeje = urlParams.get('despeje') || "No especificado";
-        
         if (idSol) {
             document.getElementById('id_solicitud').value = idSol;
-            document.getElementById('circuito_info').value = circuito;
-            document.getElementById('despeje_info').value = despeje;
             document.getElementById('usuario_info').value = usuarioSesion + " (" + sectorSesion + ")";
+            
+            // 1. Llamamos a la función para traer el circuito y el despeje
+            cargarEncabezado(idSol);
+            
+            // 2. Llamamos a tu función original para cargar la tabla
             cargarManiobrasExistentes();
-        } 
-        else {
+        } else {
             alert("Error: No se detectó un ID de solicitud válido.");
             window.location.href = "dashboard.html";
         }
 
         let contadorFilas = 1;
+
+        // --- NUEVA FUNCIÓN BASADA EN TU CÓDIGO ---
+        async function cargarEncabezado(id) {
+            try {
+                // Usamos la misma acción que ya tienes programada en Apps Script
+                const url = `${URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if(!data.error && data.datos) {
+                    // Usamos .value porque son campos <input>
+                    const inputCircuito = document.getElementById('circuito_info');
+                    if(inputCircuito) inputCircuito.value = data.datos[6] || "N/A";
+                    
+                    const inputDespeje = document.getElementById('despeje_info');
+                    if(inputDespeje) inputDespeje.value = data.datos[23] || "N/A";
+                }
+            } catch(e) {
+                console.error("Error cargando el encabezado:", e);
+            }
+        }
+        
+        // ... aquí continúan tus demás funciones (cargarManiobrasExistentes, etc) ...
 
         // --- 1. FUNCIÓN PARA CARGAR MANIOBRAS PREVIAS DESDE GOOGLE SHEETS ---
         async function cargarManiobrasExistentes() {
