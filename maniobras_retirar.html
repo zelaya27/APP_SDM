@@ -58,17 +58,24 @@
             <button type="button" class="btn-add" onclick="agregarFila()"><i class="fas fa-plus"></i> Agregar Paso</button>
         </h2>
         
-        <div class="header-info">
+     <div class="header-info">
             <div>
                 <label>ID Solicitud</label>
                 <input type="text" id="id_solicitud" class="id-input" readonly>
+            </div>
+            <div>
+                <label>Circuito</label>
+                <input type="text" id="circuito_info" class="id-input" readonly>
+            </div>
+            <div>
+                <label>Nombre del Despeje</label>
+                <input type="text" id="despeje_info" class="id-input" readonly>
             </div>
             <div>
                 <label>Usuario Registra</label>
                 <input type="text" id="usuario_info" class="id-input" readonly>
             </div>
         </div>
-
         <form id="form-maniobra" onsubmit="guardarManiobras(event)">
             <table>
                 <thead>
@@ -108,12 +115,19 @@
         const urlParams = new URLSearchParams(window.location.search);
         const idSol = urlParams.get('id');
         
+       const urlParams = new URLSearchParams(window.location.search);
+        const idSol = urlParams.get('id');
+        const circuito = urlParams.get('circuito') || "No especificado";
+        const despeje = urlParams.get('despeje') || "No especificado";
+        
         if (idSol) {
             document.getElementById('id_solicitud').value = idSol;
+            document.getElementById('circuito_info').value = circuito;
+            document.getElementById('despeje_info').value = despeje;
             document.getElementById('usuario_info').value = usuarioSesion + " (" + sectorSesion + ")";
-            // Llamamos a la función para cargar los datos en cuanto detectamos el ID
             cargarManiobrasExistentes();
-        } else {
+        } 
+        else {
             alert("Error: No se detectó un ID de solicitud válido.");
             window.location.href = "dashboard.html";
         }
