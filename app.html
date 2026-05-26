@@ -618,15 +618,22 @@
         }
 
         // --- ENVÍO DE DATOS ---
-     async function guardarFormulario() {
+     // Agregamos la 'e' para capturar el evento del formulario o botón
+async function guardarFormulario(e) {
+    // 1. Detenemos la recarga automática de la página
+    if (e) e.preventDefault(); 
+
     const btn = document.getElementById('btnSubmit');
     btn.disabled = true;
-    btn.innerHTML = 'Enviando...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...'; // Opcional: ícono de carga
     
     const tipo = document.getElementById('tipo_trabajo').value;
     
     // Construcción del objeto JSON a enviar
     const payload = {
+        // 2. AGREGAMOS LA ACCIÓN (Verifica que este nombre coincida con tu Apps Script)
+        "action": "guardarSolicitud", 
+        
         "ID_SOLICITUD": document.getElementById('id_solicitud').value, 
         "NUMERO_DESPEJE": document.getElementById('numero_despeje').value,
         "SOLICITUD": document.getElementById('solicitud').value, 
@@ -673,20 +680,19 @@
     };
 
     try {
-        // CAMBIO: mode: 'cors' para permitir la comunicación bidireccional
         const response = await fetch(URL_APPS_SCRIPT, { 
             method: 'POST', 
             mode: 'cors', 
             body: JSON.stringify(payload) 
         });
         
-        const res = await response.json(); // Ahora sí podemos leer la respuesta
+        const res = await response.json(); 
         
         if (res.status === "ÉXITO") {
             alert("¡Solicitud registrada con éxito!");
-            window.location.reload();
+            window.location.href = "panel_principal.html"; // Es mejor redirigir al panel que recargar la página limpia
         } else {
-            throw new Error(res.message || "Error desconocido al guardar");
+            throw new Error(res.message || "Error desconocido al guardar en el servidor");
         }
     } catch (error) {
         console.error("Error:", error);
