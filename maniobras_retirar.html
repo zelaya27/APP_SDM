@@ -69,6 +69,21 @@ td input {
     white-space: normal;
     word-wrap: break-word; /* Permite que las palabras largas se rompan */
 }
+        /* Asegura que los textarea ocupen todo el espacio de la celda */
+td textarea {
+    width: 100%;
+    min-height: 40px; /* Altura mínima inicial */
+    resize: vertical !important; /* Fuerza la capacidad de estirar */
+    padding: 8px;
+    box-sizing: border-box;
+    display: block;
+    font-family: inherit;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    border-radius: 4px;
+    overflow-y: auto; /* Permite scroll si el texto es muy largo */
+}
         /* =========================================
            BARRA DE INFORMACIÓN
            ========================================= */
@@ -172,16 +187,19 @@ td input {
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
-                    <tr>
-                        <td><input type="number" class="m-sec" value="1" required></td>
-                        <td><input type="text" class="m-man" list="lista-maniobras" placeholder="Ej. ABRIR" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-equ" list="lista-equipos" placeholder="Ej. 32L" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
-                        <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACION" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-ope" placeholder="Ej. ABRIR CUCHILLAS" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-per" list="lista-personal" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="time" class="m-hor" required></td>
-                        <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-                    </tr>
+                  <tr>
+    <td><input type="number" class="m-sec" value="1" required></td>
+    <td><input type="text" class="m-man" list="lista-maniobras" placeholder="Ej. ABRIR" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-equ" list="lista-equipos" placeholder="Ej. 32L" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
+    
+    <td><textarea class="m-dir" placeholder="Ej. SUBESTACION" required oninput="this.value = this.value.toUpperCase()"></textarea></td>
+    
+    <td><textarea class="m-ope" placeholder="Ej. ABRIR CUCHILLAS" required oninput="this.value = this.value.toUpperCase()"></textarea></td>
+    
+    <td><input type="text" class="m-per" list="lista-personal" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="time" class="m-hor" required></td>
+    <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+</tr>
                 </tbody>
             </table>
         </form>
@@ -246,17 +264,19 @@ td input {
                     maniobras.forEach(m => {
                         const tr = document.createElement('tr');
                         // CORRECCIÓN: Se eliminaron las dos columnas sobrantes y se arregló la sintaxis
-                        tr.innerHTML = `
-                            <td><input type="number" class="m-sec" value="${m.secuencia || ''}" required></td>
-                            <td><input type="text" class="m-man" list="lista-maniobras" value="${m.maniobra || ''}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-equ" list="lista-equipos" value="${m.equipo || ''}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
-                            <td><input type="text" class="m-dir" value="${m.direccion || ''}" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-ope" value="${m.operacion_a_ejecutar || ''}" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-per" list="lista-personal" value="${m.personal_que_ejecutara || ''}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion || ''}" required></td>
-                            <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-                        `;
-                        tbody.appendChild(tr);
+                     tr.innerHTML = `
+    <td><input type="number" class="m-sec" value="${m.secuencia || ''}" required></td>
+    <td><input type="text" class="m-man" list="lista-maniobras" value="${m.maniobra || ''}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-equ" list="lista-equipos" value="${m.equipo || ''}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
+    
+    <td><textarea class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()">${m.direccion || ''}</textarea></td>
+    
+    <td><textarea class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()">${m.operacion_a_ejecutar || ''}</textarea></td>
+    
+    <td><input type="text" class="m-per" list="lista-personal" value="${m.personal_que_ejecutara || ''}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion || ''}" required></td>
+    <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+`;
                     });
                 }
             } catch (error) {
@@ -269,16 +289,19 @@ td input {
             const tbody = document.getElementById('tabla-body');
             const tr = document.createElement('tr');
             // CORRECCIÓN: Se limpiaron los "m.algo" que daban error porque al agregar no existen datos previos.
-            tr.innerHTML = `
-                <td><input type="number" class="m-sec" value="${contadorFilas}" required></td>
-                <td><input type="text" class="m-man" list="lista-maniobras" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-equ" list="lista-equipos" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
-                <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-per" list="lista-personal" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="time" class="m-hor" required></td>
-                <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-            `;
+         tr.innerHTML = `
+    <td><input type="number" class="m-sec" value="${m.secuencia || ''}" required></td>
+    <td><input type="text" class="m-man" list="lista-maniobras" value="${m.maniobra || ''}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-equ" list="lista-equipos" value="${m.equipo || ''}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
+    
+    <td><textarea class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()">${m.direccion || ''}</textarea></td>
+    
+    <td><textarea class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()">${m.operacion_a_ejecutar || ''}</textarea></td>
+    
+    <td><input type="text" class="m-per" list="lista-personal" value="${m.personal_que_ejecutara || ''}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion || ''}" required></td>
+    <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+`;
             tbody.appendChild(tr);
         }
 
