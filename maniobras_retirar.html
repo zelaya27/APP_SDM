@@ -75,7 +75,7 @@ th {
 /* Estilo unificado para inputs y textareas */
 td input, td textarea {
     width: 100%;
-    padding: 27px; /* Mantén un padding consistente */
+    padding: 2px; /* Mantén un padding consistente */
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
     color: #fff;
@@ -91,7 +91,7 @@ td input, td textarea {
 /* Solo para textarea (ajuste de redimensionamiento) */
 td textarea {
     resize: vertical;
-    min-height: 40px;
+    min-height: 30px;
 }
         /* =========================================
            BARRA DE INFORMACIÓN
@@ -293,12 +293,6 @@ td textarea {
             contadorFilas++;
             const tbody = document.getElementById('tabla-body');
             const tr = document.createElement('tr');
-            // CORRECCIÓN: Se limpiaron los "m.algo" que daban error porque al agregar no existen datos previos.
-           function agregarFila() {
-    contadorFilas++;
-    const tbody = document.getElementById('tabla-body');
-    const tr = document.createElement('tr');
-    
     tr.innerHTML = `
         <td><textarea class="m-sec" required>${contadorFilas}</textarea></td>
         
