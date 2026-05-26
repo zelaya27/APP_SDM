@@ -411,7 +411,16 @@ function procesarYMostrarDatos(data) {
     if (typeof poblarListaCircuitos === "function") poblarListaCircuitos();
     if (typeof poblarListasPersonal === "function") poblarListasPersonal();
 }
-
+function forzarActualizacionCatalogos() {
+    // Borramos la memoria del navegador
+    localStorage.removeItem("datos_catalogos_despejes");
+    localStorage.removeItem("tiempo_catalogos_despejes");
+    
+    alert("Memoria limpiada. Descargando datos actualizados de Google Sheets...");
+    
+    // Volvemos a llamar a la función (que ahora sí irá a Google porque borramos la caché)
+    descargarDatosGoogleSheets(); 
+}
         // Función para leer valores de forma segura (evita errores de nulos)
         function getVal(id) {
             const el = document.getElementById(id);
