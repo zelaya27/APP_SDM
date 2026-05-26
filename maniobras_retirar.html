@@ -133,7 +133,12 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
     <option value="SACAR DE LINEA GENERACION"></option>
     <option value="ENTRAR A LINEA GENERACION"></option>
 </datalist>
-
+        
+        <datalist id="lista-personal">
+            <option value="SCADA">
+            <option value="UTCD">
+            <option value="CND">
+        </datalist>
 <datalist id="lista-equipos"></datalist>
 
         <form id="form-maniobra" onsubmit="guardarManiobras(event)">
@@ -242,6 +247,8 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
     <td><input type="text" class="m-per" value="${m.personal_que_ejecutara}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
     <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion}" required></td>
     <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+    <td><input type="text" value="${fila.personal || ''}" list="lista-personal" required></td>
+    <td><input type="text" list="lista-personal" required></td>
 `;
                         tbody.appendChild(tr);
                     });
