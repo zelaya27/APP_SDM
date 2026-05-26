@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-    <script src="config.js"></script>
-
-<script>
-    // En lugar de escribir la URL larga, simplemente usas la variable del archivo config
-    const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-
-    // ... el resto de tu código JS ...
-</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maniobras a Retornar - APP_SDM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="config.js"></script>
     <style>
         :root {
             --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
@@ -20,240 +13,228 @@
             --text-color: #ffffff; --muted-text: #a0aec0; --border-color: #2c3e50;
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
-        header { background-color: var(--card-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
-        .container { max-width: 1200px; margin: 30px auto; background: var(--card-color); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow-x: auto;}
-        h2 { margin-top: 0; border-bottom: 2px solid var(--success-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+
+        header { background-color: var(--card-color); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-title { margin: 10px; padding: 0; border: none; font-size: 24px; }
+        .header-actions { display: flex; align-items: center; gap: 30px; }
+
+        .container { width: 100%; max-width: 100%; margin: 8px 0; background: var(--card-color); padding: 8px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow-x: auto; box-sizing: border-box; }
+        h2 { margin-top: 0; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* TABLA Y CELDAS */
+        table { width: 100%; border-collapse: collapse; min-width: 100%; table-layout: auto; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        th { background-color: var(--accent-color); color: white; font-size: 13px; }
         
-        .header-info { display: flex; gap: 20px; margin-bottom: 20px; background: #1a2a3a; padding: 15px; border-radius: 5px; }
-        .header-info div { flex: 1; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted-text); font-size: 14px;}
-        .id-input { width: 100%; padding: 10px; background-color: #0b141d; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; box-sizing: border-box; font-weight: bold;}
-        
-        table { width: 100%; border-collapse: collapse; min-width: 900px;}
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { background-color: var(--success-color); color: white; font-size: 13px;}
-        td input { width: 100%; padding: 8px; background-color: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 13px;}
-        
-        .btn-add { background: var(--info-color); color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;}
+        td input, td textarea { min-height: 40px; width: 100%; padding: 8px; background-color: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
+        td textarea { resize: vertical !important; display: block; overflow-y: auto; }
+
+        .btn-add { background: var(--success-color); color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-remove { background: var(--danger-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
-        
-        .btn-submit { background: var(--success-color); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 20px; }
+        .btn-submit { background: var(--success-color); color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-submit:disabled { background: #555; cursor: not-allowed; }
-        .btn-volver { background: transparent; color: var(--muted-text); border: 1px solid var(--border-color); padding: 8px 15px; text-decoration: none; border-radius: 4px; }
+        .btn-volver { background:#F7F5F5; color:#000000; border: 1px solid var(--border-color); padding: 8px 15px; text-decoration: none; border-radius: 4px; }
+
+        .header-info { display: flex; gap: 20px; margin-bottom: 20px; background: var(--success-color); color: white; padding: 15px; border-radius: 5px; }
+        .header-info div { flex: 1; }
+        .id-input { width: 100%; padding: 10px; background-color: #0b141d; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; box-sizing: border-box; font-weight: bold; }
     </style>
 </head>
-<body>
-
+<body>  
     <header>
-        <div class="logo-box" style="background: white; padding: 5px; border-radius:4px;">
-            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
+        <div class="header-left">
+            <div class="logo-box" style="background: white; padding: 5px; border-radius:4px;">
+                <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo">
+            </div>
+            <h2 class="header-title"><i class="fas fa-arrow-circle-up" style="color:#27ae60;"></i> Secuencia a Retornar</h2>
         </div>
-        <a href="dashboard.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
+        <div class="header-actions">
+            <button type="button" class="btn-add" onclick="agregarFila()"><i class="fas fa-plus"></i> Agregar Paso</button>
+            <button type="submit" id="btn-guardar" class="btn-submit" form="form-maniobra"><i class="fas fa-save"></i> GUARDAR</button>
+            <a href="dashboard.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
+        </div>
     </header>
 
     <div class="container">
-        <h2>
-            <span><i class="fas fa-arrow-circle-up" style="color:#27ae60;"></i> Secuencia de Maniobras a Retornar</span>
-            <button type="button" class="btn-add" onclick="agregarFila()"><i class="fas fa-plus"></i> Agregar Paso</button>
-        </h2>
-        
         <div class="header-info">
-            <div>
-                <label>ID Solicitud</label>
-                <input type="text" id="id_solicitud" class="id-input" readonly>
-            </div>
-            <div>
-                <label>Usuario Registra</label>
-                <input type="text" id="usuario_info" class="id-input" readonly>
-            </div>
+            <div><label>ID Solicitud:</label><input type="text" id="id_solicitud" class="id-input" readonly></div>
+            <div><label>Circuito:</label><input type="text" id="circuito_info" class="id-input" readonly></div>
+            <div><label>Nombre del Despeje:</label><input type="text" id="despeje_info" class="id-input" readonly></div>
+            <div><label>Usuario Info:</label><input type="text" id="usuario_info" class="id-input" readonly></div>
         </div>
+
+        <datalist id="lista-maniobras">
+            <option value="ABRIR Y BLOQUEAR"> <option value="DESBLOQUEAR Y CERRAR"> <option value="ABRIR"> <option value="CERRAR"> <option value="BLOQUEAR"> <option value="COLOCAR TARJETA DE PROTECCION"> <option value="RETIRAR TARJETA DE PROTECCION"> <option value="SACAR DE LINEA GENERACION"> <option value="ENTRAR A LINEA GENERACION">
+        </datalist>
+        <datalist id="lista-personal"> <option value="SCADA"> <option value="UTCD"> <option value="CND"> </datalist>
+        <datalist id="lista-equipos"></datalist>
 
         <form id="form-maniobra" onsubmit="guardarManiobras(event)">
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 70px;">Secuencia</th>
-                        <th>Maniobra</th>
-                        <th>Equipo</th>
-                        <th>Dirección</th>
-                        <th>Operación a Ejecutar</th>
-                        <th>Personal</th>
-                        <th style="width: 100px;">Hora</th>
+                        <th style="width: 50px;">Secuencia</th>
+                        <th style="width: 200px;">Maniobra</th>
+                        <th style="width: 280px;">Equipo</th> 
+                        <th style="width: 280px;">Dirección</th> 
+                        <th style="width: 310px;">Operación</th>
+                        <th style="width: 100px;">Personal</th>
+                        <th style="width: 70px;">Hora</th>
                         <th style="width: 50px;">Quitar</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
-                    <tr>
-                        <td><input type="number" class="m-sec" value="1" required></td>
-                        <td><input type="text" class="m-man" placeholder="Ej. CERRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-equ" placeholder="Ej. INT-01" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACION" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-ope" placeholder="Ej. CERRAR CUCHILLAS" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="text" class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                        <td><input type="time" class="m-hor" required></td>
-                        <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-                    </tr>
-                </tbody>
+                    </tbody>
             </table>
-
-            <button type="submit" id="btn-guardar" class="btn-submit"><i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA A RETORNAR</button>
         </form>
     </div>
+
     <script>
-    // --- INICIO DEL SCRIPT ---
+        const URL_APPS_SCRIPT = typeof CONFIG !== 'undefined' ? CONFIG.URL_APPS_SCRIPT : "";
         const usuarioSesion = sessionStorage.getItem("usuario");
         const sectorSesion = sessionStorage.getItem("sector");
         if (!usuarioSesion) window.location.href = "index.html";
 
-        // Declaramos urlParams y obtenemos los datos SOLO UNA VEZ
         const urlParams = new URLSearchParams(window.location.search);
         const idSol = urlParams.get('id');
-        const circuito = urlParams.get('circuito') || "No especificado";
-        const despeje = urlParams.get('despeje') || "No especificado";
-        
+        let mapaEquipos = {};
+
         if (idSol) {
             document.getElementById('id_solicitud').value = idSol;
-            
-            // Llenamos los nuevos campos
-            document.getElementById('circuito_info').value = circuito;
-            document.getElementById('despeje_info').value = despeje;
-            
             document.getElementById('usuario_info').value = usuarioSesion + " (" + sectorSesion + ")";
-            
-            // Llamamos a la función para cargar los datos en cuanto detectamos el ID
+            cargarEncabezado(idSol);
             cargarManiobrasExistentes();
+            cargarCatalogos();
         } else {
             alert("Error: No se detectó un ID de solicitud válido.");
             window.location.href = "dashboard.html";
         }
 
-        let contadorFilas = 1;
+        async function cargarEncabezado(id) {
+            try {
+                const url = `${URL_APPS_SCRIPT}?action=buscarParaDuplicar&id=${id}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if(!data.error && data.datos) {
+                    document.getElementById('circuito_info').value = data.datos[6] || "N/A";
+                    document.getElementById('despeje_info').value = data.datos[23] || "N/A";
+                }
+            } catch(e) { console.error("Error cargando encabezado:", e); }
+        }
 
-        // --- 1. FUNCIÓN PARA CARGAR MANIOBRAS PREVIAS DESDE GOOGLE SHEETS ---
         async function cargarManiobrasExistentes() {
             try {
-                // Hacemos un GET al endpoint que configuramos en el backend
+                // Modificado para obtener de la hoja "retornar"
                 const urlConsulta = `${URL_APPS_SCRIPT}?action=getManiobras&id=${idSol}&tipo=retornar`;
                 const response = await fetch(urlConsulta);
                 const maniobras = await response.json();
+                const tbody = document.getElementById('tabla-body');
+                tbody.innerHTML = ""; 
 
                 if (maniobras && maniobras.length > 0) {
-                    const tbody = document.getElementById('tabla-body');
-                    tbody.innerHTML = ""; // Limpiamos la fila en blanco predeterminada
-                    
-                    // Actualizamos el contador a la cantidad de filas que vienen de la base
-                    contadorFilas = maniobras.length;
-
-                    maniobras.forEach(m => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><input type="number" class="m-sec" value="${m.secuencia}" required></td>
-                            <td><input type="text" class="m-man" value="${m.maniobra}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-equ" value="${m.equipo}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-dir" value="${m.direccion}" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-ope" value="${m.operacion_a_ejecutar}" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-per" value="${m.personal_que_ejecutara}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion}" required></td>
-                            <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
+                    maniobras.forEach(m => agregarFila(m));
+                } else {
+                    agregarFila(); // Si no hay nada, al menos mostrar una fila vacía
                 }
-            } catch (error) {
-                console.error("Error al cargar maniobras:", error);
-                // Si falla o no hay datos, se queda la fila original en blanco
-            }
+            } catch (error) { console.error("Error al cargar maniobras:", error); }
         }
 
-        // --- 2. FUNCIÓN PARA AGREGAR NUEVAS FILAS ---
-        function agregarFila() {
-            contadorFilas++;
+        function agregarFila(m = {}) {
             const tbody = document.getElementById('tabla-body');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><input type="number" class="m-sec" value="${contadorFilas}" required></td>
-                <td><input type="text" class="m-man" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-equ" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="time" class="m-hor" required></td>
+                <td><input type="number" class="m-sec" value="${m.secuencia || ''}" required></td>
+                <td><input type="text" class="m-man" list="lista-maniobras" value="${m.maniobra || ''}" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="text" class="m-equ" list="lista-equipos" value="${m.equipo || ''}" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
+                <td><textarea class="m-dir" required oninput="this.value = this.value.toUpperCase()">${m.direccion || ''}</textarea></td>
+                <td><textarea class="m-ope" required oninput="this.value = this.value.toUpperCase()">${m.operacion_a_ejecutar || ''}</textarea></td>
+                <td><input type="text" class="m-per" list="lista-personal" value="${m.personal_que_ejecutara || ''}" required oninput="this.value = this.value.toUpperCase()"></td>
+                <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion || ''}" required></td>
                 <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
             `;
             tbody.appendChild(tr);
         }
 
-        // --- 3. FUNCIÓN PARA ELIMINAR FILAS ---
         function eliminarFila(btn) {
-            const fila = btn.closest('tr');
-            if(document.querySelectorAll('#tabla-body tr').length > 1) {
-                fila.remove();
+            const filas = document.querySelectorAll('#tabla-body tr');
+            if(filas.length > 1) {
+                btn.closest('tr').remove();
             } else {
                 alert("Debe haber al menos una maniobra registrada.");
             }
         }
 
-     // --- 4. FUNCIÓN PARA GUARDAR EN LA HOJA DE CÁLCULO ---
         async function guardarManiobras(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-guardar');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando Secuencia...';
+            btn.innerHTML = 'Guardando...';
 
             const filas = document.querySelectorAll('#tabla-body tr');
-            const arrayManiobras = [];
+            const arrayManiobras = Array.from(filas).map(fila => ({
+                secuencia: fila.querySelector('.m-sec').value,
+                maniobra: fila.querySelector('.m-man').value,
+                equipo: fila.querySelector('.m-equ').value,
+                direccion: fila.querySelector('.m-dir').value,
+                operacion_a_ejecutar: fila.querySelector('.m-ope').value,
+                personal_que_ejecutara: fila.querySelector('.m-per').value,
+                hora_de_ejecucion: fila.querySelector('.m-hor').value
+            }));
 
-            filas.forEach(fila => {
-                arrayManiobras.push({
-                    secuencia: fila.querySelector('.m-sec').value,
-                    maniobra: fila.querySelector('.m-man').value,
-                    equipo: fila.querySelector('.m-equ').value,
-                    direccion: fila.querySelector('.m-dir').value,
-                    operacion_a_ejecutar: fila.querySelector('.m-ope').value,
-                    personal_que_ejecutara: fila.querySelector('.m-per').value,
-                    hora_de_ejecucion: fila.querySelector('.m-hor').value
-                });
-            });
-
-            // Recuerda que en maniobras_retornar.html la acción debe ser "guardarRetornarMulti"
-            const esRetirar = window.location.pathname.includes('retirar');
-            const accionMapeada = esRetirar ? "guardarRetirarMulti" : "guardarRetornarMulti";
-
-            const payload = {
-                action: accionMapeada, 
-                id_solicitud: idSol,
-                sector: sectorSesion,
-                usuario: usuarioSesion,
+            // Modificado el action para que vaya a la hoja correcta: guardarRetornarMulti
+            const payload = { 
+                action: "guardarRetornarMulti", 
+                id_solicitud: idSol, 
+                sector: sectorSesion, 
+                usuario: usuarioSesion, 
                 maniobras: arrayManiobras 
             };
 
             try {
-                const response = await fetch(URL_APPS_SCRIPT, { 
-                    method: 'POST', 
-                    mode: 'cors', 
-                    body: JSON.stringify(payload) 
-                });
-                
-                // CORREGIDO: Leemos la respuesta como JSON en lugar de texto plano
+                const response = await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'cors', body: JSON.stringify(payload) });
                 const res = await response.json();
-
                 if(res.status === "ÉXITO") {
-                    alert("¡Secuencia de Maniobras guardada y/o actualizada con éxito!");
+                    alert("¡Secuencia a Retornar guardada con éxito!");
                     window.location.href = "dashboard.html";
                 } else {
-                    alert("Error devuelto por el servidor: " + (res.message || "No se pudo procesar."));
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA';
+                    throw new Error(res.message || "Error desconocido");
                 }
-
             } catch (error) {
-                console.error("Fallo la conexión:", error);
-                alert("Ocurrió un error de comunicación al guardar. Revisa la consola del navegador.");
+                console.error(error);
+                alert("Error al guardar: " + error.message);
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR TODA LA SECUENCIA';
+                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR';
+            }
+        }
+
+        async function cargarCatalogos() {
+            try {
+                const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
+                const data = await response.json();
+                if (data && data.equipos) {
+                    const datalistEquipos = document.getElementById('lista-equipos');
+                    data.equipos.slice(1).forEach(fila => {
+                        if (fila[3]?.toString().trim().toUpperCase() === sectorSesion?.trim().toUpperCase()) {
+                            if (fila[13]) {
+                                const option = document.createElement('option');
+                                option.value = fila[13];
+                                datalistEquipos.appendChild(option);
+                                mapaEquipos[fila[13]] = fila[11] || "";
+                            }
+                        }
+                    });
+                }
+            } catch (error) { console.error("Error al cargar equipos:", error); }
+        }
+
+        function autocompletarDireccion(input) {
+            const equipo = input.value.trim().toUpperCase();
+            const fila = input.closest('tr');
+            if (mapaEquipos[equipo] !== undefined) {
+                fila.querySelector('.m-dir').value = mapaEquipos[equipo];
             }
         }
     </script>
-  
 </body>
 </html>
