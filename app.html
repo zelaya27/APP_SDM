@@ -619,62 +619,60 @@
 
         // --- ENVÍO DE DATOS ---
      // Agregamos la 'e' para capturar el evento del formulario o botón
-async function guardarFormulario(e) {
-    // 1. Detenemos la recarga automática de la página
+   async function guardarFormulario(e) {
     if (e) e.preventDefault(); 
 
     const btn = document.getElementById('btnSubmit');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...'; // Opcional: ícono de carga
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...'; 
     
-    const tipo = document.getElementById('tipo_trabajo').value;
+    const tipo = getVal('tipo_trabajo');
+    const tipoGestion = getVal('select-gestion'); // Capturamos el select correctamente
     
-    // Construcción del objeto JSON a enviar
+    // Construcción del objeto JSON usando getVal para evitar errores de "null"
     const payload = {
-        // 2. AGREGAMOS LA ACCIÓN (Verifica que este nombre coincida con tu Apps Script)
         "action": "guardarSolicitud", 
-        
-        "ID_SOLICITUD": document.getElementById('id_solicitud').value, 
-        "NUMERO_DESPEJE": document.getElementById('numero_despeje').value,
-        "SOLICITUD": document.getElementById('solicitud').value, 
-        "APEGO": document.getElementById('apego').value,
-        "FECHA_SOLICITUD": document.getElementById('fecha_solicitud').value, 
-        "SUBESTACION": document.getElementById('subestacion').value,
-        "CIRCUITO": document.getElementById('circuito').value, 
-        "SECCION": document.getElementById('seccion').value,
-        "INTERRUPTOR_DE_CIRCUITO": document.getElementById('interruptor_de_circuito').value, 
-        "RESTAURADOR": document.getElementById('restaurador').value,
-        "OTROS_EQUIPOS": document.getElementById('otros_equipos').value, 
-        "UBICACION_DEL_EQUIPO": document.getElementById('ubicacion_del_equipo').value,
-        "UBICACION_DEL_TRABAJO": document.getElementById('ubicacion_del_trabajo').value, 
-        "FECHA_INTERRUPCION": document.getElementById('fecha_interrupcion').value,
-        "DIA_DE_SEMANA": document.getElementById('dia_de_semana').value, 
-        "HORA_INICIO": document.getElementById('hora_inicio').value,
-        "HORA_FINAL": document.getElementById('hora_final').value, 
-        "TIEMPO_NECESARIO": document.getElementById('tiempo_necesario').value,
-        "TRABAJO_A_REALIZAR": document.getElementById('trabajo_a_realizar').value, 
-        "RESPONSABLE": document.getElementById('responsable').value,
-        "SUSTITUTO": document.getElementById('sustituto').value, 
-        "ZONAS_AFECTADAS": document.getElementById('zonas_afectadas').value,
-        "AREA_AFECTADA": document.getElementById('area_afectada').value, 
-        "NOMBRE_DESPEJE": document.getElementById('nombre_despeje').value,
-        "APEGOS_ENLACES": document.getElementById('apegos_enlaces').value, 
-        "APEGO_DESPEJE": document.getElementById('apego_despeje').value,
+        "ID_SOLICITUD": getVal('id_solicitud'), 
+        "NUMERO_DESPEJE": getVal('numero_despeje'),
+        "SOLICITUD": tipoGestion === 'solicitud' ? 'X' : '',  // Convertimos a 'X' si aplica
+        "APEGO": tipoGestion === 'apego' ? 'X' : '',          // Convertimos a 'X' si aplica
+        "FECHA_SOLICITUD": getVal('fecha_solicitud'), 
+        "SUBESTACION": getVal('subestacion'),
+        "CIRCUITO": getVal('circuito'), 
+        "SECCION": getVal('seccion'),
+        "INTERRUPTOR_DE_CIRCUITO": getVal('interruptor_de_circuito'), 
+        "RESTAURADOR": getVal('restaurador'),
+        "OTROS_EQUIPOS": getVal('otros_equipos'), 
+        "UBICACION_DEL_EQUIPO": getVal('ubicacion_del_equipo'),
+        "UBICACION_DEL_TRABAJO": getVal('ubicacion_del_trabajo'), 
+        "FECHA_INTERRUPCION": getVal('fecha_interrupcion'),
+        "DIA_DE_SEMANA": getVal('dia_de_semana'), 
+        "HORA_INICIO": getVal('hora_inicio'),
+        "HORA_FINAL": getVal('hora_final'), 
+        "TIEMPO_NECESARIO": getVal('tiempo_necesario'),
+        "TRABAJO_A_REALIZAR": getVal('trabajo_a_realizar'), 
+        "RESPONSABLE": getVal('responsable'),
+        "SUSTITUTO": getVal('sustituto'), 
+        "ZONAS_AFECTADAS": getVal('zonas_afectadas'),
+        "AREA_AFECTADA": getVal('area_afectada'), 
+        "NOMBRE_DESPEJE": getVal('nombre_despeje'),
+        "APEGOS_ENLACES": getVal('apegos_enlaces'), 
+        "APEGO_DESPEJE": getVal('apego_despeje'),
         "MANTO_PROGRAMADO": tipo === 'PROGRAMADO' ? 'X' : '', 
         "MANTO_EMERGENCIA": tipo === 'EMERGENCIA' ? 'X' : '',
         "MANTO_EQ_MEDICION": tipo === 'MEDICION' ? 'X' : '', 
         "PROYECTO_EXPANSION": tipo === 'PROYECTO' ? 'X' : '',
         "MANTO_OTROS": tipo === 'OTROS' ? 'X' : '', 
-        "ODT_PROGRAMADA": document.getElementById('odt_programada').value,
-        "ODT_EMERGENCIA": document.getElementById('odt_emergencia').value, 
-        "ODT_OS": document.getElementById('odt_os').value,
-        "CODIGO_PROYECTO": document.getElementById('codigo_proyecto').value, 
-        "ODT_OTROS": document.getElementById('odt_otros').value,
-        "JUSTIFICACION": document.getElementById('justificacion').value, 
-        "OBSERVACIONES": document.getElementById('observaciones').value,
-        "SOLICITADO_POR": document.getElementById('solicitado_por').value, 
-        "CARGO_DEL_SOLICITANTE": document.getElementById('cargo_del_solicitante').value,
-        "APROBADO_POR": document.getElementById('aprobado_por').value, 
+        "ODT_PROGRAMADA": getVal('odt_programada'),
+        "ODT_EMERGENCIA": getVal('odt_emergencia'), 
+        "ODT_OS": getVal('odt_os'),
+        "CODIGO_PROYECTO": getVal('codigo_proyecto'), 
+        "ODT_OTROS": getVal('odt_otros'),
+        "JUSTIFICACION": getVal('justificacion'), 
+        "OBSERVACIONES": getVal('observaciones'),
+        "SOLICITADO_POR": getVal('solicitado_por'), 
+        "CARGO_DEL_SOLICITANTE": getVal('cargo_del_solicitante'),
+        "APROBADO_POR": getVal('aprobado_por'), 
         "SECTOR": sectorSesion, 
         "USUARIO": usuarioSesion
     };
@@ -690,9 +688,10 @@ async function guardarFormulario(e) {
         
         if (res.status === "ÉXITO") {
             alert("¡Solicitud registrada con éxito!");
-            window.location.href = "panel_principal.html"; // Es mejor redirigir al panel que recargar la página limpia
+            // Corregido: Redirección uniforme hacia el dashboard
+            window.location.href = "dashboard.html"; 
         } else {
-            throw new Error(res.message || "Error desconocido al guardar en el servidor");
+            throw new Error(res.message || res.error || "Error desconocido al guardar en el servidor");
         }
     } catch (error) {
         console.error("Error:", error);
