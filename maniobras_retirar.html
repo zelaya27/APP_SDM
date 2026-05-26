@@ -233,16 +233,16 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
 
                     maniobras.forEach(m => {
                         const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><input type="number" class="m-sec" value="${m.secuencia}" required></td>
-                            <td><input type="text" class="m-man" value="${m.maniobra}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-equ" value="${m.equipo}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-dir" value="${m.direccion}" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-ope" value="${m.operacion_a_ejecutar}" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="text" class="m-per" value="${m.personal_que_ejecutara}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                            <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion}" required></td>
-                            <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-                        `;
+                       tr.innerHTML = `
+    <td><input type="number" class="m-sec" value="${m.secuencia}" required></td>
+    <td><input type="text" class="m-man" list="lista-maniobras" value="${m.maniobra}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-equ" list="lista-equipos" value="${m.equipo}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
+    <td><input type="text" class="m-dir" value="${m.direccion}" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-ope" value="${m.operacion_a_ejecutar}" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-per" value="${m.personal_que_ejecutara}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion}" required></td>
+    <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+`;
                         tbody.appendChild(tr);
                     });
                 }
@@ -257,16 +257,16 @@ label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--muted
             contadorFilas++;
             const tbody = document.getElementById('tabla-body');
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><input type="number" class="m-sec" value="${contadorFilas}" required></td>
-                <td><input type="text" class="m-man" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-equ" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="time" class="m-hor" required></td>
-                <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-            `;
+       tr.innerHTML = `
+    <td><input type="number" class="m-sec" value="${m.secuencia}" required></td>
+    <td><input type="text" class="m-man" list="lista-maniobras" value="${m.maniobra}" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-equ" list="lista-equipos" value="${m.equipo}" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
+    <td><input type="text" class="m-dir" value="${m.direccion}" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-ope" value="${m.operacion_a_ejecutar}" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="text" class="m-per" value="${m.personal_que_ejecutara}" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+    <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion}" required></td>
+    <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+`;
             tbody.appendChild(tr);
         }
 
