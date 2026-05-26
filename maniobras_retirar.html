@@ -9,6 +9,9 @@
     <script src="config.js"></script>
 
     <style>
+        *, *:before, *:after {
+    box-sizing: border-box !important; 
+}
         :root {
             --bg-color: #0b141d; --card-color: #14212d; --accent-color: #003366;
             --success-color: #27ae60; --danger-color: #e74c3c; --info-color: #3498db;
@@ -69,39 +72,26 @@ th {
     font-size: 13px;
 }
 
-td input { 
-    width: 100%; 
-    padding: 25px; 
-    background-color: var(--bg-color); 
-    border: 1px solid var(--border-color); 
-    color: #fff; 
-    border-radius: 1px; 
-    box-sizing: border-box; 
+/* Estilo unificado para inputs y textareas */
+td input, td textarea {
+    width: 100%;
+    padding: 10px; /* Mantén un padding consistente */
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    border-radius: 4px;
     font-size: 12px;
-    white-space: normal; /* Permite que el input también maneje el texto multilínea */
-}
-        /* Cambiamos el selector de 'td input' a 'td textarea' */
-td textarea { 
-    width: 100%; 
-    padding: 10px; 
-    background-color: var(--bg-color); 
-    border: 1px solid var(--border-color); 
-    color: #fff; 
-    border-radius: 4px; 
-    box-sizing: border-box; 
-    font-size: 12px; /* Aumenté un poco el tamaño para que sea legible */
-    
-    /* CORRECCIONES PARA EL SALTO DE LÍNEA */
-    white-space: normal; /* Asegura el salto de línea (semicolon añadido) */
-    word-wrap: break-word; /* Rompe palabras largas */
-    word-break: break-word; /* Obliga al navegador a romper el texto si llega al borde */
-    overflow-wrap: break-word; /* Soporte moderno para saltos */
-    
-    /* Propiedades de diseño */
-    display: block;
-    resize: vertical; 
-    min-height: 40px; 
     font-family: inherit;
+    /* Forzamos el comportamiento */
+    display: block;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* Solo para textarea (ajuste de redimensionamiento) */
+td textarea {
+    resize: vertical;
+    min-height: 40px;
 }
         /* =========================================
            BARRA DE INFORMACIÓN
