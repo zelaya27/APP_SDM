@@ -48,25 +48,37 @@
         
 /* Ajuste para aumentar la altura y permitir salto de línea */
 table {
-    border-collapse: collapse;
-    table-layout: fixed; /* Ayuda a controlar el ancho de las columnas */
-    width: 100%;
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 100%;
+    table-layout: auto; /* Cambiado a auto para que el ancho se ajuste al contenido */
 }
 
 th, td {
-    padding: 30px 10px; /* Aumentamos el padding vertical de 8px a 15px */
-    vertical-align: middle; /* Centrado vertical */
+    padding: 30px 10px; /* Aumenta este valor para mayor altura vertical */
+    text-align: left; 
     border-bottom: 1px solid var(--border-color);
-    word-wrap: break-word; /* Permite que las palabras largas se rompan */
-    white-space: normal;   /* Permite que el texto salte a la siguiente línea */
+    vertical-align: middle; /* Alinea el contenido al centro vertical */
+    white-space: normal;    /* ESTO ES LO QUE HACE QUE EL TEXTO SALTE A LA SIGUIENTE LÍNEA */
+    word-wrap: break-word;  /* Rompe palabras largas para que no desborden */
 }
 
-/* Opcional: Si quieres que los inputs ocupen más espacio visual */
-td input {
-    width: 100%;
-    padding: 10px;
-    min-height: 40px; /* Altura mínima para que el texto sea legible */
-    white-space: normal;
+th { 
+    background-color: var(--accent-color); 
+    color: white; 
+    font-size: 13px;
+}
+
+td input { 
+    width: 100%; 
+    padding: 8px; 
+    background-color: var(--bg-color); 
+    border: 1px solid var(--border-color); 
+    color: #fff; 
+    border-radius: 4px; 
+    box-sizing: border-box; 
+    font-size: 13px;
+    white-space: normal; /* Permite que el input también maneje el texto multilínea */
 }
         /* =========================================
            BARRA DE INFORMACIÓN
