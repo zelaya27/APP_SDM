@@ -86,11 +86,7 @@ td input, td textarea {
     display: block;
     white-space: normal;
     word-wrap: break-word;
-}
-
-/* Solo para textarea (ajuste de redimensionamiento) */
-td textarea {
-    min-height: 30px;
+     min-height: 34px;
 }
         /* =========================================
            BARRA DE INFORMACIÓN
@@ -271,13 +267,13 @@ td textarea {
                     maniobras.forEach(m => {
                         const tr = document.createElement('tr');
     tr.innerHTML = `
-        <td><textarea type="number" class="m-sec" value="${m.secuencia || ''}" </textarea></td>
+        <td><input type="number" class="m-sec" value="${m.secuencia || ''}"</td>
         <td><textarea class="m-man" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()">${m.maniobra || ''}</textarea></td>
         <td><textarea class="m-equ" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)">${m.equipo || ''}</textarea></td>
         <td><textarea class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()">${m.direccion || ''}</textarea></td>
         <td><textarea class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()">${m.operacion_a_ejecutar || ''}</textarea></td>
         <td><textarea class="m-per" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()">${m.personal_que_ejecutara || ''}</textarea></td>
-        <td><textareatype="time" class="m-hor" value="${m.hora_de_ejecucion || ''}" </textarea></td>
+        <td><input type="time" class="m-hor" value="${m.hora_de_ejecucion || ''}" </td>
         <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
     `;
     tbody.appendChild(tr);
@@ -293,7 +289,7 @@ td textarea {
             const tbody = document.getElementById('tabla-body');
             const tr = document.createElement('tr');
     tr.innerHTML = `
-        <td><textarea class="m-sec" required>${contadorFilas}</textarea></td>
+        <td><input  class="m-sec" required>${contadorFilas}required></td>
         
         <td><textarea  type="text" class="m-man" list="lista-maniobras" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></textarea></td>
         
@@ -305,7 +301,7 @@ td textarea {
         
         <td><textarea  type="text" class="m-per" list="lista-personal" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
         
-        <td><textarea  type="time" class="m-hor" required></textarea></td>
+        <td><input   type="time" class="m-hor" required></td>
         
         <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
     `;
