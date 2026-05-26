@@ -136,18 +136,16 @@
             <div style="font-size: 11px; text-align: right; margin-right: 10px;">
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
                     <span id="lbl-usuario" style="color:white; font-weight:bold;"></span>
-                    <i class="material-icons" style="font-size: 14px;">person</i>
-                </div>
+                    <i class="material-icons" style="font-size: 14px;">person</i></div>
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
                     <span id="lbl-sector" style="color:#3498db;"></span>
                     <i class="material-icons" style="font-size: 14px;">location_on</i>
                 </div>
             </div>
+            <button type="button" onclick="forzarActualizacionCatalogos()" class="btn-sincronizar" style="background-color: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">
+                🔄 Sincronizar </button>
             <button class="btn-nav" onclick="window.location.href='dashboard.html'">
                 <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel </button>
-                <button type="button" onclick="forzarActualizacionCatalogos()" class="btn-sincronizar" style="background-color: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">
-                🔄 Sincronizar </button>
-           
             <button type="button" id="btn_generar_excel" onclick="generarExcelSolicitud()" class="btn_generar_excel">
                 <i class="material-icons">download</i>Excel
             </button>
