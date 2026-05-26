@@ -144,6 +144,9 @@
             </div>
             <button class="btn-nav" onclick="window.location.href='dashboard.html'">
                 <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel
+                <button type="button" onclick="forzarActualizacionCatalogos()" class="btn-sincronizar" style="background-color: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">
+    🔄 Sincronizar
+</button>
             </button>
             <button type="button" id="btn_generar_excel" onclick="generarExcelSolicitud()" class="btn_generar_excel">
                 <i class="material-icons">download</i>Excel
@@ -349,21 +352,65 @@
             document.getElementById('lbl-usuario').innerText = usuarioSesion;
             document.getElementById('lbl-sector').innerText = sectorSesion;
             
-            await descargarDatosGoogleSheets(); 
+       // --- DESCARGA Y LLENADO DE DATOS OPTIMIZADO (CON CACHÉ) ---
+async function descargarDatosGoogleSheets() {
+    const CACHE_KEY = "datos_catalogos_despejes";
+    const CACHE_TIME_KEY = "tiempo_catalogos_despejes";
+    const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; // 24 horas en milisegundos (ajusta según necesites)
 
-            // Verificar si venimos a editar un registro
-            const urlParams = new URLSearchParams(window.location.search);
-            const idEdicion = urlParams.get('id');
-            const modo = urlParams.get('modo');
+    // 1. Revisar si tenemos datos guardados en el navegador y si aún son válidos
+    const datosGuardados = localStorage.getItem(CACHE_KEY);
+    const tiempoGuardado = localStorage.getItem(CACHE_TIME_KEY);
 
-            if (idEdicion && (modo === 'editar' || modo === 'formulario')) {
-                document.getElementById('id_solicitud').value = idEdicion;
-                await cargarDatosEdicion(idEdicion);
-            } else {
-                generarIDUnico();
-                document.getElementById('fecha_solicitud').value = new Date().toISOString().split('T')[0];
-            }
-        };
+    if (datosGuardados && tiempoGuardado) {
+        const tiempoTranscurrido = Date.now() - parseInt(tiempoGuardado);
+        
+        if (tiempoTranscurrido < TIEMPO_EXPIRACION) {
+            console.log("⚡ Carga ultra rápida: Usando memoria caché del navegador.");
+            procesarYMostrarDatos(JSON.parse(datosGuardados));
+            return; // Salimos de la función, NO esperamos a Google
+        }
+    }
+
+    // 2. Si no hay caché o ya caducó, consultamos a Google Sheets
+    try {
+        console.log("☁️ Descargando datos frescos desde Google Sheets...");
+        
+        // Verifica que URL_APPS_SCRIPT o CONFIG.URL_APPS_SCRIPT esté bien declarada en tu código
+        const urlFetch = typeof CONFIG !== 'undefined' ? CONFIG.URL_APPS_SCRIPT : URL_APPS_SCRIPT;
+        const res = await fetch(`${urlFetch}?action=getDatos`); 
+        const data = await res.json();
+        
+        // 3. Guardamos los datos nuevos en la memoria del navegador para la próxima vez
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+
+        procesarYMostrarDatos(data);
+
+    } catch(e) { 
+        console.error("❌ Error de red conectando a Google Sheets:", e); 
+        // 4. Sistema de rescate: Si falla el internet, usamos los datos viejos si existen
+        if (datosGuardados) {
+            console.log("⚠️ Sin internet. Usando datos antiguos de rescate.");
+            procesarYMostrarDatos(JSON.parse(datosGuardados));
+        } else {
+            alert("Error de conexión y no hay datos guardados previamente.");
+        }
+    }
+}
+
+// --- FUNCIÓN AUXILIAR PARA REPARTIR LOS DATOS ---
+function procesarYMostrarDatos(data) {
+    // Estas son las variables globales que ya tenías
+    if(data.circuitos) baseCircuitos = data.circuitos;
+    if(data.equipos) baseEquipos = data.equipos;
+    if(data.responsables) baseResponsables = data.responsables;
+    if(data.ingenieros) baseIngenieros = data.ingenieros;
+    
+    // Llamamos a tus funciones que llenan los <select> en el HTML
+    if (typeof poblarListaCircuitos === "function") poblarListaCircuitos();
+    if (typeof poblarListasPersonal === "function") poblarListasPersonal();
+}
 
         // Función para leer valores de forma segura (evita errores de nulos)
         function getVal(id) {
