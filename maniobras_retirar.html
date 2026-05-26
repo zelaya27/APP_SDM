@@ -77,25 +77,31 @@ td input {
     color: #fff; 
     border-radius: 1px; 
     box-sizing: border-box; 
-    font-size: 8px;
+    font-size: 12px;
     white-space: normal; /* Permite que el input también maneje el texto multilínea */
 }
         /* Cambiamos el selector de 'td input' a 'td textarea' */
 td textarea { 
     width: 100%; 
-    padding: 10px; /* Reduje el padding de 25px a 10px, 25px es demasiado grande para un input */
+    padding: 10px; 
     background-color: var(--bg-color); 
     border: 1px solid var(--border-color); 
     color: #fff; 
-    border-radius: 4px; /* Un poco más estándar */
+    border-radius: 4px; 
     box-sizing: border-box; 
-    font-size: 8px;
-    white-space: normal
-    /* Propiedades clave para multilínea */
+    font-size: 12px; /* Aumenté un poco el tamaño para que sea legible */
+    
+    /* CORRECCIONES PARA EL SALTO DE LÍNEA */
+    white-space: normal; /* Asegura el salto de línea (semicolon añadido) */
+    word-wrap: break-word; /* Rompe palabras largas */
+    word-break: break-word; /* Obliga al navegador a romper el texto si llega al borde */
+    overflow-wrap: break-word; /* Soporte moderno para saltos */
+    
+    /* Propiedades de diseño */
     display: block;
-    resize: vertical; /* Permite al usuario estirarlo si necesita escribir más */
-    min-height: 40px; /* Altura inicial */
-    font-family: inherit; /* Hereda la fuente de tu tabla */
+    resize: vertical; 
+    min-height: 40px; 
+    font-family: inherit;
 }
         /* =========================================
            BARRA DE INFORMACIÓN
