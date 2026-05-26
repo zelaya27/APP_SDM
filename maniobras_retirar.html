@@ -294,17 +294,29 @@ td textarea {
             const tbody = document.getElementById('tabla-body');
             const tr = document.createElement('tr');
             // CORRECCIÓN: Se limpiaron los "m.algo" que daban error porque al agregar no existen datos previos.
-            tr.innerHTML = `
-                <td><input type="number" class="m-sec" value="${contadorFilas}" required></td>
-                <td><input type="text" class="m-man" list="lista-maniobras" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-equ" list="lista-equipos" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
-                <td><input type="text" class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="text" class="m-per" list="lista-personal" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
-                <td><input type="time" class="m-hor" required></td>
-                <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
-            `;
-            tbody.appendChild(tr);
+           function agregarFila() {
+    contadorFilas++;
+    const tbody = document.getElementById('tabla-body');
+    const tr = document.createElement('tr');
+    
+    tr.innerHTML = `
+        <td><textarea class="m-sec" required>${contadorFilas}</textarea></td>
+        
+        <td><input type="text" class="m-man" list="lista-maniobras" placeholder="Ej. RETIRAR" required oninput="this.value = this.value.toUpperCase()"></td>
+        
+        <td><input type="text" class="m-equ" list="lista-equipos" placeholder="Ej. L-30" required oninput="this.value = this.value.toUpperCase()" onchange="autocompletarDireccion(this)"></td>
+        
+        <td><textarea class="m-dir" placeholder="Ej. SUBESTACIÓN" required oninput="this.value = this.value.toUpperCase()"></textarea></td>
+        
+        <td><textarea class="m-ope" placeholder="Ej. RETIRAR TARJETA" required oninput="this.value = this.value.toUpperCase()"></textarea></td>
+        
+        <td><input type="text" class="m-per" list="lista-personal" placeholder="Nombre" required oninput="this.value = this.value.toUpperCase()"></td>
+        
+        <td><input type="time" class="m-hor" required></td>
+        
+        <td><button type="button" class="btn-remove" onclick="eliminarFila(this)"><i class="fas fa-trash"></i></button></td>
+    `;
+    tbody.appendChild(tr);
         }
 
         function eliminarFila(btn) {
