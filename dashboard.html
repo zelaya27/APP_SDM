@@ -263,17 +263,17 @@ window.onload = async function() {
             }
         }
 
-        // --- FUNCIÓN AUXILIAR PARA REPARTIR LOS DATOS ---
-        function procesarYMostrarDatos(data) {
-            if(data.circuitos) baseCircuitos = data.circuitos;
-            if(data.equipos) baseEquipos = data.equipos;
-            if(data.responsables) baseResponsables = data.responsables;
-            if(data.ingenieros) baseIngenieros = data.ingenieros;
-            
-            if (typeof poblarListaCircuitos === "function") poblarListaCircuitos();
-            if (typeof poblarListasPersonal === "function") poblarListasPersonal();
-        }
-
+function procesarYMostrarDatos(data) {
+    if(data.circuitos) baseCircuitos = data.circuitos;
+    if(data.equipos) baseEquipos = data.equipos;
+    if(data.responsables) baseResponsables = data.responsables;
+    if(data.ingenieros) baseIngenieros = data.ingenieros;
+    
+    // Llamamos a la función corregida inmediatamente
+    inicializarFiltroCircuitos(); 
+    
+    if (typeof poblarListasPersonal === "function") poblarListasPersonal();
+}
         function forzarActualizacionCatalogos() {
             localStorage.removeItem("datos_catalogos_despejes");
             localStorage.removeItem("tiempo_catalogos_despejes");
@@ -299,34 +299,38 @@ window.onload = async function() {
         // 4. FUNCIONES PRINCIPALES DE CARGA DE DATOS
 
         // Carga la lista de circuitos según el sector del usuario para llenar el filtro
-        async function inicializarFiltroCircuitos() {
-            const selectCircuito = document.getElementById('filtroCircuito');
-            if (!selectCircuito) return;
+      async function inicializarFiltroCircuitos() {
+    const selectCircuito = document.getElementById('filtroCircuito');
+    if (!selectCircuito) return;
 
-            try {
-                const response = await fetch(`${URL_APPS_SCRIPT}?action=getDatos`);
-                const catalogos = await response.json();
-                
-                if (catalogos && catalogos.circuitos) {
-                    const miSector = sectorSesion.trim().toUpperCase();
-                    // Filtramos para que solo vea los circuitos de SU sector (Columna 3)
-                    const circuitosFiltrados = catalogos.circuitos.slice(1).filter(fila => {
-                        const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : "";
-                        return sectorHoja === miSector;
-                    });
+    // Limpiamos opciones previas
+    selectCircuito.innerHTML = '<option value="ALL">Todos</option>';
+    
+    const miSector = sectorSesion ? sectorSesion.trim().toUpperCase() : "";
+    console.log("DEBUG: Sector detectado:", miSector);
+    console.log("DEBUG: Circuitos recibidos:", baseCircuitos.length);
 
-                    // Agregamos las opciones al menú desplegable
-                    circuitosFiltrados.forEach(fila => {
-                        const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
-                        if (nombreCircuito) {
-                            selectCircuito.innerHTML += `<option value="${nombreCircuito}">${nombreCircuito}</option>`;
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error("Error al cargar circuitos:", error);
+    if (baseCircuitos && baseCircuitos.length > 1) {
+        let contador = 0;
+        // Saltamos la fila 0 (encabezados)
+        baseCircuitos.slice(1).forEach((fila, index) => {
+            // Ajusta estos índices [3] y [6] si tus columnas son distintas
+            const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : "";
+            const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
+
+            if (sectorHoja === miSector && nombreCircuito) {
+                const opt = document.createElement('option');
+                opt.value = nombreCircuito;
+                opt.textContent = nombreCircuito;
+                selectCircuito.appendChild(opt);
+                contador++;
             }
-        }
+        });
+        console.log(`DEBUG: Se agregaron ${contador} circuitos al filtro.`);
+    } else {
+        console.warn("ADVERTENCIA: baseCircuitos está vacío o no cargó correctamente.");
+    }
+}
 
         // Se conecta al servidor y trae TODAS las solicitudes del sector
         async function cargarSolicitudes() {
