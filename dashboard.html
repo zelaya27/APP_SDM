@@ -319,7 +319,7 @@
                         <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
                             <i class="fas fa-arrow-circle-up"></i> M. Retornar
                         </button>
-                        <button class="btn-accionbtn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
+                      <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
                             <i class="fas fa-file-excel"></i> Excel
                         </button>
                     </td>
@@ -351,6 +351,7 @@
         }
 
         // Genera y descarga el Excel
+     // Genera y descarga el Excel
         async function descargarExcelDashboard(boton, idSolicitud) {
             // Cambiamos el botón para que diga "Procesando..." y nadie haga doble clic
             const textoOriginal = boton.innerHTML;
@@ -368,58 +369,61 @@
                 }
 
                 // 2. Empaquetamos los datos en un "Paquete" ordenado
-                //LOS ÍNDICES DE LAS COLUMNAS
-                // Nota: [0] es la Columna A, [1] es la B, [2] es la C, etc.
+                // ¡IMPORTANTE! Agregamos el action: "generarExcel" (o la acción que use tu Código.gs)
                 const datosParaExcel = {
-            ID_SOLICITUD: solicitudCompleta[0] || idSolicitud, 
-            NUMERO_DESPEJE: solicitudCompleta[1] || "",
-            SOLICITUD: solicitudCompleta[2] || "", 
-            APEGO: solicitudCompleta[3] || "",
-            FECHA_SOLICITUD: solicitudCompleta[4] || "", 
-            SUBESTACION: solicitudCompleta[5] || "",
-            CIRCUITO: solicitudCompleta[6] || "", 
-            SECCION: solicitudCompleta[7] || "",
-            INTERRUPTOR_DE_CIRCUITO: solicitudCompleta[8] || "", 
-            RESTAURADOR: solicitudCompleta[9] || "",
-            OTROS_EQUIPOS: solicitudCompleta[10] || "", 
-            UBICACION_DEL_EQUIPO: solicitudCompleta[11] || "",
-            UBICACION_DEL_TRABAJO: solicitudCompleta[12] || "", 
-            FECHA_INTERRUPCION: solicitudCompleta[13] || "",
-            DIA_DE_SEMANA: solicitudCompleta[14] || "", 
-            HORA_INICIO: solicitudCompleta[15] || "",
-            HORA_FINAL: solicitudCompleta[16] || "", 
-            TIEMPO_NECESARIO: solicitudCompleta[17] || "",
-            TRABAJO_A_REALIZAR: solicitudCompleta[18] || "", 
-            RESPONSABLE: solicitudCompleta[19] || "",
-            SUSTITUTO: solicitudCompleta[20] || "", 
-            ZONAS_AFECTADAS: solicitudCompleta[21] || "",
-            AREA_AFECTADA: solicitudCompleta[22] || "", 
-            NOMBRE_DESPEJE: solicitudCompleta[23] || "",
-            APEGOS_ENLACES: solicitudCompleta[24] || "", 
-            APEGO_DESPEJE: solicitudCompleta[25] || "",
-            MANTO_PROGRAMADO: solicitudCompleta[26] || "",
-            MANTO_EMERGENCIA: solicitudCompleta[27] || "",
-            MANTO_EQ_MEDICION: solicitudCompleta[28] || "",
-            PROYECTO_EXPANSION: solicitudCompleta[29] || "",
-            MANTO_OTROS: solicitudCompleta[30] || "",
-            ODT_PROGRAMADA: solicitudCompleta[31] || "", 
-            ODT_EMERGENCIA: solicitudCompleta[32] || "",
-            ODT_OS: solicitudCompleta[33] || "", 
-            CODIGO_PROYECTO: solicitudCompleta[34] || "",
-            ODT_OTROS: solicitudCompleta[35] || "", 
-            JUSTIFICACION: solicitudCompleta[36] || "",
-            OBSERVACIONES: solicitudCompleta[37] || "", 
-            SOLICITADO_POR: solicitudCompleta[38] || "",
-            CARGO_DEL_SOLICITANTE: solicitudCompleta[39] || "", 
-            APROBADO_POR: solicitudCompleta[40] || "",
-            SECTOR: sectorSesion || solicitudCompleta[41] || "", 
-            USUARIO: usuarioSesion || solicitudCompleta[42] || ""
+                    action: "generarExcel", // <-- ESTO ES VITAL PARA QUE EL SERVIDOR RESPONDA
+                    ID_SOLICITUD: solicitudCompleta[0] || idSolicitud, 
+                    NUMERO_DESPEJE: solicitudCompleta[1] || "",
+                    SOLICITUD: solicitudCompleta[2] || "", 
+                    APEGO: solicitudCompleta[3] || "",
+                    FECHA_SOLICITUD: solicitudCompleta[4] || "", 
+                    SUBESTACION: solicitudCompleta[5] || "",
+                    CIRCUITO: solicitudCompleta[6] || "", 
+                    SECCION: solicitudCompleta[7] || "",
+                    INTERRUPTOR_DE_CIRCUITO: solicitudCompleta[8] || "", 
+                    RESTAURADOR: solicitudCompleta[9] || "",
+                    OTROS_EQUIPOS: solicitudCompleta[10] || "", 
+                    UBICACION_DEL_EQUIPO: solicitudCompleta[11] || "",
+                    UBICACION_DEL_TRABAJO: solicitudCompleta[12] || "", 
+                    FECHA_INTERRUPCION: solicitudCompleta[13] || "",
+                    DIA_DE_SEMANA: solicitudCompleta[14] || "", 
+                    HORA_INICIO: solicitudCompleta[15] || "",
+                    HORA_FINAL: solicitudCompleta[16] || "", 
+                    TIEMPO_NECESARIO: solicitudCompleta[17] || "",
+                    TRABAJO_A_REALIZAR: solicitudCompleta[18] || "", 
+                    RESPONSABLE: solicitudCompleta[19] || "",
+                    SUSTITUTO: solicitudCompleta[20] || "", 
+                    ZONAS_AFECTADAS: solicitudCompleta[21] || "",
+                    AREA_AFECTADA: solicitudCompleta[22] || "", 
+                    NOMBRE_DESPEJE: solicitudCompleta[23] || "",
+                    APEGOS_ENLACES: solicitudCompleta[24] || "", 
+                    APEGO_DESPEJE: solicitudCompleta[25] || "",
+                    MANTO_PROGRAMADO: solicitudCompleta[26] || "",
+                    MANTO_EMERGENCIA: solicitudCompleta[27] || "",
+                    MANTO_EQ_MEDICION: solicitudCompleta[28] || "",
+                    PROYECTO_EXPANSION: solicitudCompleta[29] || "",
+                    MANTO_OTROS: solicitudCompleta[30] || "",
+                    ODT_PROGRAMADA: solicitudCompleta[31] || "", 
+                    ODT_EMERGENCIA: solicitudCompleta[32] || "",
+                    ODT_OS: solicitudCompleta[33] || "", 
+                    CODIGO_PROYECTO: solicitudCompleta[34] || "",
+                    ODT_OTROS: solicitudCompleta[35] || "", 
+                    JUSTIFICACION: solicitudCompleta[36] || "",
+                    OBSERVACIONES: solicitudCompleta[37] || "", 
+                    SOLICITADO_POR: solicitudCompleta[38] || "",
+                    CARGO_DEL_SOLICITANTE: solicitudCompleta[39] || "", 
+                    APROBADO_POR: solicitudCompleta[40] || "",
+                    SECTOR: sectorSesion || solicitudCompleta[41] || "", 
+                    USUARIO: usuarioSesion || solicitudCompleta[42] || ""
                 };
 
                 // 3. Mandamos el paquete a Google Apps Script para que cree el Excel
-                const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
-                    method: 'POST', mode: 'cors', body: JSON.stringify(datosParaExcel)
+                const response = await fetch(URL_APPS_SCRIPT, {
+                    method: 'POST', 
+                    mode: 'cors', 
+                    body: JSON.stringify(datosParaExcel)
                 });
+                
                 const res = await response.json();
 
                 // 4. Si fue un éxito, obligamos al navegador a descargar el archivo
@@ -431,17 +435,20 @@
                     document.body.removeChild(enlaceDescarga);
                 } else {
                     alert("Error en el servidor: " + (res.message || res.error));
+                    console.error("Respuesta del servidor:", res);
                 }
 
             } catch (err) {
+                console.error("Error de comunicación:", err);
                 alert("No se pudo conectar con el servidor para generar el Excel.");
             } finally {
                 // Devolvemos el botón a la normalidad
-                boton.disabled = false;
-                boton.innerHTML = textoOriginal;
+                if(boton) {
+                    boton.disabled = false;
+                    boton.innerHTML = textoOriginal;
+                }
             }
         }
-
         // Cierra la sesión borrando la llave y mandando a la pantalla de entrada
         function cerrarSesion() {
             sessionStorage.clear();
