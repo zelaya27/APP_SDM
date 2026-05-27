@@ -115,6 +115,9 @@
         
         <div class="user-info">
             <span id="nombre-usuario"><i class="fas fa-user-circle"></i> Cargando...</span>
+            <button id="btnForzarActualizar" onclick="forzarActualizacion()" class="btn-accion">
+    🔄 Sinc
+</button>
             <button class="btn-logout" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
         </div>
     </header>
@@ -192,7 +195,51 @@
             cargarSolicitudes(); 
             inicializarFiltroCircuitos(); 
         }
+// --- DESCARGA Y LLENADO DE DATOS OPTIMIZADO (CON CACHÉ) ---
+async function descargarDatosGoogleSheets() { 
+    const CACHE_KEY = "datos_catalogos_despejes"; 
+    const CACHE_TIME_KEY = "tiempo_catalogos_despejes"; 
+    const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; // 24 horas (o puedes usar 1 hora)
 
+    // 1. Revisar si tenemos datos guardados en el navegador y si aún son válidos
+    const datosGuardados = localStorage.getItem(CACHE_KEY); 
+    const tiempoGuardado = localStorage.getItem(CACHE_TIME_KEY); 
+
+    if (datosGuardados && tiempoGuardado) { 
+        const tiempoTranscurrido = Date.now() - parseInt(tiempoGuardado); 
+        if (tiempoTranscurrido < TIEMPO_EXPIRACION) { 
+            console.log("⚡ Carga ultra rápida: Usando memoria caché del navegador."); 
+            // Llama a la función que pinta las listas en tu app
+            procesarYMostrarDatos(JSON.parse(datosGuardados)); 
+            return; // Salimos de la función, NO esperamos a Google
+        } 
+    }
+function forzarActualizacion() {
+    // Borramos las llaves de la memoria
+    localStorage.removeItem("datos_catalogos_despejes");
+    localStorage.removeItem("tiempo_catalogos_despejes");
+    
+    // Volvemos a llamar a la función (ahora se irá por la ruta de Google)
+    descargarDatosGoogleSheets();
+    alert("Datos actualizados correctamente desde Google Sheets.");
+}
+    // 2. Si no hay caché o ya caducó, consultamos a Google Sheets 
+    try { 
+        console.log("☁️ Descargando datos frescos desde Google Sheets..."); 
+        const res = await fetch(`${CONFIG.URL_APPS_SCRIPT}?action=getDatos`);
+        const data = await res.json();
+        
+        // 3. Guardar los datos nuevos en la caché para la próxima vez
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+
+        // Mostrar los datos
+        procesarYMostrarDatos(data);
+
+    } catch (error) {
+        console.error("Error de red cargando datos.", error);
+    }
+}
         // 3. FUNCIONES DE AYUDA (Herramientas)
         
         // Esta función convierte la fecha fea de la base de datos a un formato bonito (DD/MM/AAAA)
@@ -449,11 +496,13 @@
                 }
             }
         }
+        
         // Cierra la sesión borrando la llave y mandando a la pantalla de entrada
         function cerrarSesion() {
             sessionStorage.clear();
             window.location.href = "index.html";
         }
+        
     </script>
 </body>
 </html>
