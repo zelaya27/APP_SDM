@@ -178,42 +178,68 @@
 
 
     <script>
-        // 1. VARIABLES GLOBALES (Datos compartidos)
-        const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT; // Trae la URL desde config.js
-        let todosLosDatos = []; // Aquí guardaremos todo lo que llegue del servidor
+       // Variables globales para almacenar datos descargados de Google Sheets
+        let baseCircuitos = [], baseEquipos = [], baseResponsables = [], baseIngenieros = [];
+        const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
+        const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
+        let currentStep = 1; 
+        const totalSteps = 4;
+        // --- INICIALIZACIÓN (CORREGIDA) ---
+        window.onload = async function() {
+            // 1. Mostrar usuario y sector en la cabecera
+            document.getElementById('lbl-usuario').innerText = usuarioSesion;
+            document.getElementById('lbl-sector').innerText = sectorSesion;
+            
+            // 2. Ejecutar la descarga de datos al iniciar la página
+            descargarDatosGoogleSheets();
 
-        // 2. SEGURIDAD Y SESIÓN
-        // Verificamos quién entró. Si no hay sesión, lo expulsamos al login.
-        const usuarioSesion = sessionStorage.getItem("usuario");
-        const sectorSesion = sessionStorage.getItem("sector");
+            // 3. (Opcional) Si la aplicación necesita abrir un ID específico desde la URL para editar
+            const urlParams = new URLSearchParams(window.location.search);
+            const idSol = urlParams.get('id');
+            if(idSol) {
+                cargarDatosEdicion(idSol);
+            }
+        }; // <-- FALTABA ESTA LLAVE Y PUNTO Y COMA PARA CERRAR EL ONLOAD
 
-        if (!usuarioSesion) {
-            window.location.href = "index.html"; 
-        } else {
-            // Si el usuario es válido, mostramos su nombre y cargamos los datos
-            document.getElementById("nombre-usuario").innerHTML = `<i class="fas fa-user-circle"></i> ${usuarioSesion} (${sectorSesion})`;
-            cargarSolicitudes(); 
-            inicializarFiltroCircuitos(); 
+        // --- DESCARGA Y LLENADO DE DATOS OPTIMIZADO (CON CACHÉ) ---
+        async function descargarDatosGoogleSheets() {
+            const CACHE_KEY = "datos_catalogos_despejes";
+            const CACHE_TIME_KEY = "tiempo_catalogos_despejes";
+            const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; // 24 horas
+
+            const datosGuardados = localStorage.getItem(CACHE_KEY);
+            const tiempoGuardado = localStorage.getItem(CACHE_TIME_KEY);
+
+            if (datosGuardados && tiempoGuardado) {
+                const tiempoTranscurrido = Date.now() - parseInt(tiempoGuardado);
+                if (tiempoTranscurrido < TIEMPO_EXPIRACION) {
+                    console.log("⚡ Carga ultra rápida: Usando memoria caché del navegador.");
+                    procesarYMostrarDatos(JSON.parse(datosGuardados));
+                    return; 
+                }
+            }
+
+            try {
+                console.log("☁️ Descargando datos frescos desde Google Sheets...");
+                const urlFetch = typeof CONFIG !== 'undefined' ? CONFIG.URL_APPS_SCRIPT : URL_APPS_SCRIPT;
+                const res = await fetch(`${urlFetch}?action=getDatos`); 
+                const data = await res.json();
+                
+                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+
+                procesarYMostrarDatos(data);
+
+            } catch(e) { 
+                console.error("❌ Error de red conectando a Google Sheets:", e); 
+                if (datosGuardados) {
+                    console.log("⚠️ Sin internet. Usando datos antiguos de rescate.");
+                    procesarYMostrarDatos(JSON.parse(datosGuardados));
+                } else {
+                    alert("Error de conexión y no hay datos guardados previamente.");
+                }
+            }
         }
-// --- DESCARGA Y LLENADO DE DATOS OPTIMIZADO (CON CACHÉ) ---
-async function descargarDatosGoogleSheets() { 
-    const CACHE_KEY = "datos_catalogos_despejes"; 
-    const CACHE_TIME_KEY = "tiempo_catalogos_despejes"; 
-    const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; // 24 horas (o puedes usar 1 hora)
-
-    // 1. Revisar si tenemos datos guardados en el navegador y si aún son válidos
-    const datosGuardados = localStorage.getItem(CACHE_KEY); 
-    const tiempoGuardado = localStorage.getItem(CACHE_TIME_KEY); 
-
-    if (datosGuardados && tiempoGuardado) { 
-        const tiempoTranscurrido = Date.now() - parseInt(tiempoGuardado); 
-        if (tiempoTranscurrido < TIEMPO_EXPIRACION) { 
-            console.log("⚡ Carga ultra rápida: Usando memoria caché del navegador."); 
-            // Llama a la función que pinta las listas en tu app
-            procesarYMostrarDatos(JSON.parse(datosGuardados)); 
-            return; // Salimos de la función, NO esperamos a Google
-        } 
-    }
 function forzarActualizacion() {
     // Borramos las llaves de la memoria
     localStorage.removeItem("datos_catalogos_despejes");
