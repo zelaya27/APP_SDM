@@ -87,7 +87,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
         th { background-color: var(--accent-color); color: white; font-weight: 600; }
-        tr:hover { background-color: #1a2a3a; } /* Efecto al pasar el mouse */
+        tr:hover { background-color: #FFEEAD; } /* Efecto al pasar el mouse */
 
         /* 7. ESTILOS DE BOTONES */
         .btn-limpiar { background: #34495e; color: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -127,7 +127,7 @@
         
         <div class="user-info">
             <span id="nombre-usuario"><i class="fas fa-user-circle"></i> Cargando...</span> | <span id="nombre-sector">Cargando sector...</span>
-            <button id="btnForzarActualizar" onclick="forzarActualizacionCatalogos()" class="btn-Sinc"> 🔄 Sinc</button>
+            <button class="btn-Sinc"   onclick="forzarActualizacionCatalogos()" > 🔄 Sinc </button>
             <button class="btn-logout" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
         </div>
     </header>
