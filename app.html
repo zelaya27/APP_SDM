@@ -570,16 +570,32 @@
 
         // --- CÁLCULOS Y EVENTOS ---
         function dispararEventosAutocompletado() {
-            const valInt = document.getElementById('interruptor_de_circuito').value;
-            const valRes = document.getElementById('restaurador').value;
-            if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
-            if (valInt) document.getElementById('interruptor_de_circuito').value = valInt;
-            if (valRes) document.getElementById('restaurador').value = valRes;
-            if (typeof calcularTiempo === "function") calcularTiempo();
-            if (typeof calcularDia === "function") calcularDia();
-            if(document.getElementById('solicitud').value === 'X') seleccionarGestion('solicitud');
-            if(document.getElementById('apego').value === 'X') seleccionarGestion('apego');
+    // Definimos los IDs que queremos consultar
+    const ids = ['interruptor_de_circuito', 'restaurador'];
+
+    ids.forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            // Solo intentamos leer el valor si el elemento existe
+            const valor = elemento.value;
+            console.log(`Valor de ${id}:`, valor);
+        } else {
+            console.warn(`Advertencia: El elemento con ID "${id}" no existe en el DOM.`);
         }
+    });
+
+    // Continuamos con el resto de tu lógica, asegurando que las funciones existan
+    if (typeof alCambiarCircuito === "function") alCambiarCircuito();
+    if (typeof calcularTiempo === "function") calcularTiempo();
+    if (typeof calcularDia === "function") calcularDia();
+    
+    // Verificación segura para botones de gestión
+    const sol = document.getElementById('solicitud');
+    if(sol && sol.value === 'X') seleccionarGestion('solicitud');
+    
+    const apego = document.getElementById('apego');
+    if(apego && apego.value === 'X') seleccionarGestion('apego');
+}
 
         function calcularDia() {
             const fechaInput = document.getElementById('fecha_interrupcion').value;
