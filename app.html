@@ -52,10 +52,11 @@
         .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: white; }
         
         .header-right { display: flex; align-items: center; gap: 15px; }
-        .btn-nav, .btn_generar_excel { 
+        .btn.sinc, .btn-nav, .btn_generar_excel { 
             min-height: 40px;display: flex; align-items: center; gap: 5px; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; color: white; 
         }
         .btn-nav { min-height: 40px;background: var(--rojo); }
+        .btn-sinc { min-height: 40px;background: var(--success-color); }
         .btn_generar_excel {min-height: 40px; background: var(--success-color); }
 
         /* Contenedor principal y tarjetas */
@@ -93,7 +94,7 @@
         
         label { font-size: 13px; margin-bottom: 5px; color: var(--muted-text); font-weight: 500; }
         input, select, textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 9px; color: white; font-size: 14px; width: 100%; box-sizing: border-box;}
-        .buttons-container { background-color:var(--success-color);min-height: 40px; margin-top: 25px; display: flex; justify-content: space-between; }
+        .buttons-container { background-color:var(--bg-color);min-height: 40px; margin-top: 25px; display: flex; justify-content: space-between; }
         .btn { padding: 12px 25px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; }
         
         .hidden { display: none !important; }
@@ -142,7 +143,7 @@
                     <i class="material-icons" style="font-size: 14px;">location_on</i>
                 </div>
             </div>
-            <button type="button" onclick="forzarActualizacionCatalogos()" class="btn-sincronizar" style="background-color: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">
+            <button type="button" id="btn-sinc" onclick="forzarActualizacionCatalogos()" class="btn-sincronizar" style="background-color: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">
                 🔄 Sincronizar </button>
             <button class="btn-nav" onclick="window.location.href='dashboard.html'">
                 <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel </button>
