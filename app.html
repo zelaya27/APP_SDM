@@ -375,19 +375,32 @@
         const totalSteps = 4;
         // --- INICIALIZACIÓN (CORREGIDA) ---
         window.onload = async function() {
-            // 1. Mostrar usuario y sector en la cabecera
-            document.getElementById('lbl-usuario').innerText = usuarioSesion;
-            document.getElementById('lbl-sector').innerText = sectorSesion;
-            
-            // 2. Ejecutar la descarga de datos al iniciar la página
-            descargarDatosGoogleSheets();
+    // 1. Mostrar usuario y sector en la cabecera
+    document.getElementById('lbl-usuario').innerText = usuarioSesion;
+    document.getElementById('lbl-sector').innerText = sectorSesion;
+    
+    // 2. Ejecutar la descarga de datos al iniciar la página
+    // Es recomendable usar 'await' para asegurar que los catálogos carguen antes de llenar los datos
+    await descargarDatosGoogleSheets();
 
-            // 3. (Opcional) Si la aplicación necesita abrir un ID específico desde la URL para editar
-            const urlParams = new URLSearchParams(window.location.search);
-            const idSol = urlParams.get('id');
-            if(idSol) {
-                cargarDatosEdicion(idSol);
-            }
+    // 3. Verificar si venimos a editar un registro o crear uno nuevo
+    const urlParams = new URLSearchParams(window.location.search);
+    const idSol = urlParams.get('id');
+    
+    if (idSol) {
+        // MODO EDICIÓN: Cargar los datos existentes
+        document.getElementById('id_solicitud').value = idSol;
+        await cargarDatosEdicion(idSol);
+    } else {
+        // MODO NUEVA SOLICITUD: Generar nuevo ID y poner la fecha de hoy
+        generarIDUnico(); // Genera el nuevo código (ej. REQ-...)
+        
+        const campoFecha = document.getElementById('fecha_solicitud');
+        if (campoFecha) {
+            campoFecha.value = new Date().toISOString().split('T')[0]; // Pone la fecha actual en formato YYYY-MM-DD
+        }
+    }
+};
         }; // <-- FALTABA ESTA LLAVE Y PUNTO Y COMA PARA CERRAR EL ONLOAD
 
         // --- DESCARGA Y LLENADO DE DATOS OPTIMIZADO (CON CACHÉ) ---
