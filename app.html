@@ -777,61 +777,66 @@
         btn.innerHTML = 'GUARDAR SOLICITUD';
     }
 }
-        // --- EXCEL ---
+  
+   // --- EXCEL ---
 async function generarExcelSolicitud() {
     const btn = document.getElementById('btn_generar_excel');
-    if(btn) { btn.disabled = true; btn.innerHTML = 'Generando...'; }
+    if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...'; }
+    
+    const tipo = getVal('tipo_trabajo');
+    const tipoGestion = getVal('select-gestion'); // Capturamos el select correctamente al igual que en guardar
     
     // Claves en MAYÚSCULAS para emparejar con el archivo .gs
     const datos = {
-        ID_SOLICITUD: getVal('id_solicitud'), 
-        NUMERO_DESPEJE: getVal('numero_despeje'),
-        SOLICITUD: getVal('solicitud'), 
-        APEGO: getVal('apego'),
-        FECHA_SOLICITUD: getVal('fecha_solicitud'), 
-        SUBESTACION: getVal('subestacion'),
-        CIRCUITO: getVal('circuito'), 
-        SECCION: getVal('seccion'),
-        INTERRUPTOR_DE_CIRCUITO: getVal('interruptor_de_circuito'), 
-        RESTAURADOR: getVal('restaurador'),
-        OTROS_EQUIPOS: getVal('otros_equipos'), 
-        UBICACION_DEL_EQUIPO: getVal('ubicacion_del_equipo'),
-        UBICACION_DEL_TRABAJO: getVal('ubicacion_del_trabajo'), 
-        FECHA_INTERRUPCION: getVal('fecha_interrupcion'),
-        DIA_DE_SEMANA: getVal('dia_de_semana'), 
-        HORA_INICIO: getVal('hora_inicio'),
-        HORA_FINAL: getVal('hora_final'), 
-        TIEMPO_NECESARIO: getVal('tiempo_necesario'),
-        TRABAJO_A_REALIZAR: getVal('trabajo_a_realizar'), 
-        RESPONSABLE: getVal('responsable'),
-        SUSTITUTO: getVal('sustituto'), 
-        ZONAS_AFECTADAS: getVal('zonas_afectadas'),
-        AREA_AFECTADA: getVal('area_afectada'), 
-        NOMBRE_DESPEJE: getVal('nombre_despeje'),
-        APEGOS_ENLACES: getVal('apegos_enlaces'), 
-        APEGO_DESPEJE: getVal('apego_despeje'),
-        MANTO_PROGRAMADO: document.getElementById('tipo_trabajo').value === 'PROGRAMADO' ? 'X' : '',
-        MANTO_EMERGENCIA: document.getElementById('tipo_trabajo').value === 'EMERGENCIA' ? 'X' : '',
-        MANTO_EQ_MEDICION: document.getElementById('tipo_trabajo').value === 'MEDICION' ? 'X' : '',
-        PROYECTO_EXPANSION: document.getElementById('tipo_trabajo').value === 'PROYECTO' ? 'X' : '',
-        MANTO_OTROS: document.getElementById('tipo_trabajo').value === 'OTROS' ? 'X' : '',
-        ODT_PROGRAMADA: getVal('odt_programada'), 
-        ODT_EMERGENCIA: getVal('odt_emergencia'),
-        ODT_OS: getVal('odt_os'), 
-        CODIGO_PROYECTO: getVal('codigo_proyecto'),
-        ODT_OTROS: getVal('odt_otros'), 
-        JUSTIFICACION: getVal('justificacion'),
-        OBSERVACIONES: getVal('observaciones'), 
-        SOLICITADO_POR: getVal('solicitado_por'),
-        CARGO_DEL_SOLICITANTE: getVal('cargo_del_solicitante'), 
-        APROBADO_POR: getVal('aprobado_por'),
-        SECTOR: sectorSesion, 
-        USUARIO: usuarioSesion
+        "action": "generarExcel", // AGREGADO: Acción requerida por el backend
+        "ID_SOLICITUD": getVal('id_solicitud'), 
+        "NUMERO_DESPEJE": getVal('numero_despeje'),
+        "SOLICITUD": tipoGestion === 'solicitud' ? 'X' : '', // CORREGIDO: Igual que en guardarFormulario
+        "APEGO": tipoGestion === 'apego' ? 'X' : '',         // CORREGIDO: Igual que en guardarFormulario
+        "FECHA_SOLICITUD": getVal('fecha_solicitud'), 
+        "SUBESTACION": getVal('subestacion'),
+        "CIRCUITO": getVal('circuito'), 
+        "SECCION": getVal('seccion'),
+        "INTERRUPTOR_DE_CIRCUITO": getVal('interruptor_de_circuito'), 
+        "RESTAURADOR": getVal('restaurador'),
+        "OTROS_EQUIPOS": getVal('otros_equipos'), 
+        "UBICACION_DEL_EQUIPO": getVal('ubicacion_del_equipo'),
+        "UBICACION_DEL_TRABAJO": getVal('ubicacion_del_trabajo'), 
+        "FECHA_INTERRUPCION": getVal('fecha_interrupcion'),
+        "DIA_DE_SEMANA": getVal('dia_de_semana'), 
+        "HORA_INICIO": getVal('hora_inicio'),
+        "HORA_FINAL": getVal('hora_final'), 
+        "TIEMPO_NECESARIO": getVal('tiempo_necesario'),
+        "TRABAJO_A_REALIZAR": getVal('trabajo_a_realizar'), 
+        "RESPONSABLE": getVal('responsable'),
+        "SUSTITUTO": getVal('sustituto'), 
+        "ZONAS_AFECTADAS": getVal('zonas_afectadas'),
+        "AREA_AFECTADA": getVal('area_afectada'), 
+        "NOMBRE_DESPEJE": getVal('nombre_despeje'),
+        "APEGOS_ENLACES": getVal('apegos_enlaces'), 
+        "APEGO_DESPEJE": getVal('apego_despeje'),
+        "MANTO_PROGRAMADO": tipo === 'PROGRAMADO' ? 'X' : '',
+        "MANTO_EMERGENCIA": tipo === 'EMERGENCIA' ? 'X' : '',
+        "MANTO_EQ_MEDICION": tipo === 'MEDICION' ? 'X' : '',
+        "PROYECTO_EXPANSION": tipo === 'PROYECTO' ? 'X' : '',
+        "MANTO_OTROS": tipo === 'OTROS' ? 'X' : '',
+        "ODT_PROGRAMADA": getVal('odt_programada'), 
+        "ODT_EMERGENCIA": getVal('odt_emergencia'),
+        "ODT_OS": getVal('odt_os'), 
+        "CODIGO_PROYECTO": getVal('codigo_proyecto'),
+        "ODT_OTROS": getVal('odt_otros'), 
+        "JUSTIFICACION": getVal('justificacion'),
+        "OBSERVACIONES": getVal('observaciones'), 
+        "SOLICITADO_POR": getVal('solicitado_por'),
+        "CARGO_DEL_SOLICITANTE": getVal('cargo_del_solicitante'), 
+        "APROBADO_POR": getVal('aprobado_por'),
+        "SECTOR": sectorSesion, 
+        "USUARIO": usuarioSesion
     };
 
     try {
-        // Petición directa utilizando tu constante global de configuración
-        const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
+        // CORREGIDO: Usando URL_APPS_SCRIPT (que ya cuenta con la función de validación que agregaste)
+        const response = await fetch(URL_APPS_SCRIPT, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify(datos)
@@ -840,7 +845,7 @@ async function generarExcelSolicitud() {
         const res = await response.json();
 
        if (res.status === "ÉXITO") {
-            // CORREGIDO: Fuerza la descarga directa en la carpeta local de Descargas
+            // Fuerza la descarga directa en la carpeta local de Descargas
             const enlaceDescarga = document.createElement('a');
             enlaceDescarga.href = res.url;
             
@@ -858,7 +863,7 @@ async function generarExcelSolicitud() {
         console.error("Error de comunicación:", err);
         alert("No se pudo establecer conexión con el servidor de Apps Script.");
     } finally {
-        if(btn) { btn.disabled = false; btn.innerHTML = 'Descargar Excel'; }
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="material-icons">download</i>Excel'; }
     }
 }
 
