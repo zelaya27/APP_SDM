@@ -184,23 +184,31 @@
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
         let currentStep = 1; 
         const totalSteps = 4;
+      
         // --- INICIALIZACIÓN (CORREGIDA) ---
-        window.onload = async function() {
-            // 1. Mostrar usuario y sector en la cabecera
-            document.getElementById('lbl-usuario').innerText = usuarioSesion;
-            document.getElementById('lbl-sector').innerText = sectorSesion;
-            
-            // 2. Ejecutar la descarga de datos al iniciar la página
-            descargarDatosGoogleSheets();
+window.onload = async function() {
+    // 1. Mostrar usuario y sector en la cabecera (IDs corregidos)
+    const elUsuario = document.getElementById('nombre-usuario');
+    const elSector = document.getElementById('nombre-sector');
+    
+    if (elUsuario) elUsuario.innerText = usuarioSesion;
+    if (elSector) elSector.innerText = sectorSesion;
+    
+    // 2. Ejecutar la descarga de datos al iniciar
+    // Primero descargamos los catálogos
+    await descargarDatosGoogleSheets();
+    
+    // 3. ¡ESTO ES LO QUE FALTABA! 
+    // Ahora llamamos a la función que trae las solicitudes de la tabla
+    await cargarSolicitudes();
 
-            // 3. (Opcional) Si la aplicación necesita abrir un ID específico desde la URL para editar
-            const urlParams = new URLSearchParams(window.location.search);
-            const idSol = urlParams.get('id');
-            if(idSol) {
-                cargarDatosEdicion(idSol);
-            }
-        }; // <-- FALTABA ESTA LLAVE Y PUNTO Y COMA PARA CERRAR EL ONLOAD
-
+    // 4. (Opcional) Si la aplicación necesita abrir un ID específico desde la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const idSol = urlParams.get('id');
+    if(idSol) {
+        cargarDatosEdicion(idSol);
+    }
+};
         // --- DESCARGA Y LLENADO DE DATOS OPTIMIZADO (CON CACHÉ) ---
         async function descargarDatosGoogleSheets() {
             const CACHE_KEY = "datos_catalogos_despejes";
