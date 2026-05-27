@@ -553,7 +553,38 @@
                 }
             } catch (error) { console.error("Error:", error); }
         }
+    function seleccionarGestion(tipo) {
+    // 1. Buscamos los inputs ocultos
+    const inputSolicitud = document.getElementById('solicitud');
+    const inputApego = document.getElementById('apego');
 
+    // 2. Limpiamos ambos valores por defecto
+    if (inputSolicitud) inputSolicitud.value = "";
+    if (inputApego) inputApego.value = "";
+
+    // 3. Evaluamos qué opción llegó desde el select
+    // Convertimos a minúsculas para evitar errores si el HTML dice 'SOLICITUD'
+    const seleccion = tipo ? tipo.toString().toLowerCase() : "";
+
+    if (seleccion === 'solicitud') {
+        if (inputSolicitud) inputSolicitud.value = "X";
+    } else if (seleccion === 'apego') {
+        if (inputApego) inputApego.value = "X";
+    }
+    
+    // (Opcional) Si aún conservas los botones visuales viejos y quieres que se iluminen:
+    const btnSol = document.getElementById('btn-solicitud');
+    const btnApe = document.getElementById('btn-apego');
+    if (btnSol && btnApe) {
+        if (seleccion === 'solicitud') {
+            btnSol.classList.add('active');
+            btnApe.classList.remove('active');
+        } else if (seleccion === 'apego') {
+            btnApe.classList.add('active');
+            btnSol.classList.remove('active');
+        }
+    }
+}
         // --- CÁLCULOS Y EVENTOS ---
  function dispararEventosAutocompletado() {
             // Definimos los IDs que queremos consultar
