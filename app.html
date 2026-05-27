@@ -115,7 +115,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px; /* o el espacio que prefieras entre inputs */
-
+}
              #trabajo_a_realizar {
         min-height: 500px; /* Altura para Trabajo a Realizar */
         resize: vertical;  /* Permite al usuario estirar la caja solo hacia abajo */
@@ -477,21 +477,6 @@
             document.getElementById('id_solicitud').value = "REQ-" + id;
         }
 
-        function seleccionarGestion(tipo) {
-            document.getElementById('btn-solicitud').classList.remove('active');
-            document.getElementById('btn-apego').classList.remove('active');
-            document.getElementById('solicitud').value = "";
-            document.getElementById('apego').value = "";
-
-            if(tipo === 'solicitud') {
-                document.getElementById('btn-solicitud').classList.add('active');
-                document.getElementById('solicitud').value = "X";
-            } else {
-                document.getElementById('btn-apego').classList.add('active');
-                document.getElementById('apego').value = "X";
-            }
-        }
-
         // --- CARGA DE DATOS ---
         async function cargarDatosEdicion(id) {
             try {
@@ -512,8 +497,9 @@
                     // Mapeo campo a campo
                     setVal('id_solicitud', fila[0]); 
                     setVal('numero_despeje', fila[1]);
-                    setVal('solicitud', fila[2]); 
-                    setVal('apego', fila[3]);     
+                    // Mapeo para el nuevo campo select-gestion
+                    if (fila[2] === 'X') setVal('select-gestion', 'solicitud');
+                    else if (fila[3] === 'X') setVal('select-gestion', 'apego');    
                     setVal('fecha_solicitud', formatFecha(fila[4])); 
                     setVal('subestacion', fila[5]); 
                     setVal('circuito', fila[6]); 
@@ -569,33 +555,34 @@
         }
 
         // --- CÁLCULOS Y EVENTOS ---
-        function dispararEventosAutocompletado() {
-    // Definimos los IDs que queremos consultar
-    const ids = ['interruptor_de_circuito', 'restaurador'];
+ function dispararEventosAutocompletado() {
+            // Definimos los IDs que queremos consultar
+            const ids = ['interruptor_de_circuito', 'restaurador'];
 
-    ids.forEach(id => {
-        const elemento = document.getElementById(id);
-        if (elemento) {
-            // Solo intentamos leer el valor si el elemento existe
-            const valor = elemento.value;
-            console.log(`Valor de ${id}:`, valor);
-        } else {
-            console.warn(`Advertencia: El elemento con ID "${id}" no existe en el DOM.`);
+            ids.forEach(id => {
+                const elemento = document.getElementById(id);
+                if (elemento) {
+                    const valor = elemento.value;
+                    console.log(`Valor de ${id}:`, valor);
+                }
+            });
+
+            // --- ESCUDO PROTECTOR PARA EQUIPOS ---
+            // Guardamos los valores que la base de datos acaba de colocar
+            const valInt = document.getElementById('interruptor_de_circuito').value;
+            const valRes = document.getElementById('restaurador').value;
+
+            // Esta función recarga las opciones (y las limpia por defecto)
+            if (typeof alCambiarCircuito === "function") alCambiarCircuito();
+
+            // Devolvemos los valores a su lugar
+            if (valInt) document.getElementById('interruptor_de_circuito').value = valInt;
+            if (valRes) document.getElementById('restaurador').value = valRes;
+            // -------------------------------------
+
+            if (typeof calcularTiempo === "function") calcularTiempo();
+            if (typeof calcularDia === "function") calcularDia();
         }
-    });
-
-    // Continuamos con el resto de tu lógica, asegurando que las funciones existan
-    if (typeof alCambiarCircuito === "function") alCambiarCircuito();
-    if (typeof calcularTiempo === "function") calcularTiempo();
-    if (typeof calcularDia === "function") calcularDia();
-    
-    // Verificación segura para botones de gestión
-    const sol = document.getElementById('solicitud');
-    if(sol && sol.value === 'X') seleccionarGestion('solicitud');
-    
-    const apego = document.getElementById('apego');
-    if(apego && apego.value === 'X') seleccionarGestion('apego');
-}
 
         function calcularDia() {
             const fechaInput = document.getElementById('fecha_interrupcion').value;
