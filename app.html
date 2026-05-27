@@ -60,12 +60,26 @@
         .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: white; }
         
         .header-right { display: flex; align-items: center; gap: 15px; }
-        .btn.sinc, .btn-nav, .btn_generar_excel { 
-            min-height: 40px;display: flex; align-items: center; gap: 5px; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; color: white; 
-        }
-        .btn-nav { min-height: 40px;background: var(--rojo); }
-        .btn-sinc { min-height: 40px;background: var(--success-color); }
-        .btn_generar_excel {min-height: 40px; background: var(--success-color); }
+       /* Contenedor que agrupa los botones */
+.botones-header {
+    display: flex;
+    gap: 10px; /* Espacio entre botones */
+    align-items: center;
+}
+
+/* Forzamos el mismo alto para los tres botones */
+.btn-nav, .btn-sinc, .btn_generar_excel {
+    height: 40px;          /* Altura fija para todos */
+    padding: 0 15px;       /* Padding horizontal uniforme */
+    display: inline-flex;  /* Flexbox para centrar contenido */
+    align-items: center;   /* Alineación vertical */
+    justify-content: center; /* Alineación horizontal */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    box-sizing: border-box; /* Importante para que el padding no sume tamaño extra */
+}
 
         /* Contenedor principal y tarjetas */
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
@@ -151,12 +165,19 @@
                     <i class="material-icons" style="font-size: 14px;">location_on</i>
                 </div>
             </div>
-           
-            <button class="btn-nav" onclick="window.location.href='dashboard.html'">
-                <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel </button>
-                <button type="button" id="btn-sinc onclick="forzarActualizacionCatalogos()" class="btn-sinc">  🔄 Sinc </button>
-             <button type="button" id="btn_generar_excel" onclick="generarExcelSolicitud()" class="btn_generar_excel">
-                <i class="material-icons">download</i>Excel</button>
+           <div class="botones-header">
+    <button class="btn-nav" onclick="window.location.href='dashboard.html'">
+        <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel
+    </button>
+    
+    <button type="button" id="btn-sinc" onclick="forzarActualizacionCatalogos()" class="btn-sinc">
+        🔄 Sinc
+    </button>
+    
+    <button type="button" id="btn_generar_excel" onclick="generarExcelSolicitud()" class="btn_generar_excel">
+        <i class="material-icons">download</i>Excel
+    </button>
+</div>
         </div>
     </header>
 
