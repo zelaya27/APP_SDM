@@ -146,6 +146,9 @@
              <a href="duplicar.html" class="btn-duplicar"><i class="fas fa-plus"></i> Duplicar Solicitud</a>
       <button type="button" id="btnAvisos" onclick="exportarAvisos()" class="btn-avisos">
     <i class="fas fa-file-excel"></i> Exportar Avisos
+          <button type="button" id="btnMecepConsulta" onclick="exportarConsultaMecep(this)" class="btn-avisos">
+    <i class="fas fa-file-excel"></i> Exportar MECEP
+</button>
 </button>
             <div class="filtros-contenedor">
                 <div class="filtros-grupo">
@@ -500,7 +503,61 @@ function procesarYMostrarDatos(data) {
                 window.location.href = `mecep.html?id=${idSolicitud}`; // Archivo nuevo para Mecep
             }
         }
+async function exportarConsultaMecep(boton) {
+    const textoOriginal = boton ? boton.innerHTML : "";
 
+    if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = "Procesando...";
+    }
+
+    const filasVisibles = document.querySelectorAll('#tabla-body tr');
+    const ids = [];
+
+    filasVisibles.forEach(tr => {
+        const id = tr.cells[0] ? tr.cells[0].innerText.trim() : null;
+        if (id && id !== "No hay solicitudes registradas.") {
+            ids.push(id.toString());
+        }
+    });
+
+    if (ids.length === 0) {
+        alert("No hay solicitudes visibles para exportar MECEP.");
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+        return;
+    }
+
+    try {
+        const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: 'exportarConsultaMecep',
+                idsVisibles: ids
+            })
+        });
+
+        const res = await response.json();
+
+        if (res.status === "ÉXITO") {
+            window.open(res.url, '_blank');
+        } else {
+            alert("Error en el servidor: " + (res.error || res.message || "Desconocido"));
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión al exportar consulta MECEP.");
+    } finally {
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    }
+}
         async function descargarExcelDashboard(boton, idSolicitud) {
             const textoOriginal = boton.innerHTML;
             boton.disabled = true;
