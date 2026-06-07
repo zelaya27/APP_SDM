@@ -559,17 +559,22 @@ function procesarYMostrarDatos(data) {
                 }
             }
         }
-        async function exportarAvisos() {
+      async function exportarAvisos() {
   // 1. Recolectar IDs visibles
-  const filasVisibles = document.querySelectorAll('#tuTablaId tbody tr:not([style*="display: none"])');
+  // Ahora apuntamos a #tabla-body, que contiene los tr directamente
+  const filasVisibles = document.querySelectorAll('#tabla-body tr:not([style*="display: none"])');
   const ids = [];
+
   filasVisibles.forEach(tr => {
-    // Asumiendo que el ID está en el primer TD o en un atributo data-id
+    // Intentamos obtener el ID desde el atributo 'data-id' o desde la primera celda
+    // Asegúrate de que el índice cells[0] sea donde realmente está tu ID
     const id = tr.getAttribute('data-id') || tr.cells[0].innerText;
-    if(id) ids.push(id);
+    if (id) ids.push(id);
   });
 
-  if(ids.length === 0) return alert("No hay datos visibles para exportar");
+  if (ids.length === 0) {
+    return alert("No hay datos visibles para exportar");
+  }
 
   // 2. Llamada al servidor
   try {
@@ -577,20 +582,20 @@ function procesarYMostrarDatos(data) {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
-        action: 'exportarAvisos',
+        action: 'exportarAvisos', 
         idsVisibles: ids
       })
     });
-    
+
     const res = await response.json();
-    
+
     if (res.status === "ÉXITO") {
       // Forzar descarga en el navegador
       window.open(res.url, '_blank');
     } else {
-      alert("Error: " + res.error);
+      alert("Error en el servidor: " + res.error);
     }
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     alert("Error de conexión al exportar.");
   }
