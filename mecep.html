@@ -68,8 +68,9 @@
 
         /* Estilos del formulario */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        @media (max-width: 768px) { .form-grid, .form-grid-3 { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .form-grid, .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; } }
         
         .form-group { display: flex; flex-direction: column; margin-bottom: 5px; }
         .form-group.full-width { grid-column: 1 / -1; }
@@ -80,6 +81,14 @@
             padding: 9px; color: white; font-size: 14px; width: 100%; box-sizing: border-box; 
         }
         input[readonly] { background-color: #1a2938; color: #cbd5e1; border-color: #334155; }
+
+        /* Iconos de calendario y hora en color blanco */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
         
         textarea { min-height: 80px; resize: vertical; }
         
@@ -145,22 +154,29 @@
                     </div>
                     <div class="form-group">
                         <label>Número de Despeje</label>
-                        <input type="text" id="numero_despeje" readonly>
+                        <input type="text" id="numero_despeje" oninput="this.value = this.value.toUpperCase()">
                     </div>
+                    <div class="form-group">
+                        <label>Nombre del Despeje</label>
+                        <input type="text" id="nombre_despeje" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                </div>
+
+                <div class="form-grid-2" style="margin-top: 15px;">
                     <div class="form-group">
                         <label>Circuito</label>
                         <select id="circuito" onchange="alCambiarCircuito()">
                             <option value="">Cargando circuitos...</option>
                         </select>
                     </div>
-                    <div class="form-group full-width">
+                    <div class="form-group">
                         <label>Subestación</label>
                         <input type="text" id="subestacion" readonly>
                     </div>
                 </div>
 
                 <div class="section-title">Datos de Tiempos y Maniobra</div>
-                <div class="form-grid-3">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label>Fecha de Interrupción</label>
                         <input type="date" id="fecha_interrupcion" onchange="calcularDia()">
@@ -169,10 +185,8 @@
                         <label>Día de la Semana</label>
                         <input type="text" id="dia_de_semana" readonly>
                     </div>
-                    <div class="form-group">
-                        <label>Tiempo Necesario</label>
-                        <input type="text" id="tiempo_necesario" readonly>
-                    </div>
+                </div>
+                <div class="form-grid-3" style="margin-top: 15px;">
                     <div class="form-group">
                         <label>Hora de Inicio</label>
                         <input type="time" id="hora_inicio" onchange="calcularTiempo()">
@@ -180,6 +194,10 @@
                     <div class="form-group">
                         <label>Hora Final</label>
                         <input type="time" id="hora_final" onchange="calcularTiempo()">
+                    </div>
+                    <div class="form-group">
+                        <label>Tiempo Necesario</label>
+                        <input type="text" id="tiempo_necesario" readonly>
                     </div>
                 </div>
 
@@ -195,11 +213,21 @@
                 </div>
 
                 <div class="section-title">Control MECEP</div>
-                <div class="form-grid-3">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label>Fecha MECEP</label>
                         <input type="datetime-local" id="fecha_mecep">
                     </div>
+                    <div class="form-group">
+                        <label>Interrupción MECEP</label>
+                        <div class="btn-group-mecep">
+                            <button type="button" id="btn_si" class="btn-mecep si" onclick="setInterrupcion('SI')">SÍ</button>
+                            <button type="button" id="btn_no" class="btn-mecep no" onclick="setInterrupcion('NO')">NO</button>
+                        </div>
+                        <input type="hidden" id="interrupcion_mecep" value="SI">
+                    </div>
+                </div>
+                <div class="form-grid-2" style="margin-top: 15px;">
                     <div class="form-group">
                         <label>Solicitado MECEP</label>
                         <input type="text" id="solicitado_mecep" oninput="this.value = this.value.toUpperCase()">
@@ -208,17 +236,11 @@
                         <label>Entregar MECEP</label>
                         <input type="text" id="entregar_mecep" oninput="this.value = this.value.toUpperCase()">
                     </div>
-                    <div class="form-group">
-                        <label>Equipo MECEP</label>
+                </div>
+                <div class="form-grid" style="margin-top: 15px;">
+                    <div class="form-group full-width">
+                        <label>Equipos MECEP</label>
                         <input type="text" id="equipo_mecep" oninput="this.value = this.value.toUpperCase()">
-                    </div>
-                    <div class="form-group">
-                        <label>Interrupción MECEP</label>
-                        <div class="btn-group-mecep">
-                            <button type="button" id="btn_si" class="btn-mecep si" onclick="setInterrupcion('SI')">SÍ</button>
-                            <button type="button" id="btn_no" class="btn-mecep no" onclick="setInterrupcion('NO')">NO</button>
-                        </div>
-                        <input type="hidden" id="interrupcion_mecep" value="">
                     </div>
                 </div>
                 
@@ -247,6 +269,9 @@
             
             // Llenar Fecha MECEP inicial con la fecha/hora actual
             setFechaMecepActual();
+
+            // Interrupción MECEP por defecto en SÍ
+            setInterrupcion('SI');
 
             await descargarDatosGoogleSheets();
 
@@ -394,6 +419,7 @@
                     // Mapeo según la estructura solicitada (Índices = Num Columna - 1)
                     setVal('id_solicitud', fila[0]);      // Col 1
                     setVal('numero_despeje', fila[1]);    // Col 2
+                    setVal('nombre_despeje', fila[23]);   // Col 24 / índice 23
                     
                     setVal('circuito', fila[6]);          // Col 7
                     if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
@@ -459,6 +485,7 @@
                 "action": "guardarMecep", // Acción que recibirá Apps Script para guardar en esas columnas
                 "ID_SOLICITUD": getVal('id_solicitud'), 
                 "NUMERO_DESPEJE": getVal('numero_despeje'),
+                "NOMBRE_DESPEJE": getVal('nombre_despeje'),
                 "SUBESTACION": getVal('subestacion'),
                 "CIRCUITO": getVal('circuito'), 
                 "FECHA_INTERRUPCION": getVal('fecha_interrupcion'),
