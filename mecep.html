@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APP_SDM - Formato MECEP</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="config.js"></script>
+    <script>
+        function getUrlApp() {
+            if (typeof CONFIG !== 'undefined' && CONFIG.URL_APPS_SCRIPT) {
+                return CONFIG.URL_APPS_SCRIPT;
+            } else {
+                console.error("Error: config.js no cargado o URL_APPS_SCRIPT faltante.");
+                return ""; 
+            }
+        }
+        const URL_APPS_SCRIPT = getUrlApp();
+    </script>
+ 
+    <style>
+        /* Variables globales de diseño (Heredadas de app.html) */
+        :root {
+            --bg-color: #0b141d; 
+            --card-color: #14212d; 
+            --accent-color: #003366;
+            --success-color: #27ae60; 
+            --text-color: #ffffff; 
+            --muted-text: #a0aec0;
+            --border-color: #2c3e50;
+            --rojo: #C90E21;
+        }
+
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        
+        /* Cabecera optimizada con Flexbox */
+        header { 
+            background-color: var(--card-color); 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--accent-color); 
+        }
+        .header-left { display: flex; align-items: center; }
+        .logo-box { background: #ffffff; padding: 4px 10px; border-radius: 4px; }
+        .logo-box img { height: 35px; display: block; }
+        .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: white; }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        
+        .botones-header { display: flex; gap: 10px; align-items: center; }
+        .btn-nav, .btn-sinc {
+            height: 40px; padding: 0 15px; display: inline-flex; align-items: center; justify-content: center;
+            border: none; border-radius: 4px; cursor: pointer; font-size: 14px; box-sizing: border-box;
+            background-color: var(--border-color); color: white; transition: 0.3s;
+        }
+        .btn-nav:hover, .btn-sinc:hover { background-color: var(--accent-color); }
+
+        /* Contenedor principal y tarjetas */
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        .card { background-color: var(--card-color); border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        
+        /* Títulos de sección */
+        .section-title { 
+            font-size: 16px; font-weight: bold; color: var(--success-color); 
+            margin-top: 20px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; 
+        }
+
+        /* Estilos del formulario */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        @media (max-width: 768px) { .form-grid, .form-grid-3 { grid-template-columns: 1fr; } }
+        
+        .form-group { display: flex; flex-direction: column; margin-bottom: 5px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        label { font-size: 13px; margin-bottom: 5px; color: var(--muted-text); font-weight: 500; }
+        input, select, textarea { 
+            background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; 
+            padding: 9px; color: white; font-size: 14px; width: 100%; box-sizing: border-box; 
+        }
+        input[readonly] { background-color: #1a2938; color: #cbd5e1; border-color: #334155; }
+        
+        textarea { min-height: 80px; resize: vertical; }
+        
+        /* Botones MECEP SÍ/NO */
+        .btn-group-mecep { display: flex; gap: 10px; }
+        .btn-mecep { 
+            flex: 1; padding: 10px; border: 2px solid var(--border-color); background: var(--bg-color); 
+            color: white; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-mecep.si.active { background-color: var(--rojo); border-color: var(--rojo); }
+        .btn-mecep.no.active { background-color: var(--success-color); border-color: var(--success-color); }
+
+        .buttons-container { margin-top: 25px; display: flex; justify-content: flex-end; }
+        .btn-submit { 
+            background: var(--success-color); color: white; padding: 12px 25px; 
+            border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; 
+            transition: background 0.3s;
+        }
+        .btn-submit:hover { background: #219653; }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo-box">
+                <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo">
+            </div>
+        </div>
+
+        <div class="header-title">Formato MECEP</div>
+
+        <div class="header-right">
+            <div style="font-size: 11px; text-align: right; margin-right: 10px;">
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
+                    <span id="lbl-usuario" style="color:white; font-weight:bold;"></span>
+                    <i class="material-icons" style="font-size: 14px;">person</i>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
+                    <span id="lbl-sector" style="color:#3498db;"></span>
+                    <i class="material-icons" style="font-size: 14px;">location_on</i>
+                </div>
+            </div>
+            <div class="botones-header">
+                <button class="btn-nav" onclick="window.location.href='dashboard.html'">
+                    <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel
+                </button>
+                <button type="button" class="btn-sinc" onclick="forzarActualizacionCatalogos()">
+                    🔄 Sinc
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <form id="mecepForm">
+                <div class="section-title">Datos Generales</div>
+                <div class="form-grid-3">   
+                    <div class="form-group">
+                        <label>ID Solicitud</label>
+                        <input type="text" id="id_solicitud" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Despeje</label>
+                        <input type="text" id="numero_despeje" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Circuito</label>
+                        <select id="circuito" onchange="alCambiarCircuito()">
+                            <option value="">Cargando circuitos...</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Subestación</label>
+                        <input type="text" id="subestacion" readonly>
+                    </div>
+                </div>
+
+                <div class="section-title">Datos de Tiempos y Maniobra</div>
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label>Fecha de Interrupción</label>
+                        <input type="date" id="fecha_interrupcion" onchange="calcularDia()">
+                    </div>
+                    <div class="form-group">
+                        <label>Día de la Semana</label>
+                        <input type="text" id="dia_de_semana" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Tiempo Necesario</label>
+                        <input type="text" id="tiempo_necesario" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora de Inicio</label>
+                        <input type="time" id="hora_inicio" onchange="calcularTiempo()">
+                    </div>
+                    <div class="form-group">
+                        <label>Hora Final</label>
+                        <input type="time" id="hora_final" onchange="calcularTiempo()">
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 15px;">
+                    <div class="form-group full-width">
+                        <label>Trabajo a Realizar</label>
+                        <textarea id="trabajo_a_realizar" oninput="this.value = this.value.toUpperCase()"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Observaciones</label>
+                        <textarea id="observaciones" oninput="this.value = this.value.toUpperCase()"></textarea>
+                    </div>
+                </div>
+
+                <div class="section-title">Control MECEP</div>
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label>Fecha MECEP</label>
+                        <input type="datetime-local" id="fecha_mecep">
+                    </div>
+                    <div class="form-group">
+                        <label>Solicitado MECEP</label>
+                        <input type="text" id="solicitado_mecep" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="form-group">
+                        <label>Entregar MECEP</label>
+                        <input type="text" id="entregar_mecep" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="form-group">
+                        <label>Equipo MECEP</label>
+                        <input type="text" id="equipo_mecep" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="form-group">
+                        <label>Interrupción MECEP</label>
+                        <div class="btn-group-mecep">
+                            <button type="button" id="btn_si" class="btn-mecep si" onclick="setInterrupcion('SI')">SÍ</button>
+                            <button type="button" id="btn_no" class="btn-mecep no" onclick="setInterrupcion('NO')">NO</button>
+                        </div>
+                        <input type="hidden" id="interrupcion_mecep" value="">
+                    </div>
+                </div>
+                
+                <div class="form-group full-width" style="margin-top: 15px;">
+                    <label>Referencia MECEP</label>
+                    <textarea id="referencia_mecep" oninput="this.value = this.value.toUpperCase()"></textarea>
+                </div>
+
+                <div class="buttons-container">
+                    <button type="button" class="btn-submit" id="btnSubmit" onclick="guardarMecep()">GUARDAR MECEP</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variables Globales
+        let baseCircuitos = [];
+        const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
+        const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
+
+        // INICIALIZACIÓN
+        window.onload = async function() {
+            document.getElementById('lbl-usuario').innerText = usuarioSesion;
+            document.getElementById('lbl-sector').innerText = sectorSesion;
+            
+            // Llenar Fecha MECEP inicial con la fecha/hora actual
+            setFechaMecepActual();
+
+            await descargarDatosGoogleSheets();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const idSol = urlParams.get('id');
+            
+            if (idSol) {
+                document.getElementById('id_solicitud').value = idSol;
+                await cargarDatosMecep(idSol);
+            } else {
+                alert("Advertencia: No se recibió un ID de Solicitud válido.");
+            }
+        };
+
+        // FECHA Y HORA ACTUAL PARA MECEP
+        function setFechaMecepActual() {
+            const now = new Date();
+            // Restamos el timezone offset para que coincida con la zona horaria local en el input
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('fecha_mecep').value = now.toISOString().slice(0, 16);
+        }
+
+        // DESCARGA Y CACHÉ DE CIRCUITOS (similar a app.html)
+        async function descargarDatosGoogleSheets() {
+            const CACHE_KEY = "datos_catalogos_despejes";
+            const CACHE_TIME_KEY = "tiempo_catalogos_despejes";
+            const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; 
+
+            const datosGuardados = localStorage.getItem(CACHE_KEY);
+            const tiempoGuardado = localStorage.getItem(CACHE_TIME_KEY);
+
+            if (datosGuardados && tiempoGuardado) {
+                const tiempoTranscurrido = Date.now() - parseInt(tiempoGuardado);
+                if (tiempoTranscurrido < TIEMPO_EXPIRACION) {
+                    procesarYMostrarDatos(JSON.parse(datosGuardados));
+                    return; 
+                }
+            }
+
+            try {
+                const urlFetch = typeof CONFIG !== 'undefined' ? CONFIG.URL_APPS_SCRIPT : URL_APPS_SCRIPT;
+                const res = await fetch(`${urlFetch}?action=getDatos`); 
+                const data = await res.json();
+                
+                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+
+                procesarYMostrarDatos(data);
+            } catch(e) { 
+                console.error("Error conectando a Google Sheets:", e); 
+                if (datosGuardados) {
+                    procesarYMostrarDatos(JSON.parse(datosGuardados));
+                }
+            }
+        }
+
+        function procesarYMostrarDatos(data) {
+            if(data.circuitos) baseCircuitos = data.circuitos;
+            poblarListaCircuitos();
+        }
+
+        function forzarActualizacionCatalogos() {
+            localStorage.removeItem("datos_catalogos_despejes");
+            localStorage.removeItem("tiempo_catalogos_despejes");
+            alert("Descargando datos actualizados de Google Sheets...");
+            descargarDatosGoogleSheets(); 
+        }
+
+        function getVal(id) {
+            const el = document.getElementById(id);
+            return el ? el.value : "";
+        }
+
+        function poblarListaCircuitos() {
+            const selCircuito = document.getElementById('circuito');
+            selCircuito.innerHTML = '<option value="">Seleccione un circuito...</option>';
+            let sectorLimpio = sectorSesion.toString().trim().toUpperCase();
+            
+            for (let i = 1; i < baseCircuitos.length; i++) {
+                const f = baseCircuitos[i];
+                if(f.length > 6 && f[3] && f[3].toString().trim().toUpperCase() === sectorLimpio && f[6]) {
+                    selCircuito.innerHTML += `<option value="${f[6].toString().trim()}">${f[6]}</option>`;
+                }
+            }
+        }
+
+        function alCambiarCircuito() {
+            const circSeleccionado = document.getElementById('circuito').value.trim().toUpperCase();
+            document.getElementById('subestacion').value = "";
+            if(!circSeleccionado) return;
+            const filaCirc = baseCircuitos.find(f => f[6] && f[6].toString().trim().toUpperCase() === circSeleccionado);
+            if(filaCirc) document.getElementById('subestacion').value = filaCirc[4];
+        }
+
+        // CÁLCULOS FECHAS Y TIEMPOS
+        function calcularDia() {
+            const fechaInput = document.getElementById('fecha_interrupcion').value;
+            if (fechaInput) {
+                const fecha = new Date(fechaInput + "T12:00:00"); 
+                const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+                document.getElementById('dia_de_semana').value = dias[fecha.getDay()];
+            }
+        }
+
+        function calcularTiempo() {
+            const h1 = document.getElementById('hora_inicio').value, h2 = document.getElementById('hora_final').value;
+            if (h1 && h2) {
+                const [hh1, mm1] = h1.split(':').map(Number), [hh2, mm2] = h2.split(':').map(Number);
+                let mins = (hh2 * 60 + mm2) - (hh1 * 60 + mm1); 
+                if (mins < 0) mins += 24 * 60; 
+                document.getElementById('tiempo_necesario').value = `${Math.floor(mins / 60)} hrs ${mins % 60} min`;
+            }
+        }
+
+        // LÓGICA BOTONES MECEP (SÍ/NO)
+        function setInterrupcion(valor) {
+            document.getElementById('interrupcion_mecep').value = valor;
+            const btnSi = document.getElementById('btn_si');
+            const btnNo = document.getElementById('btn_no');
+
+            btnSi.classList.remove('active');
+            btnNo.classList.remove('active');
+
+            if (valor === 'SI') {
+                btnSi.classList.add('active');
+            } else if (valor === 'NO') {
+                btnNo.classList.add('active');
+            }
+        }
+
+        // CARGAR DATOS EXISTENTES DE GOOGLE SHEETS
+        async function cargarDatosMecep(id) {
+            try {
+                const res = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${id}`);
+                const fila = await res.json(); 
+
+                if (fila && fila.length > 0 && !fila.error) {
+                    const setVal = (idHTML, valor) => {
+                        const el = document.getElementById(idHTML);
+                        if (el && valor !== undefined && valor !== null) { el.value = valor; }
+                    };
+                    const formatFecha = (iso) => (iso && iso.length >= 10 ? iso.substring(0, 10) : iso);
+                    const formatHora = (iso) => (iso && iso.includes('T') ? iso.split('T')[1].substring(0, 5) : iso);
+
+                    // Mapeo según la estructura solicitada (Índices = Num Columna - 1)
+                    setVal('id_solicitud', fila[0]);      // Col 1
+                    setVal('numero_despeje', fila[1]);    // Col 2
+                    
+                    setVal('circuito', fila[6]);          // Col 7
+                    if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
+                    setVal('subestacion', fila[5]);       // Col 6
+                    
+                    setVal('fecha_interrupcion', formatFecha(fila[13])); // Col 14
+                    setVal('dia_de_semana', fila[14]);                   // Col 15
+                    setVal('hora_inicio', formatHora(fila[15]));         // Col 16
+                    setVal('hora_final', formatHora(fila[16]));          // Col 17
+                    setVal('tiempo_necesario', fila[17]);                // Col 18
+                    setVal('trabajo_a_realizar', fila[18]);              // Col 19
+                    setVal('observaciones', fila[37]);                   // Col 38
+
+                    // Datos específicos MECEP
+                    if(fila[43]) { 
+                        // Tratamos de colocar la fecha guardada (DD/MM/YYYY HH:MM o similar) en el input datetime-local
+                        // Para datetime-local el formato debe ser YYYY-MM-DDThh:mm
+                        try {
+                           const f = new Date(fila[43]);
+                           if(!isNaN(f)) {
+                               f.setMinutes(f.getMinutes() - f.getTimezoneOffset());
+                               document.getElementById('fecha_mecep').value = f.toISOString().slice(0, 16);
+                           }
+                        } catch(e) {}
+                    }
+                    
+                    setVal('solicitado_mecep', fila[44]); // Col 45
+                    setVal('entregar_mecep', fila[45]);   // Col 46
+                    setVal('equipo_mecep', fila[46]);     // Col 47
+                    
+                    // Inicializar botones SI/NO (Col 48 es índice 47)
+                    if(fila[47]) {
+                        setInterrupcion(fila[47].toString().trim().toUpperCase());
+                    }
+
+                    setVal('referencia_mecep', fila[48]); // Col 49
+                }
+            } catch (error) { 
+                console.error("Error cargando datos:", error); 
+            }
+        }
+
+        // GUARDAR DATOS MECEP
+        async function guardarMecep() {
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerHTML = 'Guardando...'; 
+            
+            // Formatear Fecha MECEP para enviar a Google Sheets en formato "DD/MM/YYYY HH:MM"
+            let fechaMecepFormateada = "";
+            const fechaMecepRaw = getVal('fecha_mecep');
+            if (fechaMecepRaw) {
+                const dateObj = new Date(fechaMecepRaw);
+                const dd = String(dateObj.getDate()).padStart(2, '0');
+                const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const yyyy = dateObj.getFullYear();
+                const hh = String(dateObj.getHours()).padStart(2, '0');
+                const min = String(dateObj.getMinutes()).padStart(2, '0');
+                fechaMecepFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+            }
+
+            const payload = {
+                "action": "guardarMecep", // Acción que recibirá Apps Script para guardar en esas columnas
+                "ID_SOLICITUD": getVal('id_solicitud'), 
+                "NUMERO_DESPEJE": getVal('numero_despeje'),
+                "SUBESTACION": getVal('subestacion'),
+                "CIRCUITO": getVal('circuito'), 
+                "FECHA_INTERRUPCION": getVal('fecha_interrupcion'),
+                "DIA_DE_SEMANA": getVal('dia_de_semana'), 
+                "HORA_INICIO": getVal('hora_inicio'),
+                "HORA_FINAL": getVal('hora_final'), 
+                "TIEMPO_NECESARIO": getVal('tiempo_necesario'),
+                "TRABAJO_A_REALIZAR": getVal('trabajo_a_realizar'), 
+                "OBSERVACIONES": getVal('observaciones'),
+                "SECTOR": sectorSesion, 
+                "USUARIO": usuarioSesion,
+                "FECHA_MECEP": fechaMecepFormateada,
+                "SOLICITADO_MECEP": getVal('solicitado_mecep'),
+                "ENTREGAR_MECEP": getVal('entregar_mecep'),
+                "EQUIPO_MECEP": getVal('equipo_mecep'),
+                "INTERRUPCION_MECEP": getVal('interrupcion_mecep'),
+                "REFERENCIA_MECEP": getVal('referencia_mecep')
+            };
+
+            try {
+                const response = await fetch(URL_APPS_SCRIPT, { 
+                    method: 'POST', 
+                    mode: 'cors', 
+                    body: JSON.stringify(payload) 
+                });
+                
+                const res = await response.json(); 
+                
+                if (res.status === "ÉXITO") {
+                    alert("¡Formulario MECEP guardado con éxito!");
+                    window.location.href = "dashboard.html"; 
+                } else {
+                    throw new Error(res.message || "Error desconocido al guardar en el servidor");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Ocurrió un error al enviar: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'GUARDAR MECEP';
+            }
+        }
+    </script>
+</body>
+</html>
