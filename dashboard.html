@@ -361,7 +361,8 @@ function procesarYMostrarDatos(data) {
             });
 
        
-            // --- CAMBIO: ORDENAR CON REGISTROS SIN FECHA AL PRINCIPIO ---
+          
+      // --- CAMBIO: ORDENAR CON REGISTROS SIN FECHA AL PRINCIPIO ---
             datosFiltrados.sort((a, b) => {
                 // 1. Obtener los valores de fecha
                 let fechaA = a.fecha_interrupcion || a.fecha;
@@ -372,12 +373,14 @@ function procesarYMostrarDatos(data) {
                 let isMissingB = !fechaB || fechaB === "Sin fecha";
             
                 // 3. Lógica de ordenamiento
-                // Si A falta y B no, A va primero (-1)
+                // Si A falta y B no, A va primero (hacia arriba)
                 if (isMissingA && !isMissingB) return -1;
-                // Si B falta y A no, B va primero (1)
+                // Si B falta y A no, B va primero (hacia arriba)
                 if (!isMissingA && isMissingB) return 1;
-                // Si ambos faltan, mantener orden relativo (0)
-                if (isMissingA && isMissingB) return 0;
+                
+                // Si ambos faltan, los ordenamos de más reciente a más antiguo por su ID
+                // Así se ven de arriba para abajo en la pantalla.
+                if (isMissingA && isMissingB) return b.id - a.id; 
             
                 // 4. Si ambos tienen fecha, convertimos a objetos Date
                 let objFechaA = new Date(fechaA + "T12:00:00");
