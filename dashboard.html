@@ -22,18 +22,17 @@
 
     <style>
         /* 1. PALETA DE COLORES PRINCIPAL */
-        /* Cambia estos códigos para alterar los colores de toda la página */
         :root {
-            --bg-color: #0b141d;        /* Color del fondo general (muy oscuro) */
-            --card-color: #14212d;      /* Color de las cajas/tarjetas (oscuro) */
-            --accent-color: #003366;    /* Azul institucional para resaltar */
-            --success-color: #27ae60;   /* Verde para acciones positivas */
-            --warning-color: #f39c12;   /* Naranja para advertencias */
-            --danger-color: #e74c3c;    /* Rojo para salir o cancelar */
-            --info-color: #3498db;      /* Azul claro para información */
-            --text-color: #ffffff;      /* Texto principal blanco */
-            --muted-text: #a0aec0;      /* Texto secundario grisáceo */
-            --border-color: #2c3e50;    /* Color de las líneas separadoras */
+            --bg-color: #0b141d;
+            --card-color: #14212d;
+            --accent-color: #003366;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --text-color: #ffffff;
+            --muted-text: #a0aec0;
+            --border-color: #2c3e50;
         }
 
         /* 2. DISEÑO GENERAL DE LA PÁGINA */
@@ -57,7 +56,7 @@
         
         /* 4. CONTENEDOR PRINCIPAL (La caja central) */
         .container {
-            max-width: 1400px; /* Ancho de la tbl principal */
+            max-width: 1400px;
             margin: 30px auto;
             padding: 20px;
             background: var(--card-color);
@@ -87,13 +86,13 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
         th { background-color: var(--accent-color); color: white; font-weight: 600; }
-        tr:hover { background-color: #665112; } /* Efecto al pasar el mouse */
+        tr:hover { background-color: #665112; } 
 
         /* 7. ESTILOS DE BOTONES */
         .btn-limpiar { background: #34495e; color: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .btn-limpiar:hover { background: var(--danger-color); border-color: var(--danger-color); }
         
-        .btn-nueva { background: #27ae60; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .btn-nueva { background: #27ae60; color: white; padding: 8px 15px; border: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .btn-nueva:hover { background: #f39c12; }
         .btn-duplicar { background: #2c3e50; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
         .btn-duplicar:hover { background: #f39c12; }
@@ -114,6 +113,10 @@
         .btn-retirar { background-color: #27ae60; } .btn-retirar:hover { background: #f39c12; }
         .btn-retornar { background-color: #B00000; }  .btn-retornar:hover { background: #f39c12; }
         .btn-descargar { background-color: #2c3e50; } .btn-descargar:hover { background: #f39c12; }
+        
+        /* ESTILO NUEVO: Botón Mecep */
+        .btn-mecep { background-color: #8e44ad; } .btn-mecep:hover { background: #f39c12; }
+        
         .acciones-td { display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
@@ -140,7 +143,9 @@
 
     <div class="container">
         <div class="header-panel">
-            <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
+            <button type="button" class="btn-nueva" onclick="crearNuevaSolicitud(this)">
+                <i class="fas fa-plus"></i> Nueva Solicitud
+            </button>
              <a href="duplicar.html" class="btn-duplicar"><i class="fas fa-plus"></i> Duplicar Solicitud</a>
       <button type="button" id="btnAvisos" onclick="exportarAvisos()" class="btn-avisos">
     <i class="fas fa-file-excel"></i> Exportar Avisos
@@ -189,50 +194,39 @@
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
-                    <tr><td colspan="7" style="text-align:center;">Cargando información, por favor espera...</td></tr>
+                    <tr><td colspan="6" style="text-align:center;">Cargando información, por favor espera...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-
     <script>
-        // Variables globales para almacenar datos descargados de Google Sheets
         let baseCircuitos = [], baseEquipos = [], baseResponsables = [], baseIngenieros = [];
         const usuarioSesion = sessionStorage.getItem("usuario") || "Desconocido";
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
-        let currentStep = 1; 
-        const totalSteps = 4;
-      
-        // --- INICIALIZACIÓN (CORREGIDA) ---
+        let todosLosDatos = [];
+        
 window.onload = async function() {
-    // 1. Mostrar usuario y sector en la cabecera (IDs corregidos)
     const elUsuario = document.getElementById('nombre-usuario');
     const elSector = document.getElementById('nombre-sector');
     
     if (elUsuario) elUsuario.innerText = usuarioSesion;
     if (elSector) elSector.innerText = sectorSesion;
     
-    // 2. Ejecutar la descarga de datos al iniciar
-    // Primero descargamos los catálogos
     await descargarDatosGoogleSheets();
-    
-    // 3. ¡ESTO ES LO QUE FALTABA! 
-    // Ahora llamamos a la función que trae las solicitudes de la tabla
     await cargarSolicitudes();
 
-    // 4. (Opcional) Si la aplicación necesita abrir un ID específico desde la URL
     const urlParams = new URLSearchParams(window.location.search);
     const idSol = urlParams.get('id');
     if(idSol) {
         cargarDatosEdicion(idSol);
     }
 };
-        // --- DESCARGA Y LLENADO DE DATOS OPTIMIZADO (CON CACHÉ) ---
+
         async function descargarDatosGoogleSheets() {
             const CACHE_KEY = "datos_catalogos_despejes";
             const CACHE_TIME_KEY = "tiempo_catalogos_despejes";
-            const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; // 24 horas
+            const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; 
 
             const datosGuardados = localStorage.getItem(CACHE_KEY);
             const tiempoGuardado = localStorage.getItem(CACHE_TIME_KEY);
@@ -274,11 +268,11 @@ function procesarYMostrarDatos(data) {
     if(data.responsables) baseResponsables = data.responsables;
     if(data.ingenieros) baseIngenieros = data.ingenieros;
     
-    // Llamamos a la función corregida inmediatamente
     inicializarFiltroCircuitos(); 
     
     if (typeof poblarListasPersonal === "function") poblarListasPersonal();
 }
+
         function forzarActualizacionCatalogos() {
             localStorage.removeItem("datos_catalogos_despejes");
             localStorage.removeItem("tiempo_catalogos_despejes");
@@ -286,18 +280,14 @@ function procesarYMostrarDatos(data) {
             descargarDatosGoogleSheets(); 
         }
 
-        // 3. FUNCIONES DE AYUDA (Herramientas)
-        
-    // Esta función convierte la fecha fea de la base de datos a un formato bonito (DD/MM/AAAA)
         function formatearFecha(fechaOriginal) {
             if (!fechaOriginal || fechaOriginal === "Sin Fecha N/A") return "Sin fecha";
             
             try {
-                // Extraemos solo la parte YYYY-MM-DD y le forzamos mediodía para evitar desfases de zona horaria
                 let parteFecha = fechaOriginal.toString().split('T')[0]; 
                 let fecha = new Date(parteFecha + "T12:00:00");
                 
-                if(isNaN(fecha.getTime())) return fechaOriginal; // Si no es fecha válida, devuelve el texto tal cual
+                if(isNaN(fecha.getTime())) return fechaOriginal;
                 
                 let dia = String(fecha.getDate()).padStart(2, '0');
                 let mes = String(fecha.getMonth() + 1).padStart(2, '0');
@@ -305,28 +295,20 @@ function procesarYMostrarDatos(data) {
                 
                 return `${dia}/${mes}/${anio}`;
             } catch(e) {
-                return fechaOriginal; // Respaldo en caso de error
+                return fechaOriginal; 
             }
         }
-        // 4. FUNCIONES PRINCIPALES DE CARGA DE DATOS
 
-        // Carga la lista de circuitos según el sector del usuario para llenar el filtro
       async function inicializarFiltroCircuitos() {
     const selectCircuito = document.getElementById('filtroCircuito');
     if (!selectCircuito) return;
 
-    // Limpiamos opciones previas
     selectCircuito.innerHTML = '<option value="ALL">Todos</option>';
     
     const miSector = sectorSesion ? sectorSesion.trim().toUpperCase() : "";
-    console.log("DEBUG: Sector detectado:", miSector);
-    console.log("DEBUG: Circuitos recibidos:", baseCircuitos.length);
 
     if (baseCircuitos && baseCircuitos.length > 1) {
-        let contador = 0;
-        // Saltamos la fila 0 (encabezados)
-        baseCircuitos.slice(1).forEach((fila, index) => {
-            // Ajusta estos índices [3] y [6] si tus columnas son distintas
+        baseCircuitos.slice(1).forEach((fila) => {
             const sectorHoja = fila[3] ? fila[3].toString().trim().toUpperCase() : "";
             const nombreCircuito = fila[6] ? fila[6].toString().trim() : "";
 
@@ -335,81 +317,75 @@ function procesarYMostrarDatos(data) {
                 opt.value = nombreCircuito;
                 opt.textContent = nombreCircuito;
                 selectCircuito.appendChild(opt);
-                contador++;
             }
         });
-        console.log(`DEBUG: Se agregaron ${contador} circuitos al filtro.`);
-    } else {
-        console.warn("ADVERTENCIA: baseCircuitos está vacío o no cargó correctamente.");
     }
 }
 
-        // Se conecta al servidor y trae TODAS las solicitudes del sector
         async function cargarSolicitudes() {
-            // El &_t=${Date.now()} evita que el navegador use caché y lo obliga a traer datos frescos
             const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sectorSesion)}&_t=${Date.now()}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                // Si el servidor falla, mostramos el error
                 if (!Array.isArray(data)) {
-                    document.getElementById("tabla-body").innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error de datos</td></tr>`;
+                    document.getElementById("tabla-body").innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Error de datos</td></tr>`;
                     return;
                 }
 
-                // Guardamos los datos y mandamos a dibujar la tabla
                 todosLosDatos = data;
                 renderizarTabla();
             } catch (error) {
-                document.getElementById("tabla-body").innerHTML = `<tr><td colspan="7" style="text-align:center;">Error al conectar al servidor.</td></tr>`;
+                document.getElementById("tabla-body").innerHTML = `<tr><td colspan="6" style="text-align:center;">Error al conectar al servidor.</td></tr>`;
             }
         }
 
-        // 5. FUNCIÓN PARA DIBUJAR LA TABLA EN PANTALLA
-        // Toma los datos, aplica los filtros y dibuja fila por fila
+        // --- FUNCION DIBUJAR TABLA Y ORDENAR (CAMBIO 2) ---
         function renderizarTabla() {
             const tbody = document.getElementById("tabla-body");
-            tbody.innerHTML = ""; // Limpiamos la tabla antes de volver a dibujar
+            tbody.innerHTML = ""; 
 
             if (todosLosDatos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
                 return;
             }
 
-            // Leemos qué filtros seleccionó el usuario
             const limite = document.getElementById("limitSelector").value;
             const circuitoBuscado = document.getElementById("filtroCircuito").value;
             const fechaDesde = document.getElementById("fechaDesde").value;
             const fechaHasta = document.getElementById("fechaHasta").value;
 
-            // Filtramos la información
             let datosFiltrados = todosLosDatos.filter(fila => {
-                // ADAPTACIÓN: Buscamos la fecha en cualquiera de los dos nombres posibles
                 let fechaFila = fila.fecha_interrupcion || fila.fecha || "";
-                
                 let cumpleCircuito = (circuitoBuscado === "ALL" || fila.circuito === circuitoBuscado);
                 let cumpleDesde = (!fechaDesde || fechaFila >= fechaDesde);
                 let cumpleHasta = (!fechaHasta || fechaFila <= fechaHasta);
                 return cumpleCircuito && cumpleDesde && cumpleHasta;
             });
 
-            // Ordenamos de más reciente a más antiguo
-            let datosOrdenados = datosFiltrados.reverse();
+            // CAMBIO 2: Ordenar por fecha de interrupción (Más reciente a más antigua)
+            datosFiltrados.sort((a, b) => {
+                let fechaA = a.fecha_interrupcion || a.fecha || "1900-01-01";
+                let fechaB = b.fecha_interrupcion || b.fecha || "1900-01-01";
+                
+                let objFechaA = new Date(fechaA + "T12:00:00");
+                let objFechaB = new Date(fechaB + "T12:00:00");
+                
+                return objFechaB - objFechaA; 
+            });
 
-            // Aplicamos el límite (Ej: Mostrar solo los últimos 10)
+            let datosOrdenados = datosFiltrados;
+
             if (limite !== "ALL") {
                 datosOrdenados = datosOrdenados.slice(0, parseInt(limite));
             }
 
             if (datosOrdenados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
                 return;
             }
 
-            // Dibujamos el HTML por cada fila encontrada
             datosOrdenados.forEach(fila => {
-                // ADAPTACIÓN: Buscamos la fecha correcta para mostrarla
                 let fechaMostrar = fila.fecha_interrupcion || fila.fecha;
 
                 const tr = document.createElement("tr");
@@ -430,6 +406,9 @@ function procesarYMostrarDatos(data) {
                         <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
                             <i class="fas fa-arrow-circle-up"></i> M. Retornar
                         </button>
+                        <button class="btn-accion btn-mecep" onclick="abrirAccion('mecep', '${fila.id}')">
+                            <i class="fas fa-clipboard-list"></i> Mecep
+                        </button>
                       <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
                             <i class="fas fa-file-excel"></i> Excel
                         </button>
@@ -438,9 +417,53 @@ function procesarYMostrarDatos(data) {
                 tbody.appendChild(tr);
             });
         }
-        // 6. FUNCIONES DE INTERACCIÓN DEL USUARIO
 
-        // Reinicia todos los filtros a su estado original
+        // --- FUNCION CREAR SOLICITUD RAPIDA (CAMBIO 1) ---
+        async function crearNuevaSolicitud(boton) {
+            const textoOriginal = boton.innerHTML;
+            boton.disabled = true;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+
+           // Generamos ID único alfanumérico de 6 dígitos
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let nuevoId = '';
+    for (let i = 0; i < 6; i++) {
+        nuevoId += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+
+            // Preparamos los datos mínimos
+            const datosGuardar = {
+                action: "guardarSolicitud",
+                ID_SOLICITUD: nuevoId,
+                USUARIO: usuarioSesion,
+                SECTOR: sectorSesion,
+                FECHA_SOLICITUD: new Date().toISOString().split('T')[0] // Se añade fecha actual por control
+            };
+
+            try {
+                const response = await fetch(URL_APPS_SCRIPT, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify(datosGuardar)
+                });
+                
+                const res = await response.json();
+                
+                if (res.status === "ÉXITO" || !res.error) {
+                    // Refrescamos la tabla para que aparezca la nueva solicitud en pantalla
+                    await cargarSolicitudes();
+                } else {
+                    alert("Error al crear: " + (res.message || res.error));
+                }
+            } catch (error) {
+                console.error("Error al crear la solicitud rápida:", error);
+                alert("Error de conexión al intentar crear la solicitud.");
+            } finally {
+                boton.disabled = false;
+                boton.innerHTML = textoOriginal;
+            }
+        }
+
         function limpiarFiltros() {
             document.getElementById("filtroCircuito").value = "ALL";
             document.getElementById("fechaDesde").value = "";
@@ -449,7 +472,6 @@ function procesarYMostrarDatos(data) {
             renderizarTabla();
         }
 
-        // Redirige al usuario a la pantalla correspondiente según el botón que presionó
         function abrirAccion(accion, idSolicitud) {
             if (accion === 'editar' || accion === 'formulario') {
                 window.location.href = `app.html?id=${idSolicitud}&modo=${accion}`;
@@ -457,19 +479,17 @@ function procesarYMostrarDatos(data) {
                 window.location.href = `maniobras_retirar.html?id=${idSolicitud}`;
             } else if (accion === 'retornar') {
                 window.location.href = `maniobras_retornar.html?id=${idSolicitud}`;
+            } else if (accion === 'mecep') {
+                window.location.href = `mecep.html?id=${idSolicitud}`; // Archivo nuevo para Mecep
             }
         }
 
-        // Genera y descarga el Excel
-     // Genera y descarga el Excel
         async function descargarExcelDashboard(boton, idSolicitud) {
-            // Cambiamos el botón para que diga "Procesando..." y nadie haga doble clic
             const textoOriginal = boton.innerHTML;
             boton.disabled = true;
             boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
 
             try {
-                // 1. Buscamos todos los datos completos de ese ID
                 const resData = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${idSolicitud}`);
                 const solicitudCompleta = await resData.json();
 
@@ -478,10 +498,8 @@ function procesarYMostrarDatos(data) {
                     return;
                 }
 
-                // 2. Empaquetamos los datos en un "Paquete" ordenado
-                // ¡IMPORTANTE! Agregamos el action: "generarExcel" (o la acción que use tu Código.gs)
                 const datosParaExcel = {
-                    action: "generarExcel", // <-- ESTO ES VITAL PARA QUE EL SERVIDOR RESPONDA
+                    action: "generarExcel", 
                     ID_SOLICITUD: solicitudCompleta[0] || idSolicitud, 
                     NUMERO_DESPEJE: solicitudCompleta[1] || "",
                     SOLICITUD: solicitudCompleta[2] || "", 
@@ -527,7 +545,6 @@ function procesarYMostrarDatos(data) {
                     USUARIO: usuarioSesion || solicitudCompleta[42] || ""
                 };
 
-                // 3. Mandamos el paquete a Google Apps Script para que cree el Excel
                 const response = await fetch(URL_APPS_SCRIPT, {
                     method: 'POST', 
                     mode: 'cors', 
@@ -536,7 +553,6 @@ function procesarYMostrarDatos(data) {
                 
                 const res = await response.json();
 
-                // 4. Si fue un éxito, obligamos al navegador a descargar el archivo
                 if (res.status === "ÉXITO") {
                     const enlaceDescarga = document.createElement('a');
                     enlaceDescarga.href = res.url;
@@ -552,28 +568,24 @@ function procesarYMostrarDatos(data) {
                 console.error("Error de comunicación:", err);
                 alert("No se pudo conectar con el servidor para generar el Excel.");
             } finally {
-                // Devolvemos el botón a la normalidad
                 if(boton) {
                     boton.disabled = false;
                     boton.innerHTML = textoOriginal;
                 }
             }
         }
+
 async function exportarAvisos(boton) {
-    // 1. Feedback visual (Opcional, si pasas el botón como parámetro)
     const textoOriginal = boton ? boton.innerHTML : "";
     if (boton) {
         boton.disabled = true;
         boton.innerHTML = "Procesando...";
     }
 
-    // 2. Recolectar IDs visibles
-    // Asegúrate de que #tabla-body sea el ID de tu tabla o tbody
     const filasVisibles = document.querySelectorAll('#tabla-body tr:not([style*="display: none"])');
     const ids = [];
 
     filasVisibles.forEach(tr => {
-        // Se asume que el ID está en el atributo 'data-id' o la primera celda
         const id = tr.getAttribute('data-id') || (tr.cells[0] ? tr.cells[0].innerText : null);
         if (id) ids.push(id.toString());
     });
@@ -584,7 +596,6 @@ async function exportarAvisos(boton) {
         return;
     }
 
-    // 3. Llamada al servidor
     try {
         const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
             method: 'POST',
@@ -613,7 +624,6 @@ async function exportarAvisos(boton) {
     }
 }
         
-        // Cierra la sesión borrando la llave y mandando a la pantalla de entrada
         function cerrarSesion() {
             sessionStorage.clear();
             window.location.href = "index.html";
