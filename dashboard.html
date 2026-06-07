@@ -360,31 +360,32 @@ function procesarYMostrarDatos(data) {
                 return cumpleCircuito && cumpleDesde && cumpleHasta;
             });
 
-           // --- CAMBIO: ORDENAR CON REGISTROS SIN FECHA AL PRINCIPIO ---
-datosFiltrados.sort((a, b) => {
-    let fechaRawA = a.fecha_interrupcion || a.fecha;
-    let fechaRawB = b.fecha_interrupcion || b.fecha;
-
-    // Detectamos si falta la fecha
-    let isMissingA = !fechaRawA;
-    let isMissingB = !fechaRawB;
-
-    // Lógica de ordenamiento:
-    // 1. Si A no tiene fecha y B sí, A va primero (-1)
-    if (isMissingA && !isMissingB) return -1;
-    
-    // 2. Si B no tiene fecha y A sí, B va primero (1)
-    if (!isMissingA && isMissingB) return 1;
-    
-    // 3. Si ambos no tienen fecha, mantenemos orden actual (0)
-    if (isMissingA && isMissingB) return 0;
-
-    // 4. Si ambos tienen fecha, ordenamos de más reciente a más antiguo (descendente)
-    let objFechaA = new Date(fechaRawA + "T12:00:00");
-    let objFechaB = new Date(fechaRawB + "T12:00:00");
-    
-    return objFechaB - objFechaA; 
-});
+       
+            // --- CAMBIO: ORDENAR CON REGISTROS SIN FECHA AL PRINCIPIO ---
+            datosFiltrados.sort((a, b) => {
+                // 1. Obtener los valores de fecha
+                let fechaA = a.fecha_interrupcion || a.fecha;
+                let fechaB = b.fecha_interrupcion || b.fecha;
+            
+                // 2. Determinar si están vacíos o son inválidos
+                let isMissingA = !fechaA || fechaA === "Sin fecha";
+                let isMissingB = !fechaB || fechaB === "Sin fecha";
+            
+                // 3. Lógica de ordenamiento
+                // Si A falta y B no, A va primero (-1)
+                if (isMissingA && !isMissingB) return -1;
+                // Si B falta y A no, B va primero (1)
+                if (!isMissingA && isMissingB) return 1;
+                // Si ambos faltan, mantener orden relativo (0)
+                if (isMissingA && isMissingB) return 0;
+            
+                // 4. Si ambos tienen fecha, convertimos a objetos Date
+                let objFechaA = new Date(fechaA + "T12:00:00");
+                let objFechaB = new Date(fechaB + "T12:00:00");
+            
+                // 5. Comparar: Más reciente primero (Descendente)
+                return objFechaB - objFechaA;
+            });
 
             let datosOrdenados = datosFiltrados;
 
