@@ -559,47 +559,60 @@ function procesarYMostrarDatos(data) {
                 }
             }
         }
-      async function exportarAvisos() {
-  // 1. Recolectar IDs visibles
-  // Ahora apuntamos a #tabla-body, que contiene los tr directamente
-  const filasVisibles = document.querySelectorAll('#tabla-body tr:not([style*="display: none"])');
-  const ids = [];
+async function exportarAvisos(boton) {
+    // 1. Feedback visual (Opcional, si pasas el botón como parámetro)
+    const textoOriginal = boton ? boton.innerHTML : "";
+    if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = "Procesando...";
+    }
 
-  filasVisibles.forEach(tr => {
-    // Intentamos obtener el ID desde el atributo 'data-id' o desde la primera celda
-    // Asegúrate de que el índice cells[0] sea donde realmente está tu ID
-    const id = tr.getAttribute('data-id') || tr.cells[0].innerText;
-    if (id) ids.push(id);
-  });
+    // 2. Recolectar IDs visibles
+    // Asegúrate de que #tabla-body sea el ID de tu tabla o tbody
+    const filasVisibles = document.querySelectorAll('#tabla-body tr:not([style*="display: none"])');
+    const ids = [];
 
-  if (ids.length === 0) {
-    return alert("No hay datos visibles para exportar");
-  }
-
-  // 2. Llamada al servidor
-  try {
-    const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
-      method: 'POST',
-      mode: 'cors',
-      body: JSON.stringify({
-        action: 'exportarAvisos', 
-        idsVisibles: ids
-      })
+    filasVisibles.forEach(tr => {
+        // Se asume que el ID está en el atributo 'data-id' o la primera celda
+        const id = tr.getAttribute('data-id') || (tr.cells[0] ? tr.cells[0].innerText : null);
+        if (id) ids.push(id.toString());
     });
 
-    const res = await response.json();
-
-    if (res.status === "ÉXITO") {
-      // Forzar descarga en el navegador
-      window.open(res.url, '_blank');
-    } else {
-      alert("Error en el servidor: " + res.error);
+    if (ids.length === 0) {
+        alert("No hay datos visibles para exportar");
+        if (boton) { boton.disabled = false; boton.innerHTML = textoOriginal; }
+        return;
     }
-  } catch (e) {
-    console.error(e);
-    alert("Error de conexión al exportar.");
-  }
+
+    // 3. Llamada al servidor
+    try {
+        const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: 'exportarAvisos', 
+                idsVisibles: ids
+            })
+        });
+
+        const res = await response.json();
+
+        if (res.status === "ÉXITO") {
+            window.open(res.url, '_blank');
+        } else {
+            alert("Error en el servidor: " + (res.error || "Desconocido"));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión al exportar.");
+    } finally {
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    }
 }
+        
         // Cierra la sesión borrando la llave y mandando a la pantalla de entrada
         function cerrarSesion() {
             sessionStorage.clear();
