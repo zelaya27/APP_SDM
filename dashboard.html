@@ -97,6 +97,8 @@
         .btn-nueva:hover { background: #f39c12; }
         .btn-duplicar { background: #2c3e50; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
         .btn-duplicar:hover { background: #f39c12; }
+         .btn-Avisos { background: #2c3e50; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .btn-Avisos:hover { background: #f39c12; }
         .btn-logout { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
         .btn-logout:hover { background: #f39c12; }
         .btn-Sinc { background-color:var(--success-color);color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
@@ -140,6 +142,9 @@
         <div class="header-panel">
             <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
              <a href="duplicar.html" class="btn-duplicar"><i class="fas fa-plus"></i> Duplicar Solicitud</a>
+      <button type="button" id="btnAvisos" onclick="abrirAvisos()" class="btn-accion btn-avisos">
+        <i class="fas fa-file-excel"></i> <span>Avisos</span>
+    </button>
             <div class="filtros-contenedor">
                 <div class="filtros-grupo">
                     <label>Mostrar:</label>
@@ -554,7 +559,42 @@ function procesarYMostrarDatos(data) {
                 }
             }
         }
-        
+        async function exportarAvisos() {
+  // 1. Recolectar IDs visibles
+  const filasVisibles = document.querySelectorAll('#tuTablaId tbody tr:not([style*="display: none"])');
+  const ids = [];
+  filasVisibles.forEach(tr => {
+    // Asumiendo que el ID está en el primer TD o en un atributo data-id
+    const id = tr.getAttribute('data-id') || tr.cells[0].innerText;
+    if(id) ids.push(id);
+  });
+
+  if(ids.length === 0) return alert("No hay datos visibles para exportar");
+
+  // 2. Llamada al servidor
+  try {
+    const response = await fetch(CONFIG.URL_APPS_SCRIPT, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        action: 'exportarConsultaDashboard',
+        idsVisibles: ids
+      })
+    });
+    
+    const res = await response.json();
+    
+    if (res.status === "ÉXITO") {
+      // Forzar descarga en el navegador
+      window.open(res.url, '_blank');
+    } else {
+      alert("Error: " + res.error);
+    }
+  } catch(e) {
+    console.error(e);
+    alert("Error de conexión al exportar.");
+  }
+}
         // Cierra la sesión borrando la llave y mandando a la pantalla de entrada
         function cerrarSesion() {
             sessionStorage.clear();
