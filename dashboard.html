@@ -428,7 +428,7 @@ function procesarYMostrarDatos(data) {
                         <button class="btn-accion btn-mecep" onclick="abrirAccion('mecep', '${fila.id}')">
                             <i class="fas fa-clipboard-list"></i> Mecep
                         </button>
-                      <button class="btn-accion btn-descargar" onclick="descargarExcelDashboard(this, '${fila.id}')">
+                      <button class="btn-accion btn-descargar" onclick="descargarExcelSolicitud(this, '${fila.id}')">
                             <i class="fas fa-file-excel"></i> Excel
                         </button>
                     </td>
@@ -558,7 +558,7 @@ async function exportarConsultaMecep(boton) {
         }
     }
 }
-        async function descargarExcelDashboard(boton, idSolicitud) {
+        async function descargarExcelSolicitud(boton, idSolicitud) {
             const textoOriginal = boton.innerHTML;
             boton.disabled = true;
             boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
@@ -573,7 +573,7 @@ async function exportarConsultaMecep(boton) {
                 }
 
                 const datosParaExcel = {
-                    action: "generarExcel", 
+                    action: "generarSolicitud", 
                     ID_SOLICITUD: solicitudCompleta[0] || idSolicitud, 
                     NUMERO_DESPEJE: solicitudCompleta[1] || "",
                     SOLICITUD: solicitudCompleta[2] || "", 
