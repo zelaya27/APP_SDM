@@ -1,5 +1,5 @@
 const CONFIG = {
-    URL_APPS_SCRIPT: 'https://script.google.com/macros/s/AKfycbyJcl2Fvc_k-d3P15HhVw8Wod1doEIFbBhscgoskh17whzpweJ28oOjWa_ULqM0Mgwy/exec'
+    URL_APPS_SCRIPT: 'https://script.google.com/macros/s/AKfycbyL-z_dCnDFdwwW00OTF_rcFtzQrlcxVhdTJkKesYmEiwL1ppRlkRF5GojBRduTbv_Z/exec'
 };
 function normalizarDatos(datos) {
     const limpios = {};
