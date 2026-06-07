@@ -283,19 +283,26 @@ function procesarYMostrarDatos(data) {
 
         // 3. FUNCIONES DE AYUDA (Herramientas)
         
-        // Esta función convierte la fecha fea de la base de datos a un formato bonito (DD/MM/AAAA)
+    // Esta función convierte la fecha fea de la base de datos a un formato bonito (DD/MM/AAAA)
         function formatearFecha(fechaOriginal) {
-            if (!fechaOriginal) return "Sin fecha";
-            let fecha = new Date(fechaOriginal);
-            if(isNaN(fecha.getTime())) return fechaOriginal; 
+            if (!fechaOriginal || fechaOriginal === "Sin Fecha N/A") return "Sin fecha";
             
-            let dia = String(fecha.getDate()).padStart(2, '0');
-            let mes = String(fecha.getMonth() + 1).padStart(2, '0');
-            let anio = fecha.getFullYear();
-            
-            return `${dia}/${mes}/${anio}`;
+            try {
+                // Extraemos solo la parte YYYY-MM-DD y le forzamos mediodía para evitar desfases de zona horaria
+                let parteFecha = fechaOriginal.toString().split('T')[0]; 
+                let fecha = new Date(parteFecha + "T12:00:00");
+                
+                if(isNaN(fecha.getTime())) return fechaOriginal; // Si no es fecha válida, devuelve el texto tal cual
+                
+                let dia = String(fecha.getDate()).padStart(2, '0');
+                let mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                let anio = fecha.getFullYear();
+                
+                return `${dia}/${mes}/${anio}`;
+            } catch(e) {
+                return fechaOriginal; // Respaldo en caso de error
+            }
         }
-
         // 4. FUNCIONES PRINCIPALES DE CARGA DE DATOS
 
         // Carga la lista de circuitos según el sector del usuario para llenar el filtro
@@ -334,7 +341,8 @@ function procesarYMostrarDatos(data) {
 
         // Se conecta al servidor y trae TODAS las solicitudes del sector
         async function cargarSolicitudes() {
-            const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sectorSesion)}`;
+            // El &_t=${Date.now()} evita que el navegador use caché y lo obliga a traer datos frescos
+            const url = `${URL_APPS_SCRIPT}?action=getLista&sector=${encodeURIComponent(sectorSesion)}&_t=${Date.now()}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
