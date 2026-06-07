@@ -372,9 +372,12 @@ function procesarYMostrarDatos(data) {
 
             // Filtramos la información
             let datosFiltrados = todosLosDatos.filter(fila => {
+                // ADAPTACIÓN: Buscamos la fecha en cualquiera de los dos nombres posibles
+                let fechaFila = fila.fecha_interrupcion || fila.fecha || "";
+                
                 let cumpleCircuito = (circuitoBuscado === "ALL" || fila.circuito === circuitoBuscado);
-                let cumpleDesde = (!fechaDesde || fila.fecha >= fechaDesde);
-                let cumpleHasta = (!fechaHasta || fila.fecha <= fechaHasta);
+                let cumpleDesde = (!fechaDesde || fechaFila >= fechaDesde);
+                let cumpleHasta = (!fechaHasta || fechaFila <= fechaHasta);
                 return cumpleCircuito && cumpleDesde && cumpleHasta;
             });
 
@@ -393,11 +396,14 @@ function procesarYMostrarDatos(data) {
 
             // Dibujamos el HTML por cada fila encontrada
             datosOrdenados.forEach(fila => {
+                // ADAPTACIÓN: Buscamos la fecha correcta para mostrarla
+                let fechaMostrar = fila.fecha_interrupcion || fila.fecha;
+
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td><strong>${fila.id}</strong></td>
                     <td>${fila.no_despeje || '-'}</td>
-                    <td>${formatearFecha(fila.fecha)}</td>
+                    <td>${formatearFecha(fechaMostrar)}</td>
                     <td>${fila.circuito || '-'}</td>
                     <td>${fila.nombre || '-'}</td>
                     
@@ -419,7 +425,6 @@ function procesarYMostrarDatos(data) {
                 tbody.appendChild(tr);
             });
         }
-
         // 6. FUNCIONES DE INTERACCIÓN DEL USUARIO
 
         // Reinicia todos los filtros a su estado original
