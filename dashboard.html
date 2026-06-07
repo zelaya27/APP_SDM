@@ -97,8 +97,8 @@
         .btn-nueva:hover { background: #f39c12; }
         .btn-duplicar { background: #2c3e50; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
         .btn-duplicar:hover { background: #f39c12; }
-         .btn-Avisos { background: #2c3e50; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .btn-Avisos:hover { background: #f39c12; }
+         .btn-avisos { background: #2c3e50; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .btn-avisos:hover { background: #f39c12; }
         .btn-logout { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
         .btn-logout:hover { background: #f39c12; }
         .btn-Sinc { background-color:var(--success-color);color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
@@ -142,9 +142,9 @@
         <div class="header-panel">
             <a href="app.html" class="btn-nueva"><i class="fas fa-plus"></i> Nueva Solicitud</a>
              <a href="duplicar.html" class="btn-duplicar"><i class="fas fa-plus"></i> Duplicar Solicitud</a>
-      <button type="button" id="btnAvisos" onclick="abrirAvisos()" class="btn-accion btn-avisos">
-        <i class="fas fa-file-excel"></i> <span>Avisos</span>
-    </button>
+      <button type="button" id="btnAvisos" onclick="exportarAvisos()" class="btn-avisos">
+    <i class="fas fa-file-excel"></i> Exportar Avisos
+</button>
             <div class="filtros-contenedor">
                 <div class="filtros-grupo">
                     <label>Mostrar:</label>
@@ -577,7 +577,7 @@ function procesarYMostrarDatos(data) {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
-        action: 'exportarConsultaDashboard',
+        action: 'exportarAvisos',
         idsVisibles: ids
       })
     });
