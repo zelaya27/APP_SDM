@@ -7,53 +7,271 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="config.js"></script>
     <style>
-        body { font-family: sans-serif; background: #0b141d; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #login-container { background: #14212d; padding: 10px; border-radius: 10px; width: 300px; text-align: center; }
-        input {font-size: 16px; width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border: none; border-radius: 5px; }
-        .btn-enviar { background: #003366; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        :root {
+            --bg: #eef3f6;
+            --panel: #ffffff;
+            --tech-blue: #8fa6b3;
+            --tech-blue-dark: #6f8794;
+            --line: #222222;
+            --text: #111111;
+            --muted: #4b5563;
+            --shadow: rgba(15, 23, 42, 0.18);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(143,166,179,.40), transparent 35%),
+                linear-gradient(135deg, #f8fbfc 0%, var(--bg) 45%, #dce5ea 100%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 18px;
+            box-sizing: border-box;
+        }
+
+        #login-container {
+            background: rgba(255,255,255,0.92);
+            padding: 22px;
+            border-radius: 18px;
+            width: 340px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,.15);
+            box-shadow: 0 18px 45px var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-box {
+            background: white;
+            padding: 14px;
+            border-radius: 14px;
+            display: inline-block;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0,0,0,.12);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+        }
+
+        .logo-box img { width: 145px; display: block; }
+
+        h2 {
+            margin: 6px 0 16px;
+            font-size: 18px;
+            letter-spacing: .5px;
+            color: #111;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            margin: 12px 0 5px;
+        }
+
+        input, select {
+            font-size: 15px;
+            width: 100%;
+            padding: 11px 12px;
+            box-sizing: border-box;
+            border: 1px solid #9aa7af;
+            border-radius: 9px;
+            background: #f9fbfc;
+            color: #111;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--tech-blue-dark);
+            box-shadow: 0 0 0 3px rgba(143,166,179,.28);
+        }
+
+        .password-wrap { position: relative; }
+
+        .eye-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #444;
+            padding: 6px;
+        }
+
+        .btn-enviar {
+            background: linear-gradient(135deg, var(--tech-blue) 0%, #b7c8d0 100%);
+            color: #000000;
+            border: 1px solid #647681;
+            padding: 13px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: 800;
+            margin-top: 18px;
+            letter-spacing: .5px;
+            transition: .2s ease;
+        }
+
+        .btn-enviar:hover { background: #f39c12; transform: translateY(-1px); }
+        .btn-enviar:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+        .ayuda {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #5f6b73;
+            min-height: 16px;
+        }
     </style>
 </head>
 <body>
     <div id="login-container">
-    <div style="background: white; padding: 15px; border-radius: 8px; display: inline-block; margin-bottom: 20px;">
-        <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" style="width: 150px; display: block;">
+        <div class="logo-box">
+            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo UTCD">
+        </div>
+
+        <h2>SOLICITUD DE MANIOBRAS</h2>
+
+        <label for="sectorInput">Sector</label>
+        <input type="text" id="sectorInput" list="listaSectores" placeholder="Escribe o selecciona sector" autocomplete="off" oninput="filtrarUsuariosPorSector()">
+        <datalist id="listaSectores"></datalist>
+
+        <label for="user">Usuario</label>
+        <input type="text" id="user" list="listaUsuarios" placeholder="Selecciona usuario del sector" autocomplete="off">
+        <datalist id="listaUsuarios"></datalist>
+
+        <label for="pass">Contraseña</label>
+        <div class="password-wrap">
+            <input type="password" id="pass" placeholder="Contraseña">
+            <button type="button" class="eye-btn" onclick="togglePassword()"><i class="fas fa-eye"></i></button>
+        </div>
+
+        <button class="btn-enviar" id="btnLogin" onclick="iniciarSesion()">INICIAR SESIÓN</button>
+        <div class="ayuda" id="estadoLogin">Selecciona sector para filtrar usuarios.</div>
     </div>
-    <input type="text" id="user" placeholder="Usuario">
-    <div style="position: relative;">
-        <input type="password" id="pass" placeholder="Contraseña">
-        <button type="button" onclick="togglePassword()" style="position: absolute; right: 10px; top: 15px; border:none; background:none; cursor:pointer; color: gray;"><i class="fas fa-eye"></i></button>
-    </div>
-    <button class="btn-enviar" onclick="iniciarSesion()">INICIAR SESIÓN</button>
-</div>
 
     <script>
+        let usuariosLogin = [];
+
+        window.onload = function() {
+            cargarUsuariosLogin();
+        };
+
+        function normalizarTexto(valor) {
+            return (valor || "").toString().trim().toUpperCase();
+        }
+
         function togglePassword() {
             const p = document.getElementById('pass');
             p.type = p.type === 'password' ? 'text' : 'password';
         }
 
-        async function iniciarSesion() {
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
-            
-            // 2. Usamos la variable del archivo config.js
-            const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT; 
+        async function cargarUsuariosLogin() {
+            const estado = document.getElementById('estadoLogin');
+            estado.innerText = 'Cargando sectores...';
 
             try {
-                // 3. ¡OJO! Aquí usabas 'URL' en el fetch, debe ser 'URL_APPS_SCRIPT'
-                const res = await fetch(`${URL_APPS_SCRIPT}?user=${user}&pass=${pass}`);
+                const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
+                const res = await fetch(`${URL_APPS_SCRIPT}?action=getUsuariosLogin&_t=${Date.now()}`);
                 const data = await res.json();
-                
+
+                if (!data || !Array.isArray(data.usuarios)) {
+                    throw new Error(data.error || 'Respuesta inválida del servidor');
+                }
+
+                usuariosLogin = data.usuarios;
+                poblarSectores();
+                estado.innerText = 'Selecciona sector para filtrar usuarios.';
+            } catch (error) {
+                console.error(error);
+                estado.innerText = 'No se pudieron cargar sectores. Aún puedes escribir tu usuario manualmente.';
+            }
+        }
+
+        function poblarSectores() {
+            const dl = document.getElementById('listaSectores');
+            dl.innerHTML = '';
+
+            const sectores = [...new Set(
+                usuariosLogin
+                    .map(u => (u.sector || '').toString().trim())
+                    .filter(Boolean)
+            )].sort();
+
+            sectores.forEach(sec => {
+                const opt = document.createElement('option');
+                opt.value = sec;
+                dl.appendChild(opt);
+            });
+        }
+
+        function filtrarUsuariosPorSector() {
+            const sectorSeleccionado = normalizarTexto(document.getElementById('sectorInput').value);
+            const dl = document.getElementById('listaUsuarios');
+            const userInput = document.getElementById('user');
+            const estado = document.getElementById('estadoLogin');
+
+            dl.innerHTML = '';
+            userInput.value = '';
+
+            if (!sectorSeleccionado) {
+                estado.innerText = 'Selecciona sector para filtrar usuarios.';
+                return;
+            }
+
+            const usuariosFiltrados = usuariosLogin.filter(u => normalizarTexto(u.sector) === sectorSeleccionado);
+
+            usuariosFiltrados.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.usuario;
+                dl.appendChild(opt);
+            });
+
+            estado.innerText = usuariosFiltrados.length
+                ? `${usuariosFiltrados.length} usuario(s) encontrados para el sector.`
+                : 'No hay usuarios para ese sector.';
+        }
+
+        async function iniciarSesion() {
+            const user = document.getElementById('user').value.trim();
+            const pass = document.getElementById('pass').value;
+            const sectorElegido = document.getElementById('sectorInput').value.trim();
+            const btn = document.getElementById('btnLogin');
+            const estado = document.getElementById('estadoLogin');
+
+            if (!sectorElegido) return alert('Selecciona un sector.');
+            if (!user) return alert('Selecciona o escribe un usuario.');
+            if (!pass) return alert('Ingresa la contraseña.');
+
+            btn.disabled = true;
+            btn.innerText = 'VALIDANDO...';
+            estado.innerText = 'Validando acceso...';
+
+            try {
+                const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
+                const res = await fetch(`${URL_APPS_SCRIPT}?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}&sector=${encodeURIComponent(sectorElegido)}`);
+                const data = await res.json();
+
                 if (data.acceso) {
                     sessionStorage.setItem("usuario", data.usuario);
                     sessionStorage.setItem("sector", data.sector);
-                    window.location.href = "dashboard.html"; 
+                    sessionStorage.setItem("tipo", data.tipo || "");
+                    window.location.href = "dashboard.html";
                 } else {
-                    alert("Usuario o contraseña incorrectos.");
+                    alert("Usuario, contraseña o sector incorrecto.");
+                    estado.innerText = 'Verifica los datos e intenta nuevamente.';
                 }
             } catch (error) {
-                console.error(error); // Verás el error real en la consola F12
+                console.error(error);
                 alert("Error de conexión con Google Sheets.");
+                estado.innerText = 'Error de conexión.';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'INICIAR SESIÓN';
             }
         }
     </script>
