@@ -20,18 +20,17 @@
 </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <style>
-        /* Variables globales de diseño */
-        :root {
-    /* Tema Principal */
-    --bg-color: #eef3f6; 
-    --card-color: #ffffff; 
+   <style>
+/* Variables globales de diseño */
+:root {
+    --bg-color: #eef3f6;
+    --card-color: #ffffff;
     --accent-color: #8fa6b3;
-    --success-color: #27ae60; 
-    --text-color: #111111; 
+    --success-color: #27ae60;
+    --text-color: #111111;
     --muted-text: #374151;
     --border-color: #111111;
-    /* Colores Adicionales */
+
     --verde-claro: #73F527;
     --verde-menta: #27F59F;
     --azul-cielo: #27E0F5;
@@ -43,110 +42,311 @@
     --negro: #000000;
     --blanco: #FFFFFF;
 }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f8fbfc 0%, var(--bg-color) 48%, #dce5ea 100%); color: var(--text-color); margin: 0; padding: 0; }
-        
-        /* Cabecera optimizada con Flexbox */
-        header { 
-            background-color: var(--card-color); 
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid var(--accent-color); 
-        }
-        .header-left { display: flex; align-items: center; }
-        .logo-box { background: #ffffff; padding: 4px 10px; border-radius: 4px; }
-        .logo-box img { height: 35px; display: block; }
-        .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: #111111; }
-        
-        .header-right { display: flex; align-items: center; gap: 15px; }
-       /* Contenedor que agrupa los botones */
-.botones-header {
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #f8fbfc 0%, var(--bg-color) 48%, #dce5ea 100%);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Cabecera */
+header {
+    background-color: var(--card-color);
+    padding: 10px 20px;
     display: flex;
-    gap: 10px; /* Espacio entre botones */
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.header-left {
+    display: flex;
     align-items: center;
 }
 
-/* Forzamos el mismo alto para los tres botones */
-.btn-nav, .btn-sinc, .btn_generar_excel {
-    height: 40px;          /* Altura fija para todos */
-    padding: 0 15px;       /* Padding horizontal uniforme */
-    display: inline-flex;  /* Flexbox para centrar contenido */
-    align-items: center;   /* Alineación vertical */
-    justify-content: center; /* Alineación horizontal */
+.logo-box {
+    background: #ffffff;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.logo-box img {
+    height: 35px;
+    display: block;
+}
+
+.header-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #111111;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.botones-header {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-nav,
+.btn-sinc,
+.btn_generar_excel {
+    height: 40px;
+    padding: 0 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    box-sizing: border-box; /* Importante para que el padding no sume tamaño extra */
+    box-sizing: border-box;
     background: linear-gradient(135deg, var(--accent-color), #b7c8d0);
     color: #000000;
 }
 
-
-        /* Contenedor principal y tarjetas */
-        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-        .card { background-color: var(--card-color); border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        
-        /* Indicador de pasos (Stepper) */
-        .stepper { 
-            display: flex; justify-content: space-between; margin-bottom: 30px; padding: 20px;
-            background: var(--card-color); border-radius: 12px; border: 1px solid var(--border-color); position: relative;
-        }
-        .stepper::before {
-            content: ''; position: absolute; top: 35px; left: 10%; right: 10%; height: 2px;
-            background: var(--border-color); z-index: 0;
-        }
-        .step { 
-            flex: 1; text-align: center; font-size: 11px; font-weight: 700; color: var(--muted-text); 
-            transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1;
-        }
-        .step.active { color: white; }
-        .step .circle { 
-            width: 35px; height: 35px; line-height: 35px; margin-bottom: 8px;
-            border: 2px solid var(--border-color); border-radius: 50%; background: #ffffff; transition: all 0.3s ease;
-        }
-        .step.active .circle { background: var(--accent-color); border-color: var(--accent-color); color: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(0, 51, 102, 0.5); }
-        .step.completed .circle { background: var(--success-color); border-color: var(--success-color); color: white; }
-        
-        /* Estilos del formulario */
-        .form-step { display: none; }
-        .form-step.active { display: block; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-        .form-group { display: flex; flex-direction: column; margin-bottom: 5px; }
-        .form-group.full-width { grid-column: span 2; }
-        
-        label { font-size: 13px; margin-bottom: 5px; color: var(--muted-text); font-weight: 500; }
-        input, select, textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 9px; color: white; font-size: 14px; width: 100%; box-sizing: border-box;}
-        .buttons-container { background-color:var(--bg-color);min-height: 40px; margin-top: 25px; display: flex; justify-content: space-between; }
-        .btn { padding: 12px 25px; border-radius: 4px; border: 1px solid #647681; cursor: pointer; font-weight: bold; font-size: 14px; background: linear-gradient(135deg, var(--accent-color), #b7c8d0); color: #000000; }
-        .btn:hover, .btn-nav:hover, .btn-sinc:hover, .btn_generar_excel:hover { background: #f39c12 !important; color: #000000; }
-        
-        .hidden { display: none !important; }
-          .form-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px; /* o el espacio que prefieras entre inputs */
-        }
-         .form-grid-2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px; /* o el espacio que prefieras entre inputs */
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 15px;
 }
-             #trabajo_a_realizar {
-        min-height: 70px; /* Altura para Trabajo a Realizar */
-        resize: vertical;  /* Permite al usuario estirar la caja solo hacia abajo */
-        padding: 8px;      /* Espacio interno para que el texto no quede pegado al borde */
+
+.card {
+    background-color: var(--card-color);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    color: #000000;
+}
+
+/* Stepper */
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--card-color);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.stepper::before {
+    content: '';
+    position: absolute;
+    top: 35px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: var(--border-color);
+    z-index: 0;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted-text);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.step.active {
+    color: #000000;
+}
+
+.step .circle {
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    margin-bottom: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    background: #ffffff;
+    color: #000000;
+    transition: all 0.3s ease;
+}
+
+.step.active .circle {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0, 51, 102, 0.35);
+}
+
+.step.completed .circle {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: #ffffff;
+}
+
+/* Formulario */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+label {
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #111111;
+    font-weight: 600;
+}
+
+input,
+select,
+textarea {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 9px;
+    color: #000000;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(143, 166, 179, 0.35);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #666666;
+    opacity: 1;
+}
+
+select option {
+    color: #000000;
+    background: #ffffff;
+}
+
+/* Textareas especiales */
+#trabajo_a_realizar {
+    min-height: 70px;
+    resize: vertical;
+    padding: 8px;
+}
+
+#zonas_afectadas {
+    min-height: 150px;
+    resize: vertical;
+    padding: 8px;
+}
+
+/* Botones */
+.buttons-container {
+    background-color: var(--bg-color);
+    min-height: 40px;
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.btn {
+    padding: 12px 25px;
+    border-radius: 4px;
+    border: 1px solid #647681;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    background: linear-gradient(135deg, var(--accent-color), #b7c8d0);
+    color: #000000;
+}
+
+.btn:hover,
+.btn-nav:hover,
+.btn-sinc:hover,
+.btn_generar_excel:hover {
+    background: #f39c12 !important;
+    color: #000000;
+}
+
+/* Utilidades */
+.hidden {
+    display: none !important;
+}
+
+/* Ajuste móvil */
+@media (max-width: 600px) {
+    .form-grid,
+    .form-grid-2,
+    .form-grid-3 {
+        grid-template-columns: 1fr;
     }
 
-    #zonas_afectadas {
-        min-height: 150px; /* Altura para Zonas Afectadas */
-        resize: vertical;
-        padding: 8px;
+    .form-group.full-width {
+        grid-column: span 1;
     }
-        }
-    </style>
+
+    header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-right {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .botones-header {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+</style>
 </head>
 <body>
     <header>
