@@ -24,13 +24,13 @@
         /* Variables globales de diseño */
         :root {
     /* Tema Principal */
-    --bg-color: #0b141d; 
-    --card-color: #14212d; 
-    --accent-color: #003366;
+    --bg-color: #eef3f6; 
+    --card-color: #ffffff; 
+    --accent-color: #8fa6b3;
     --success-color: #27ae60; 
-    --text-color: #ffffff; 
-    --muted-text: #a0aec0;
-    --border-color: #2c3e50;
+    --text-color: #111111; 
+    --muted-text: #374151;
+    --border-color: #111111;
     /* Colores Adicionales */
     --verde-claro: #73F527;
     --verde-menta: #27F59F;
@@ -43,7 +43,7 @@
     --negro: #000000;
     --blanco: #FFFFFF;
 }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f8fbfc 0%, var(--bg-color) 48%, #dce5ea 100%); color: var(--text-color); margin: 0; padding: 0; }
         
         /* Cabecera optimizada con Flexbox */
         header { 
@@ -57,7 +57,7 @@
         .header-left { display: flex; align-items: center; }
         .logo-box { background: #ffffff; padding: 4px 10px; border-radius: 4px; }
         .logo-box img { height: 35px; display: block; }
-        .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: white; }
+        .header-title { flex-grow: 1; text-align: center; font-size: 18px; font-weight: bold; color: #111111; }
         
         .header-right { display: flex; align-items: center; gap: 15px; }
        /* Contenedor que agrupa los botones */
@@ -79,7 +79,10 @@
     cursor: pointer;
     font-size: 14px;
     box-sizing: border-box; /* Importante para que el padding no sume tamaño extra */
+    background: linear-gradient(135deg, var(--accent-color), #b7c8d0);
+    color: #000000;
 }
+
 
         /* Contenedor principal y tarjetas */
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
@@ -101,7 +104,7 @@
         .step.active { color: white; }
         .step .circle { 
             width: 35px; height: 35px; line-height: 35px; margin-bottom: 8px;
-            border: 2px solid var(--border-color); border-radius: 50%; background: var(--bg-color); transition: all 0.3s ease;
+            border: 2px solid var(--border-color); border-radius: 50%; background: #ffffff; transition: all 0.3s ease;
         }
         .step.active .circle { background: var(--accent-color); border-color: var(--accent-color); color: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(0, 51, 102, 0.5); }
         .step.completed .circle { background: var(--success-color); border-color: var(--success-color); color: white; }
@@ -117,7 +120,8 @@
         label { font-size: 13px; margin-bottom: 5px; color: var(--muted-text); font-weight: 500; }
         input, select, textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 9px; color: white; font-size: 14px; width: 100%; box-sizing: border-box;}
         .buttons-container { background-color:var(--bg-color);min-height: 40px; margin-top: 25px; display: flex; justify-content: space-between; }
-        .btn { padding: 12px 25px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .btn { padding: 12px 25px; border-radius: 4px; border: 1px solid #647681; cursor: pointer; font-weight: bold; font-size: 14px; background: linear-gradient(135deg, var(--accent-color), #b7c8d0); color: #000000; }
+        .btn:hover, .btn-nav:hover, .btn-sinc:hover, .btn_generar_excel:hover { background: #f39c12 !important; color: #000000; }
         
         .hidden { display: none !important; }
           .form-grid-3 {
@@ -158,15 +162,15 @@
         <div class="header-right">
             <div style="font-size: 11px; text-align: right; margin-right: 10px;">
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
-                    <span id="lbl-usuario" style="color:white; font-weight:bold;"></span>
+                    <span id="lbl-usuario" style="color:#111111; font-weight:bold;"></span>
                     <i class="material-icons" style="font-size: 14px;">person</i></div>
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
-                    <span id="lbl-sector" style="color:#3498db;"></span>
+                    <span id="lbl-sector" style="color:#374151;"></span>
                     <i class="material-icons" style="font-size: 14px;">location_on</i>
                 </div>
             </div>
            <div class="botones-header">
-    <button class="btn-nav" onclick="window.location.href='dashboard.html'">
+    <button class="btn-nav" onclick="salirAlPanel()">
         <i class="material-icons" style="font-size: 14px;">arrow_back</i> Panel
     </button>
     
@@ -195,7 +199,7 @@
             <div class="form-grid-3">   
                     <div class="form-group">
                         <label>1. ID Solicitud</label>
-                        <input type="text" id="id_solicitud" readonly style="background: #2c3e50; font-weight:bold;">
+                        <input type="text" id="id_solicitud" readonly style="background: #e5e7eb; font-weight:bold;">
                     </div>
                     <div class="form-group">
                         <label>2. Número de Despeje</label>
@@ -222,7 +226,7 @@
                          </div>
                     <div class="form-group">
                         <label>6.Subestación</label>
-                        <input type="text" id="subestacion" readonly style="background: #2c3e50;">
+                        <input type="text" id="subestacion" readonly style="background: #e5e7eb;">
                     </div>
           </div>
         <div class="form-group">
@@ -266,7 +270,7 @@
         </div>
         <div class="form-group">
             <label>15. Día de la Semana</label>
-            <input type="text" id="dia_de_semana" readonly style="background: #2c3e50;">
+            <input type="text" id="dia_de_semana" readonly style="background: #e5e7eb;">
         </div>
           </div>
          <div class="form-grid-3">  
@@ -280,7 +284,7 @@
         </div>
         <div class="form-group">
             <label>18. Tiempo Necesario</label>
-            <input type="text" id="tiempo_necesario" readonly style="background: #2c3e50;">
+            <input type="text" id="tiempo_necesario" readonly style="background: #e5e7eb;">
         </div>
    </div>
 </div>
@@ -352,7 +356,7 @@
                         <div class="form-group full-width"><label>37. Justificación</label><textarea id="justificacion" oninput="this.value = this.value.toUpperCase()"></textarea></div>
                         <div class="form-group full-width"><label>38. Observaciones</label><textarea id="observaciones" oninput="this.value = this.value.toUpperCase()"></textarea></div>
                         <div class="form-group"><label>39. Solicitado Por</label><select id="solicitado_por" onchange="alSeleccionarIngeniero(this.value)"><option value="">Seleccione...</option></select></div>
-                        <div class="form-group"><label>40. Cargo del Solicitante</label><input type="text" id="cargo_del_solicitante" readonly style="background: #2c3e50;"></div>
+                        <div class="form-group"><label>40. Cargo del Solicitante</label><input type="text" id="cargo_del_solicitante" readonly style="background: #e5e7eb;"></div>
                         <div class="form-group"><label>41. Aprobado Por</label><select id="aprobado_por"><option value="">Seleccione...</option></select></div>
                     </div>
                 </div>
@@ -373,11 +377,14 @@
         const sectorSesion = sessionStorage.getItem("sector") || "No asignado";
         let currentStep = 1; 
         const totalSteps = 4;
+        let formularioModificado = false;
+        let guardadoCorrecto = false;
         // --- INICIALIZACIÓN (CORREGIDA) ---
         window.onload = async function() {
     // 1. Mostrar usuario y sector en la cabecera
     document.getElementById('lbl-usuario').innerText = usuarioSesion;
     document.getElementById('lbl-sector').innerText = sectorSesion;
+    activarProteccionSalida();
     
     // 2. Ejecutar la descarga de datos al iniciar la página
     // Es recomendable usar 'await' para asegurar que los catálogos carguen antes de llenar los datos
@@ -475,6 +482,29 @@
             return el.value;
         }
 
+        function activarProteccionSalida() {
+            const form = document.getElementById('mainForm');
+            if (form) {
+                form.addEventListener('input', () => { formularioModificado = true; });
+                form.addEventListener('change', () => { formularioModificado = true; });
+            }
+
+            window.addEventListener('beforeunload', function(e) {
+                if (formularioModificado && !guardadoCorrecto) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+        }
+
+        function salirAlPanel() {
+            if (formularioModificado && !guardadoCorrecto) {
+                const confirmar = confirm('Hay cambios que podrían no estar guardados. ¿Deseas salir de todos modos?');
+                if (!confirmar) return;
+            }
+            window.location.href = 'dashboard.html';
+        }
+
         // --- NAVEGACIÓN ---
         function cambiar(paso) {
             let newStep = currentStep + paso;
@@ -530,7 +560,25 @@
                         }
                     };
                     const formatFecha = (iso) => (iso && iso.length >= 10 ? iso.substring(0, 10) : iso);
-                    const formatHora = (iso) => (iso && iso.includes('T') ? iso.split('T')[1].substring(0, 5) : iso);
+                    const formatHora = (valor) => {
+                        if (!valor) return "";
+                        let texto = valor.toString().trim();
+                        if (texto.includes('T')) return texto.split('T')[1].substring(0, 5);
+                        if (/^\d{1,2}:\d{2}$/.test(texto)) {
+                            const partes = texto.split(':');
+                            return partes[0].padStart(2, '0') + ':' + partes[1];
+                        }
+                        const ampm = texto.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)$/i);
+                        if (ampm) {
+                            let h = parseInt(ampm[1], 10);
+                            const m = ampm[2];
+                            const mer = ampm[3].toUpperCase();
+                            if (mer === 'PM' && h < 12) h += 12;
+                            if (mer === 'AM' && h === 12) h = 0;
+                            return String(h).padStart(2, '0') + ':' + m;
+                        }
+                        return texto.substring(0, 5);
+                    };
 
                     // Mapeo campo a campo
                     setVal('id_solicitud', fila[0]); 
@@ -587,7 +635,8 @@
                     setVal('cargo_del_solicitante', fila[39]); 
                     setVal('aprobado_por', fila[40]);
 
-                    setTimeout(dispararEventosAutocompletado, 500); 
+                    setTimeout(dispararEventosAutocompletado, 500);
+                    formularioModificado = false; 
                 }
             } catch (error) { console.error("Error:", error); }
         }
@@ -819,6 +868,8 @@
         const res = await response.json(); 
         
         if (res.status === "ÉXITO") {
+            guardadoCorrecto = true;
+            formularioModificado = false;
             alert("¡Solicitud registrada con éxito!");
             // Corregido: Redirección uniforme hacia el dashboard
             window.location.href = "dashboard.html"; 
