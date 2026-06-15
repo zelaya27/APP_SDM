@@ -110,9 +110,28 @@
         
         /* Botones dentro de la tabla (Acciones) */
         .btn-accion {
-            height: 38px; padding: 0 12px; border: none; border-radius: 4px;
-            cursor: pointer; color: white; font-size: 11px;
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin: 0 2px;
+            height: 30px;
+            min-width: 34px;
+            padding: 0 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin: 0 1px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+        .btn-icon-only {
+            width: 32px;
+            min-width: 32px;
+            padding: 0;
+            font-size: 13px;
         }
          .btn-mecep { background-color: #8e44ad; } .btn-mecep:hover { background: #f39c12; }
         .btn-form { background-color: #3498db; } .btn-form:hover { background: #f39c12; }
@@ -120,14 +139,20 @@
         .btn-retornar { background-color: #B00000; }  .btn-retornar:hover { background: #f39c12; }
         .btn-descargar { background-color: #2c3e50; } .btn-descargar:hover { background: #f39c12; }
         .btn-eliminar { background-color: #e91e63; } .btn-eliminar:hover { background: #f39c12; color:#000000; }
-        .acciones-td { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 4px; }
-        .estado-select { padding: 6px 8px; border-radius: 999px; border: 1px solid var(--soft-border); font-weight: 800; font-size: 12px; color: #111111; background: #ffffff; }
+        .acciones-td { display: flex; justify-content: center; align-items: center; flex-wrap: nowrap; gap: 3px; min-width: 355px; }
+        .estado-select { padding: 4px 6px; border-radius: 999px; border: 1px solid var(--soft-border); font-weight: 800; font-size: 10px; color: #111111; background: #ffffff; max-width: 104px; }
         .estado-programado { background: #dbeafe; border-color: #60a5fa; color: #1d4ed8; }
         .estado-ejecutado { background: #dcfce7; border-color: #22c55e; color: #166534; }
         .estado-cancelado { background: #fce7f3; border-color: #f472b6; color: #be185d; }
         .fila-bloqueada { background: #f8fafc; }
         .fila-bloqueada td { color: #64748b; }
         .accion-bloqueada { opacity: .45; pointer-events: none; filter: grayscale(1); }
+        .estado-cargando { opacity: .65; cursor: wait; }
+        @media (max-width: 1100px) {
+            .acciones-td { min-width: 320px; }
+            .btn-accion { height: 28px; padding: 0 6px; font-size: 9px; }
+            .btn-icon-only { width: 30px; min-width: 30px; padding: 0; }
+        }
     </style>
 </head>
 <body>
@@ -452,23 +477,23 @@ function procesarYMostrarDatos(data) {
                         </select>
                     </td>
                     <td class="acciones-td">
-                        <button class="btn-accion btn-mecep ${claseBloqueo}" onclick="abrirAccion('mecep', '${fila.id}')">
-                            <i class="fas fa-clipboard-list"></i> Mecep
+                        <button class="btn-accion btn-mecep ${claseBloqueo}" onclick="abrirAccion('mecep', '${fila.id}', this)" title="MECEP">
+                            <i class="fas fa-clipboard-list"></i> MECEP
                         </button>
-                        <button class="btn-accion btn-form ${claseBloqueo}" onclick="abrirAccion('formulario', '${fila.id}')">
+                        <button class="btn-accion btn-form ${claseBloqueo}" onclick="abrirAccion('formulario', '${fila.id}', this)" title="Solicitud">
                             <i class="fas fa-file-alt"></i> Solicitud
                         </button>
-                        <button class="btn-accion btn-retirar ${claseBloqueo}" onclick="abrirAccion('retirar', '${fila.id}')">
-                            <i class="fas fa-arrow-circle-down"></i> M. Retirar
+                        <button class="btn-accion btn-retirar ${claseBloqueo}" onclick="abrirAccion('retirar', '${fila.id}', this)" title="Retirar">
+                            <i class="fas fa-arrow-circle-down"></i> Retirar
                         </button>
-                        <button class="btn-accion btn-retornar ${claseBloqueo}" onclick="abrirAccion('retornar', '${fila.id}')">
-                            <i class="fas fa-arrow-circle-up"></i> M. Retornar
+                        <button class="btn-accion btn-retornar ${claseBloqueo}" onclick="abrirAccion('retornar', '${fila.id}', this)" title="Retornar">
+                            <i class="fas fa-arrow-circle-up"></i> Retornar
                         </button>
-                        <button class="btn-accion btn-descargar" onclick="descargarExcelSolicitud(this, '${fila.id}')">
-                            <i class="fas fa-file-excel"></i> Excel
+                        <button class="btn-accion btn-descargar btn-icon-only" onclick="descargarExcelSolicitud(this, '${fila.id}')" title="Exportar Excel">
+                            <i class="fas fa-file-excel"></i>
                         </button>
-                        <button class="btn-accion btn-eliminar ${claseBloqueo}" onclick="eliminarSolicitud(this, '${fila.id}')">
-                            <i class="fas fa-trash-alt"></i> Eliminar
+                        <button class="btn-accion btn-eliminar btn-icon-only ${claseBloqueo}" onclick="eliminarSolicitud(this, '${fila.id}')" title="Eliminar">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
                 `;
@@ -539,6 +564,7 @@ function procesarYMostrarDatos(data) {
 
             try {
                 select.disabled = true;
+                select.classList.add('estado-cargando');
                 const response = await fetch(URL_APPS_SCRIPT, {
                     method: 'POST',
                     mode: 'cors',
@@ -563,6 +589,7 @@ function procesarYMostrarDatos(data) {
                 alert("Error al actualizar estado: " + error.message);
                 select.value = estadoAnterior;
                 select.disabled = false;
+                select.classList.remove('estado-cargando');
             }
         }
 
@@ -570,14 +597,14 @@ function procesarYMostrarDatos(data) {
             if (!confirm("¿Deseas eliminar este registro? ¿Estás seguro?")) return;
 
             const confirmacion = prompt("Para eliminar definitivamente escribe la palabra ELIMINAR");
-            if (confirmacion !== "ELIMINAR") {
+            if (!confirmacion || confirmacion.toString().trim().toUpperCase() !== "ELIMINAR") {
                 alert("Eliminación cancelada. No se escribió ELIMINAR correctamente.");
                 return;
             }
 
             const textoOriginal = boton.innerHTML;
             boton.disabled = true;
-            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
                 const response = await fetch(URL_APPS_SCRIPT, {
@@ -587,7 +614,8 @@ function procesarYMostrarDatos(data) {
                         action: 'eliminarSolicitudCompleta',
                         idSolicitud: idSolicitud,
                         usuario: usuarioSesion,
-                        sector: sectorSesion
+                        sector: sectorSesion,
+                        confirmacion: 'ELIMINAR'
                     })
                 });
 
@@ -616,7 +644,15 @@ function procesarYMostrarDatos(data) {
             renderizarTabla();
         }
 
-        function abrirAccion(accion, idSolicitud) {
+        function mostrarSpinnerBoton(boton) {
+            if (!boton) return;
+            boton.dataset.textoOriginal = boton.innerHTML;
+            boton.disabled = true;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+
+        function abrirAccion(accion, idSolicitud, boton) {
+            mostrarSpinnerBoton(boton);
             if (accion === 'editar' || accion === 'formulario') {
                 window.location.href = `app.html?id=${idSolicitud}&modo=${accion}`;
             } else if (accion === 'retirar') {
@@ -685,7 +721,7 @@ async function exportarConsultaMecep(boton) {
         async function descargarExcelSolicitud(boton, idSolicitud) {
             const textoOriginal = boton.innerHTML;
             boton.disabled = true;
-            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
                 const resData = await fetch(`${URL_APPS_SCRIPT}?action=getSolicitud&id=${idSolicitud}`);
