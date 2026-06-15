@@ -21,104 +21,150 @@
 </script>
 
     <style>
-        /* 1. PALETA DE COLORES PRINCIPAL */
         :root {
-            --bg-color: #eef3f6;
+            --bg-color: #f3f6fb;
             --card-color: #ffffff;
-            --accent-color: #8fa6b3;
-            --accent-hover: #f39c12;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --info-color: #3498db;
-            --text-color: #111111;
-            --muted-text: #374151;
-            --border-color: #111111;
-            --soft-border: #9ca3af;
+            --accent-color: #2563eb;
+            --accent-soft: #dbeafe;
+            --accent-hover: #1d4ed8;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --cancel-color: #ec4899;
+            --info-color: #0ea5e9;
+            --text-color: #111827;
+            --muted-text: #64748b;
+            --border-color: #d6dde8;
+            --soft-border: #e5e7eb;
+            --shadow-sm: 0 4px 14px rgba(15, 23, 42, .08);
+            --shadow-md: 0 14px 35px rgba(15, 23, 42, .12);
         }
 
-        /* 2. DISEÑO GENERAL DE LA PÁGINA */
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: linear-gradient(135deg, #f8fbfc 0%, var(--bg-color) 48%, #dce5ea 100%); 
-            color: var(--text-color); 
-            margin: 0; padding: 0; 
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, .12), transparent 32%),
+                linear-gradient(135deg, #f8fbff 0%, var(--bg-color) 52%, #e8eef7 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
-        
-        /* 3. ENCABEZADO (Menú superior) */
-        header { 
-            background-color: var(--card-color); 
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid var(--soft-border); 
+
+        header {
+            background: rgba(255, 255, 255, .88);
+            padding: 12px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            border-bottom: 1px solid rgba(214, 221, 232, .9);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        
-        /* 4. CONTENEDOR PRINCIPAL (La caja central) */
+
+        header img { height: 34px; }
+        .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; color: #334155; font-weight: 700; font-size: 13px; }
+        .info-item { background: #f8fafc; border: 1px solid var(--soft-border); padding: 7px 10px; border-radius: 999px; }
+
         .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 20px;
-            background: var(--card-color);
-            border-radius: 8px;
-            box-shadow: 0 8px 25px rgba(15,23,42,0.14);
+            max-width: 1500px;
+            margin: 24px auto;
+            padding: 18px;
+            background: rgba(255, 255, 255, .86);
+            border: 1px solid rgba(214, 221, 232, .9);
+            border-radius: 22px;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
         }
 
-        /* 5. ZONA DE FILTROS */
         .header-panel {
-            display: flex; justify-content: space-between; 
-            align-items: center; gap: 15px; flex-wrap: wrap; 
-            margin-bottom: 20px; border-bottom: 1px solid var(--soft-border);
-            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            padding: 14px;
+            background: #ffffff;
+            border: 1px solid var(--soft-border);
+            border-radius: 18px;
+            box-shadow: var(--shadow-sm);
         }
-        .filtros-contenedor { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .filtros-grupo { display: flex; align-items: center; gap: 8px; color: white; }
-        .filtros-grupo label { margin: 0; font-weight: 600; font-size: 13px; color: var(--muted-text); }
+
+        .acciones-superiores { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+        .filtros-contenedor { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .filtros-grupo { display: flex; align-items: center; gap: 7px; }
+        .filtros-grupo label { margin: 0; font-weight: 800; font-size: 12px; color: var(--muted-text); }
+
         .input-filtro {
-            padding: 6px 10px; border-radius: 5px; 
-            background: #ffffff; color: #111111; 
-            border: 1px solid var(--soft-border); 
-            cursor: pointer; font-size: 13px; outline: none; color-scheme: dark; 
+            min-height: 34px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 12px;
+            outline: none;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
         }
+        .input-filtro:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(37, 99, 235, .13); }
 
-        /* 6. ESTILOS DE TABLA */
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #ffffff; color: #111111; }
-        th, td { padding: 12px 15px; text-align: left; border: 1px solid #111111; color: #111111; }
-        th { background-color: var(--accent-color); color: #000000; font-weight: 800; }
-        tr:hover { background-color: #fff3cd; } 
+        .table-responsive { overflow-x: auto; border-radius: 16px; border: 1px solid var(--soft-border); background: #ffffff; box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 0; background: #ffffff; color: var(--text-color); }
+        th, td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--soft-border); color: var(--text-color); font-size: 13px; }
+        th { background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%); color: #0f172a; font-weight: 900; border-bottom: 1px solid #cbd5e1; white-space: nowrap; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f8fbff; }
 
-        /* 7. ESTILOS DE BOTONES */
-        .btn-limpiar { background: #e5e7eb; color: #111111; border: 1px solid var(--soft-border); padding: 6px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .btn-limpiar:hover { background: var(--danger-color); border-color: var(--danger-color); color: white; }
-        
-        .acciones-superiores { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .btn-top, .btn-limpiar, .btn-Sinc, .btn-logout, .btn-volver-tabla {
+            border-radius: 12px;
+            transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+        }
+        .btn-top:hover, .btn-limpiar:hover, .btn-Sinc:hover, .btn-logout:hover, .btn-volver-tabla:hover, .btn-accion:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15,23,42,.14); }
+
+        .btn-limpiar { background: #f8fafc; color: #334155; border: 1px solid var(--border-color); padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 800; }
+        .btn-limpiar:hover { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+
         .btn-top {
-            width: 170px; height: 42px; padding: 0 12px; border: 1px solid #647681; border-radius: 6px;
-            font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            cursor: pointer; text-decoration: none; box-sizing: border-box; transition: .2s ease; color: #000000;
+            min-width: 150px;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--border-color);
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #0f172a;
+            background: #ffffff;
         }
-        .btn-nueva { background: #27ae60; color: white; }
-        .btn-duplicar, .btn-avisos { background: linear-gradient(135deg, var(--accent-color) 0%, #b7c8d0 100%); }
-        .btn-top:hover, .btn-nueva:hover, .btn-duplicar:hover, .btn-avisos:hover { background: #f39c12; color: #000000; }
-        .btn-logout { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
-        .btn-logout:hover { background: #f39c12; color: #000000; }
-        .btn-Sinc { background-color:var(--accent-color);color: #000000; border: 1px solid #647681; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: 700; }
-        .btn-Sinc:hover { background: #f39c12; }
-        
-        /* Botones dentro de la tabla (Acciones) */
+        .btn-nueva { background: linear-gradient(135deg, #16a34a, #22c55e); color: #ffffff; border-color: #16a34a; }
+        .btn-dashboard { background: linear-gradient(135deg, #2563eb, #60a5fa); color: #ffffff; border-color: #2563eb; }
+        .btn-duplicar, .btn-avisos { background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); }
+        .btn-top:hover, .btn-nueva:hover, .btn-duplicar:hover, .btn-avisos:hover, .btn-dashboard:hover { background: #f59e0b; color: #111827; border-color: #f59e0b; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 13px; cursor: pointer; font-weight: 800; }
+        .btn-Sinc { background: #ffffff; color: #0f172a; border: 1px solid var(--border-color); padding: 8px 13px; cursor: pointer; font-weight: 800; }
+        .btn-Sinc:hover { background: #f59e0b; border-color: #f59e0b; }
+
         .btn-accion {
-            height: 30px;
+            height: 29px;
             min-width: 34px;
             padding: 0 8px;
             border: none;
-            border-radius: 5px;
+            border-radius: 9px;
             cursor: pointer;
             color: white;
             font-size: 10px;
-            font-weight: 800;
+            font-weight: 900;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -126,62 +172,89 @@
             margin: 0 1px;
             white-space: nowrap;
             line-height: 1;
+            transition: .15s ease;
         }
-        .btn-icon-only {
-            width: 32px;
-            min-width: 32px;
-            padding: 0;
-            font-size: 13px;
+        .btn-icon-only { width: 31px; min-width: 31px; padding: 0; font-size: 13px; }
+        .btn-mecep { background: #7c3aed; }
+        .btn-form { background: #2563eb; }
+        .btn-retirar { background: #16a34a; }
+        .btn-retornar { background: #dc2626; }
+        .btn-descargar { background: #334155; }
+        .btn-eliminar { background: var(--cancel-color); }
+        .btn-accion:hover { background: #f59e0b !important; color: #111827; }
+        .acciones-td { display: flex; justify-content: center; align-items: center; flex-wrap: nowrap; gap: 3px; min-width: 340px; }
+
+        .estado-select {
+            padding: 3px 6px;
+            border-radius: 999px;
+            border: 1px solid var(--soft-border);
+            font-weight: 900;
+            font-size: 9px;
+            color: var(--text-color);
+            background: #ffffff;
+            max-width: 100px;
+            text-align: center;
         }
-         .btn-mecep { background-color: #8e44ad; } .btn-mecep:hover { background: #f39c12; }
-        .btn-form { background-color: #3498db; } .btn-form:hover { background: #f39c12; }
-        .btn-retirar { background-color: #27ae60; } .btn-retirar:hover { background: #f39c12; }
-        .btn-retornar { background-color: #B00000; }  .btn-retornar:hover { background: #f39c12; }
-        .btn-descargar { background-color: #2c3e50; } .btn-descargar:hover { background: #f39c12; }
-        .btn-eliminar { background-color: #e91e63; } .btn-eliminar:hover { background: #f39c12; color:#000000; }
-        .acciones-td { display: flex; justify-content: center; align-items: center; flex-wrap: nowrap; gap: 3px; min-width: 355px; }
-        .estado-select { padding: 4px 6px; border-radius: 999px; border: 1px solid var(--soft-border); font-weight: 800; font-size: 10px; color: #111111; background: #ffffff; max-width: 104px; }
-        .estado-programado { background: #dbeafe; border-color: #60a5fa; color: #1d4ed8; }
-        .estado-ejecutado { background: #dcfce7; border-color: #22c55e; color: #166534; }
-        .estado-cancelado { background: #fce7f3; border-color: #f472b6; color: #be185d; }
+        .estado-programado { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+        .estado-ejecutado { background: #dcfce7; border-color: #86efac; color: #166534; }
+        .estado-cancelado { background: #fce7f3; border-color: #f9a8d4; color: #be185d; }
         .fila-bloqueada { background: #f8fafc; }
         .fila-bloqueada td { color: #64748b; }
-        .accion-bloqueada { opacity: .45; pointer-events: none; filter: grayscale(1); }
+        .accion-bloqueada { opacity: .38; pointer-events: none; filter: grayscale(1); }
         .estado-cargando { opacity: .65; cursor: wait; }
 
-        /* DASHBOARD GRÁFICO OCULTO */
         .vista-oculta { display: none !important; }
-        .dashboard-resumen { margin-top: 18px; }
-        .dashboard-header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
-        .dashboard-title { font-size:20px; font-weight:900; color:#111827; display:flex; align-items:center; gap:8px; }
-        .btn-dashboard { background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%); color:#ffffff; }
-        .btn-dashboard:hover { background:#f39c12; color:#000000; }
-        .btn-volver-tabla { background:#111827; color:#ffffff; border:1px solid #111827; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:800; display:inline-flex; align-items:center; gap:7px; }
-        .btn-volver-tabla:hover { background:#f39c12; color:#000000; }
+        .dashboard-resumen { margin-top: 6px; }
+        .dashboard-header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; padding:14px; background:#ffffff; border:1px solid var(--soft-border); border-radius:18px; box-shadow:var(--shadow-sm); }
+        .dashboard-title { font-size:20px; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:8px; }
+        .btn-volver-tabla { background:#0f172a; color:#ffffff; border:1px solid #0f172a; padding:9px 14px; cursor:pointer; font-weight:900; display:inline-flex; align-items:center; gap:7px; }
+        .btn-volver-tabla:hover { background:#f59e0b; color:#111827; border-color:#f59e0b; }
         .kpi-grid { display:grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap:12px; margin-bottom:18px; }
-        .kpi-card { background:#ffffff; border:1px solid #d1d5db; border-radius:14px; padding:14px; box-shadow:0 8px 22px rgba(15,23,42,.08); }
-        .kpi-label { color:#64748b; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
-        .kpi-value { color:#111827; font-size:28px; font-weight:900; margin-top:6px; }
-        .grafico-card { background:#ffffff; border:1px solid #d1d5db; border-radius:16px; padding:18px; box-shadow:0 8px 22px rgba(15,23,42,.08); margin-bottom:18px; }
-        .grafico-titulo { font-weight:900; color:#111827; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .kpi-card { background:#ffffff; border:1px solid var(--soft-border); border-radius:18px; padding:16px; box-shadow:var(--shadow-sm); }
+        .kpi-label { color:#64748b; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.04em; }
+        .kpi-value { color:#0f172a; font-size:30px; font-weight:900; margin-top:6px; }
+        .grafico-card { background:#ffffff; border:1px solid var(--soft-border); border-radius:20px; padding:18px; box-shadow:var(--shadow-sm); margin-bottom:18px; }
+        .grafico-titulo { font-weight:900; color:#0f172a; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
         .bar-row { display:grid; grid-template-columns: 110px 1fr 52px 1fr 52px; align-items:center; gap:8px; margin:10px 0; font-size:12px; }
-        .bar-label { font-weight:900; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .bar-label { font-weight:900; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .bar-track { height:18px; background:#e5e7eb; border-radius:999px; overflow:hidden; border:1px solid #d1d5db; }
         .bar-fill-solicitud { height:100%; background:#2563eb; border-radius:999px; min-width:2px; }
-        .bar-fill-apego { height:100%; background:#8e44ad; border-radius:999px; min-width:2px; }
-        .bar-num { font-weight:900; color:#111827; text-align:right; }
-        .legend-dashboard { display:flex; gap:14px; flex-wrap:wrap; color:#374151; font-size:12px; font-weight:800; margin-bottom:10px; }
+        .bar-fill-apego { height:100%; background:#7c3aed; border-radius:999px; min-width:2px; }
+        .bar-num { font-weight:900; color:#0f172a; text-align:right; }
+        .legend-dashboard { display:flex; gap:14px; flex-wrap:wrap; color:#475569; font-size:12px; font-weight:900; margin-bottom:10px; }
         .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:5px; }
         .dot-sol { background:#2563eb; }
-        .dot-ape { background:#8e44ad; }
-        .tabla-resumen { width:100%; border-collapse:collapse; background:#ffffff; }
-        .tabla-resumen th, .tabla-resumen td { border:1px solid #111111; padding:9px 11px; color:#111111; }
-        .tabla-resumen th { background:#8fa6b3; font-weight:900; }
+        .dot-ape { background:#7c3aed; }
+        .tabla-resumen { width:100%; border-collapse:separate; border-spacing:0; background:#ffffff; border:1px solid var(--soft-border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-sm); }
+        .tabla-resumen th, .tabla-resumen td { border-bottom:1px solid var(--soft-border); padding:9px 11px; color:#111827; }
+        .tabla-resumen th { background:#eef4ff; font-weight:900; }
         .tabla-resumen td.num { text-align:center; font-weight:900; }
+
+
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); backdrop-filter: blur(2px); z-index: 90; display:none; }
+        .drawer-overlay.abierto { display:block; }
+        .drawer-dashboards { position: fixed; top: 0; left: -320px; width: 300px; max-width: 86vw; height: 100vh; background: #ffffff; border-right: 1px solid var(--soft-border); box-shadow: 20px 0 50px rgba(15,23,42,.18); z-index: 100; transition: left .22s ease; padding: 18px; box-sizing: border-box; display:flex; flex-direction:column; gap:12px; }
+        .drawer-dashboards.abierto { left: 0; }
+        .drawer-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-bottom:12px; border-bottom:1px solid var(--soft-border); }
+        .drawer-title { font-size:18px; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:8px; }
+        .drawer-close { width:34px; height:34px; border-radius:10px; border:1px solid var(--soft-border); background:#f8fafc; cursor:pointer; color:#334155; }
+        .drawer-close:hover { background:#fee2e2; color:#991b1b; }
+        .drawer-btn { width:100%; min-height:46px; border-radius:14px; border:1px solid var(--soft-border); background:linear-gradient(135deg,#ffffff,#f8fafc); cursor:pointer; display:flex; align-items:center; gap:10px; padding:0 12px; font-weight:900; color:#0f172a; text-align:left; }
+        .drawer-btn:hover { background:#eef4ff; border-color:#bfdbfe; transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+        .drawer-note { margin-top:auto; color:#64748b; font-size:12px; font-weight:700; line-height:1.35; background:#f8fafc; border:1px solid var(--soft-border); border-radius:14px; padding:12px; }
+        .btn-dashboards-menu { background:linear-gradient(135deg,#0f172a,#334155); color:#ffffff; border-color:#0f172a; }
+        .btn-dashboards-menu:hover { background:#f59e0b; color:#111827; border-color:#f59e0b; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fa-spinner, .fa-circle-notch { animation: spin .8s linear infinite; }
+
         @media (max-width: 900px) {
+            header { position: static; align-items: flex-start; flex-direction: column; }
+            .container { margin: 12px; padding: 12px; }
             .kpi-grid { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
             .bar-row { grid-template-columns: 90px 1fr 38px; }
             .bar-row .bar-track.apego-track, .bar-row .apego-num { grid-column:auto; }
+            .btn-top { min-width: 138px; }
         }
 
         @media (max-width: 1100px) {
@@ -199,7 +272,7 @@
                 <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" height="30" alt="Logo UTCD">
             </div>
             <h2 style="margin: 0; color: #111111; font-size: 20px; font-weight: bold;">
-                PANEL PRINCIPAL, MIS SOLICITUDES DE DESPEJES
+                PANEL PRINCIPAL - SOLICITUDES DE MANIOBRAS
             </h2>
         </div>
         
@@ -212,14 +285,32 @@
 </div>
     </header>
 
+    <div id="drawerOverlay" class="drawer-overlay" onclick="cerrarPanelDashboards()"></div>
+    <aside id="drawerDashboards" class="drawer-dashboards" aria-label="Menú de dashboards">
+        <div class="drawer-head">
+            <div class="drawer-title"><i class="fas fa-chart-pie"></i> Dashboards</div>
+            <button type="button" class="drawer-close" onclick="cerrarPanelDashboards()" title="Cerrar"><i class="fas fa-times"></i></button>
+        </div>
+        <button type="button" class="drawer-btn" onclick="mostrarDashboardCircuitos()">
+            <i class="fas fa-chart-column"></i> Por circuito
+        </button>
+        <button type="button" class="drawer-btn" onclick="mostrarDashboardEquipos()">
+            <i class="fas fa-bolt"></i> Por equipo
+        </button>
+        <div class="drawer-note">
+            Los dashboards se muestran solo cuando los abres. La vista normal seguirá siendo la tabla dinámica con acciones.
+        </div>
+    </aside>
+
+
     <div class="container">
         <div class="header-panel">
             <div class="acciones-superiores">
                 <button type="button" class="btn-top btn-nueva" onclick="crearNuevaSolicitud(this)">
                     <i class="fas fa-plus"></i> Nueva Solicitud
                 </button>
-                <button type="button" class="btn-top btn-dashboard" id="btnDashboard" onclick="mostrarDashboardCircuitos()">
-                    <i class="fas fa-chart-bar"></i> Dashboard
+                <button type="button" class="btn-top btn-dashboards-menu" id="btnDashboard" onclick="abrirPanelDashboards()">
+                    <i class="fas fa-bars-staggered"></i> Dashboards
                 </button>
                 <a href="duplicar.html" class="btn-top btn-duplicar"><i class="fas fa-copy"></i> Duplicar Solicitud</a>
                 <button type="button" id="btnAvisos" onclick="exportarAvisos(this)" class="btn-top btn-avisos">
@@ -295,6 +386,40 @@
                         <tr><th>Circuito</th><th>Solicitudes</th><th>Apegos</th><th>Total</th></tr>
                     </thead>
                     <tbody id="tablaResumenCircuitos"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="dashboardEquipos" class="dashboard-resumen vista-oculta">
+            <div class="dashboard-header">
+                <div class="dashboard-title"><i class="fas fa-bolt"></i> Dashboard por equipo</div>
+                <button type="button" class="btn-volver-tabla" onclick="mostrarTablaPrincipal()">
+                    <i class="fas fa-arrow-left"></i> Volver a tabla
+                </button>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card"><div class="kpi-label">Solicitudes</div><div class="kpi-value" id="kpiSolicitudesEquipo">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Apegos</div><div class="kpi-value" id="kpiApegosEquipo">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value" id="kpiTotalEquipo">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Equipos</div><div class="kpi-value" id="kpiEquipos">0</div></div>
+            </div>
+
+            <div class="grafico-card">
+                <div class="grafico-titulo"><i class="fas fa-signal"></i> Solicitudes y apegos por interruptor/restaurador</div>
+                <div class="legend-dashboard">
+                    <span><i class="legend-dot dot-sol"></i> Solicitudes</span>
+                    <span><i class="legend-dot dot-ape"></i> Apegos</span>
+                </div>
+                <div id="graficoBarrasEquipos"></div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="tabla-resumen">
+                    <thead>
+                        <tr><th>Equipo</th><th>Tipo</th><th>Solicitudes</th><th>Apegos</th><th>Total</th></tr>
+                    </thead>
+                    <tbody id="tablaResumenEquipos"></tbody>
                 </table>
             </div>
         </div>
@@ -477,14 +602,35 @@ function procesarYMostrarDatos(data) {
             });
         }
 
+        function abrirPanelDashboards() {
+            document.getElementById('drawerOverlay').classList.add('abierto');
+            document.getElementById('drawerDashboards').classList.add('abierto');
+        }
+
+        function cerrarPanelDashboards() {
+            document.getElementById('drawerOverlay').classList.remove('abierto');
+            document.getElementById('drawerDashboards').classList.remove('abierto');
+        }
+
         function mostrarDashboardCircuitos() {
+            cerrarPanelDashboards();
             document.getElementById('vistaTablaPrincipal').classList.add('vista-oculta');
+            document.getElementById('dashboardEquipos').classList.add('vista-oculta');
             document.getElementById('dashboardCircuitos').classList.remove('vista-oculta');
             renderizarDashboardCircuitos();
         }
 
+        function mostrarDashboardEquipos() {
+            cerrarPanelDashboards();
+            document.getElementById('vistaTablaPrincipal').classList.add('vista-oculta');
+            document.getElementById('dashboardCircuitos').classList.add('vista-oculta');
+            document.getElementById('dashboardEquipos').classList.remove('vista-oculta');
+            renderizarDashboardEquipos();
+        }
+
         function mostrarTablaPrincipal() {
             document.getElementById('dashboardCircuitos').classList.add('vista-oculta');
+            document.getElementById('dashboardEquipos').classList.add('vista-oculta');
             document.getElementById('vistaTablaPrincipal').classList.remove('vista-oculta');
         }
 
@@ -542,6 +688,71 @@ function procesarYMostrarDatos(data) {
             tabla.innerHTML = filas.map(f => `
                 <tr>
                     <td><strong>${f.circuito}</strong></td>
+                    <td class="num">${f.solicitudes}</td>
+                    <td class="num">${f.apegos}</td>
+                    <td class="num">${f.total}</td>
+                </tr>
+            `).join('');
+        }
+
+
+        function renderizarDashboardEquipos() {
+            const datos = obtenerDatosFiltradosDashboard();
+            const resumen = {};
+
+            function sumarEquipo(nombre, tipo, fila) {
+                const equipo = (nombre || '').toString().trim();
+                if (!equipo) return;
+                const clave = tipo + '|' + equipo;
+                if (!resumen[clave]) resumen[clave] = { equipo, tipo, solicitudes: 0, apegos: 0, total: 0 };
+                if (esX(fila.solicitud)) resumen[clave].solicitudes++;
+                if (esX(fila.apego)) resumen[clave].apegos++;
+                if (esX(fila.solicitud) || esX(fila.apego)) resumen[clave].total++;
+            }
+
+            datos.forEach(fila => {
+                sumarEquipo(fila.interruptor || fila.interruptor_de_circuito || '', 'Interruptor', fila);
+                sumarEquipo(fila.restaurador || '', 'Restaurador', fila);
+            });
+
+            const filas = Object.values(resumen).sort((a, b) => b.total - a.total || a.equipo.localeCompare(b.equipo));
+            const totalSolicitudes = filas.reduce((acc, f) => acc + f.solicitudes, 0);
+            const totalApegos = filas.reduce((acc, f) => acc + f.apegos, 0);
+            const totalGeneral = filas.reduce((acc, f) => acc + f.total, 0);
+            const maxValor = Math.max(1, ...filas.map(f => Math.max(f.solicitudes, f.apegos)));
+
+            document.getElementById('kpiSolicitudesEquipo').innerText = totalSolicitudes;
+            document.getElementById('kpiApegosEquipo').innerText = totalApegos;
+            document.getElementById('kpiTotalEquipo').innerText = totalGeneral;
+            document.getElementById('kpiEquipos').innerText = filas.length;
+
+            const grafico = document.getElementById('graficoBarrasEquipos');
+            const tabla = document.getElementById('tablaResumenEquipos');
+
+            if (filas.length === 0) {
+                grafico.innerHTML = '<div style="text-align:center; color:#64748b; padding:20px; font-weight:800;">No hay equipos para mostrar con los filtros actuales.</div>';
+                tabla.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay datos.</td></tr>';
+                return;
+            }
+
+            grafico.innerHTML = filas.map(f => {
+                const wSol = Math.max(2, Math.round((f.solicitudes / maxValor) * 100));
+                const wApe = Math.max(2, Math.round((f.apegos / maxValor) * 100));
+                return `
+                    <div class="bar-row" title="${f.tipo}: ${f.equipo}">
+                        <div class="bar-label">${f.equipo}</div>
+                        <div class="bar-track"><div class="bar-fill-solicitud" style="width:${wSol}%"></div></div>
+                        <div class="bar-num">${f.solicitudes}</div>
+                        <div class="bar-track apego-track"><div class="bar-fill-apego" style="width:${wApe}%"></div></div>
+                        <div class="bar-num apego-num">${f.apegos}</div>
+                    </div>
+                `;
+            }).join('');
+
+            tabla.innerHTML = filas.map(f => `
+                <tr>
+                    <td><strong>${f.equipo}</strong></td>
+                    <td>${f.tipo}</td>
                     <td class="num">${f.solicitudes}</td>
                     <td class="num">${f.apegos}</td>
                     <td class="num">${f.total}</td>
@@ -662,10 +873,10 @@ function procesarYMostrarDatos(data) {
                 tbody.appendChild(tr);
             });
 
-            const dash = document.getElementById('dashboardCircuitos');
-            if (dash && !dash.classList.contains('vista-oculta')) {
-                renderizarDashboardCircuitos();
-            }
+            const dashCircuitos = document.getElementById('dashboardCircuitos');
+            const dashEquipos = document.getElementById('dashboardEquipos');
+            if (dashCircuitos && !dashCircuitos.classList.contains('vista-oculta')) renderizarDashboardCircuitos();
+            if (dashEquipos && !dashEquipos.classList.contains('vista-oculta')) renderizarDashboardEquipos();
         }
 
         // --- FUNCION CREAR SOLICITUD RAPIDA (CAMBIO 1) ---
