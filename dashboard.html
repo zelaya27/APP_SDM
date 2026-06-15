@@ -148,6 +148,42 @@
         .fila-bloqueada td { color: #64748b; }
         .accion-bloqueada { opacity: .45; pointer-events: none; filter: grayscale(1); }
         .estado-cargando { opacity: .65; cursor: wait; }
+
+        /* DASHBOARD GRÁFICO OCULTO */
+        .vista-oculta { display: none !important; }
+        .dashboard-resumen { margin-top: 18px; }
+        .dashboard-header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+        .dashboard-title { font-size:20px; font-weight:900; color:#111827; display:flex; align-items:center; gap:8px; }
+        .btn-dashboard { background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%); color:#ffffff; }
+        .btn-dashboard:hover { background:#f39c12; color:#000000; }
+        .btn-volver-tabla { background:#111827; color:#ffffff; border:1px solid #111827; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:800; display:inline-flex; align-items:center; gap:7px; }
+        .btn-volver-tabla:hover { background:#f39c12; color:#000000; }
+        .kpi-grid { display:grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap:12px; margin-bottom:18px; }
+        .kpi-card { background:#ffffff; border:1px solid #d1d5db; border-radius:14px; padding:14px; box-shadow:0 8px 22px rgba(15,23,42,.08); }
+        .kpi-label { color:#64748b; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+        .kpi-value { color:#111827; font-size:28px; font-weight:900; margin-top:6px; }
+        .grafico-card { background:#ffffff; border:1px solid #d1d5db; border-radius:16px; padding:18px; box-shadow:0 8px 22px rgba(15,23,42,.08); margin-bottom:18px; }
+        .grafico-titulo { font-weight:900; color:#111827; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .bar-row { display:grid; grid-template-columns: 110px 1fr 52px 1fr 52px; align-items:center; gap:8px; margin:10px 0; font-size:12px; }
+        .bar-label { font-weight:900; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .bar-track { height:18px; background:#e5e7eb; border-radius:999px; overflow:hidden; border:1px solid #d1d5db; }
+        .bar-fill-solicitud { height:100%; background:#2563eb; border-radius:999px; min-width:2px; }
+        .bar-fill-apego { height:100%; background:#8e44ad; border-radius:999px; min-width:2px; }
+        .bar-num { font-weight:900; color:#111827; text-align:right; }
+        .legend-dashboard { display:flex; gap:14px; flex-wrap:wrap; color:#374151; font-size:12px; font-weight:800; margin-bottom:10px; }
+        .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:5px; }
+        .dot-sol { background:#2563eb; }
+        .dot-ape { background:#8e44ad; }
+        .tabla-resumen { width:100%; border-collapse:collapse; background:#ffffff; }
+        .tabla-resumen th, .tabla-resumen td { border:1px solid #111111; padding:9px 11px; color:#111111; }
+        .tabla-resumen th { background:#8fa6b3; font-weight:900; }
+        .tabla-resumen td.num { text-align:center; font-weight:900; }
+        @media (max-width: 900px) {
+            .kpi-grid { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+            .bar-row { grid-template-columns: 90px 1fr 38px; }
+            .bar-row .bar-track.apego-track, .bar-row .apego-num { grid-column:auto; }
+        }
+
         @media (max-width: 1100px) {
             .acciones-td { min-width: 320px; }
             .btn-accion { height: 28px; padding: 0 6px; font-size: 9px; }
@@ -181,6 +217,9 @@
             <div class="acciones-superiores">
                 <button type="button" class="btn-top btn-nueva" onclick="crearNuevaSolicitud(this)">
                     <i class="fas fa-plus"></i> Nueva Solicitud
+                </button>
+                <button type="button" class="btn-top btn-dashboard" id="btnDashboard" onclick="mostrarDashboardCircuitos()">
+                    <i class="fas fa-chart-bar"></i> Dashboard
                 </button>
                 <a href="duplicar.html" class="btn-top btn-duplicar"><i class="fas fa-copy"></i> Duplicar Solicitud</a>
                 <button type="button" id="btnAvisos" onclick="exportarAvisos(this)" class="btn-top btn-avisos">
@@ -226,7 +265,41 @@
             </div>
         </div>
 
-        <div class="table-responsive">
+        <div id="dashboardCircuitos" class="dashboard-resumen vista-oculta">
+            <div class="dashboard-header">
+                <div class="dashboard-title"><i class="fas fa-chart-column"></i> Dashboard por circuito</div>
+                <button type="button" class="btn-volver-tabla" onclick="mostrarTablaPrincipal()">
+                    <i class="fas fa-arrow-left"></i> Volver a tabla
+                </button>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card"><div class="kpi-label">Solicitudes</div><div class="kpi-value" id="kpiSolicitudes">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Apegos</div><div class="kpi-value" id="kpiApegos">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value" id="kpiTotal">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Circuitos</div><div class="kpi-value" id="kpiCircuitos">0</div></div>
+            </div>
+
+            <div class="grafico-card">
+                <div class="grafico-titulo"><i class="fas fa-signal"></i> Solicitudes y apegos por circuito</div>
+                <div class="legend-dashboard">
+                    <span><i class="legend-dot dot-sol"></i> Solicitudes</span>
+                    <span><i class="legend-dot dot-ape"></i> Apegos</span>
+                </div>
+                <div id="graficoBarrasCircuitos"></div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="tabla-resumen">
+                    <thead>
+                        <tr><th>Circuito</th><th>Solicitudes</th><th>Apegos</th><th>Total</th></tr>
+                    </thead>
+                    <tbody id="tablaResumenCircuitos"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="vistaTablaPrincipal" class="table-responsive">
             <table>
                 <thead>
                     <tr>
@@ -387,6 +460,95 @@ function procesarYMostrarDatos(data) {
         }
 
         // --- FUNCION DIBUJAR TABLA Y ORDENAR (CAMBIO 2) ---
+        function obtenerDatosFiltradosDashboard() {
+            const circuitoBuscado = document.getElementById("filtroCircuito").value;
+            const fechaDesde = document.getElementById("fechaDesde").value;
+            const fechaHasta = document.getElementById("fechaHasta").value;
+            const nombreBuscado = (document.getElementById("filtroNombre")?.value || "").toString().trim().toUpperCase();
+
+            return todosLosDatos.filter(fila => {
+                let fechaFila = fila.fecha_interrupcion || fila.fecha || "";
+                let cumpleCircuito = (circuitoBuscado === "ALL" || fila.circuito === circuitoBuscado);
+                let cumpleDesde = (!fechaDesde || fechaFila >= fechaDesde);
+                let cumpleHasta = (!fechaHasta || fechaFila <= fechaHasta);
+                let nombreFila = (fila.nombre || "").toString().toUpperCase();
+                let cumpleNombre = (!nombreBuscado || nombreFila.includes(nombreBuscado));
+                return cumpleCircuito && cumpleDesde && cumpleHasta && cumpleNombre;
+            });
+        }
+
+        function mostrarDashboardCircuitos() {
+            document.getElementById('vistaTablaPrincipal').classList.add('vista-oculta');
+            document.getElementById('dashboardCircuitos').classList.remove('vista-oculta');
+            renderizarDashboardCircuitos();
+        }
+
+        function mostrarTablaPrincipal() {
+            document.getElementById('dashboardCircuitos').classList.add('vista-oculta');
+            document.getElementById('vistaTablaPrincipal').classList.remove('vista-oculta');
+        }
+
+        function esX(valor) {
+            return valor && valor.toString().trim().toUpperCase() === 'X';
+        }
+
+        function renderizarDashboardCircuitos() {
+            const datos = obtenerDatosFiltradosDashboard();
+            const resumen = {};
+
+            datos.forEach(fila => {
+                const circuito = (fila.circuito || 'SIN CIRCUITO').toString().trim() || 'SIN CIRCUITO';
+                if (!resumen[circuito]) resumen[circuito] = { circuito, solicitudes: 0, apegos: 0, total: 0 };
+
+                if (esX(fila.solicitud)) resumen[circuito].solicitudes++;
+                if (esX(fila.apego)) resumen[circuito].apegos++;
+                if (esX(fila.solicitud) || esX(fila.apego)) resumen[circuito].total++;
+            });
+
+            const filas = Object.values(resumen).sort((a, b) => b.total - a.total || a.circuito.localeCompare(b.circuito));
+            const totalSolicitudes = filas.reduce((acc, f) => acc + f.solicitudes, 0);
+            const totalApegos = filas.reduce((acc, f) => acc + f.apegos, 0);
+            const totalGeneral = filas.reduce((acc, f) => acc + f.total, 0);
+            const maxValor = Math.max(1, ...filas.map(f => Math.max(f.solicitudes, f.apegos)));
+
+            document.getElementById('kpiSolicitudes').innerText = totalSolicitudes;
+            document.getElementById('kpiApegos').innerText = totalApegos;
+            document.getElementById('kpiTotal').innerText = totalGeneral;
+            document.getElementById('kpiCircuitos').innerText = filas.length;
+
+            const grafico = document.getElementById('graficoBarrasCircuitos');
+            const tabla = document.getElementById('tablaResumenCircuitos');
+
+            if (filas.length === 0) {
+                grafico.innerHTML = '<div style="text-align:center; color:#64748b; padding:20px; font-weight:800;">No hay datos para mostrar con los filtros actuales.</div>';
+                tabla.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay datos.</td></tr>';
+                return;
+            }
+
+            grafico.innerHTML = filas.map(f => {
+                const wSol = Math.max(2, Math.round((f.solicitudes / maxValor) * 100));
+                const wApe = Math.max(2, Math.round((f.apegos / maxValor) * 100));
+                return `
+                    <div class="bar-row" title="${f.circuito}">
+                        <div class="bar-label">${f.circuito}</div>
+                        <div class="bar-track"><div class="bar-fill-solicitud" style="width:${wSol}%"></div></div>
+                        <div class="bar-num">${f.solicitudes}</div>
+                        <div class="bar-track apego-track"><div class="bar-fill-apego" style="width:${wApe}%"></div></div>
+                        <div class="bar-num apego-num">${f.apegos}</div>
+                    </div>
+                `;
+            }).join('');
+
+            tabla.innerHTML = filas.map(f => `
+                <tr>
+                    <td><strong>${f.circuito}</strong></td>
+                    <td class="num">${f.solicitudes}</td>
+                    <td class="num">${f.apegos}</td>
+                    <td class="num">${f.total}</td>
+                </tr>
+            `).join('');
+        }
+
         function renderizarTabla() {
             const tbody = document.getElementById("tabla-body");
             tbody.innerHTML = ""; 
@@ -499,6 +661,11 @@ function procesarYMostrarDatos(data) {
                 `;
                 tbody.appendChild(tr);
             });
+
+            const dash = document.getElementById('dashboardCircuitos');
+            if (dash && !dash.classList.contains('vista-oculta')) {
+                renderizarDashboardCircuitos();
+            }
         }
 
         // --- FUNCION CREAR SOLICITUD RAPIDA (CAMBIO 1) ---
@@ -573,7 +740,8 @@ function procesarYMostrarDatos(data) {
                         idSolicitud: idSolicitud,
                         estado: nuevoEstado,
                         usuario: usuarioSesion,
-                        sector: sectorSesion
+                        sector: sectorSesion,
+                        confirmacion: 'ELIMINAR'
                     })
                 });
 
