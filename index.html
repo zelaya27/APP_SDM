@@ -8,151 +8,395 @@
     <script src="config.js"></script>
     <style>
         :root {
-            --bg: #eef3f6;
-            --panel: #ffffff;
-            --tech-blue: #8fa6b3;
-            --tech-blue-dark: #6f8794;
-            --line: #222222;
-            --text: #111111;
-            --muted: #4b5563;
-            --shadow: rgba(15, 23, 42, 0.18);
+            --bg-1: #f7f9fc;
+            --bg-2: #e8eef5;
+            --card: rgba(255,255,255,0.88);
+            --card-solid: #ffffff;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #d7dee8;
+            --danger: #ef4444;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+            --soft-shadow: 0 10px 28px rgba(15, 23, 42, 0.10);
+            --radius-xl: 26px;
+            --radius-lg: 18px;
+            --radius-md: 12px;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background:
-                radial-gradient(circle at top left, rgba(143,166,179,.40), transparent 35%),
-                linear-gradient(135deg, #f8fbfc 0%, var(--bg) 45%, #dce5ea 100%);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 18% 18%, rgba(37,99,235,0.18), transparent 28%),
+                radial-gradient(circle at 82% 12%, rgba(14,165,233,0.16), transparent 30%),
+                radial-gradient(circle at 70% 85%, rgba(100,116,139,0.16), transparent 32%),
+                linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 18px;
-            box-sizing: border-box;
         }
 
-        #login-container {
-            background: rgba(255,255,255,0.92);
-            padding: 22px;
+        .page-shell {
+            width: min(980px, 100%);
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .hero-panel {
+            min-height: 560px;
+            border-radius: var(--radius-xl);
+            padding: 34px;
+            background:
+                linear-gradient(145deg, rgba(37,99,235,0.92), rgba(15,23,42,0.92)),
+                radial-gradient(circle at top right, rgba(255,255,255,0.22), transparent 36%);
+            color: #ffffff;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hero-panel::before {
+            content: '';
+            position: absolute;
+            inset: auto -80px -80px auto;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.13);
+        }
+
+        .hero-panel::after {
+            content: '';
+            position: absolute;
+            top: 36px;
+            right: 36px;
+            width: 96px;
+            height: 96px;
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+            transform: rotate(12deg);
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.20);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-panel h1 {
+            margin: 26px 0 12px;
+            font-size: 42px;
+            line-height: 1.04;
+            letter-spacing: -1.2px;
+        }
+
+        .hero-panel p {
+            margin: 0;
+            color: rgba(255,255,255,0.82);
+            font-size: 15px;
+            line-height: 1.6;
+            max-width: 420px;
+        }
+
+        .hero-stats {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .mini-card {
+            padding: 16px;
             border-radius: 18px;
-            width: 340px;
-            text-align: center;
-            border: 1px solid rgba(0,0,0,.15);
-            box-shadow: 0 18px 45px var(--shadow);
+            background: rgba(255,255,255,0.13);
+            border: 1px solid rgba(255,255,255,0.18);
             backdrop-filter: blur(10px);
         }
 
+        .mini-card i { font-size: 18px; margin-bottom: 10px; }
+        .mini-card strong { display: block; font-size: 14px; }
+        .mini-card span { display: block; font-size: 11px; color: rgba(255,255,255,0.72); margin-top: 3px; }
+
+        .login-card {
+            min-height: 560px;
+            border-radius: var(--radius-xl);
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.75);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
         .logo-box {
-            background: white;
-            padding: 14px;
-            border-radius: 14px;
-            display: inline-block;
-            margin-bottom: 12px;
-            border: 1px solid rgba(0,0,0,.12);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+            width: 118px;
+            height: 96px;
+            border-radius: 22px;
+            background: var(--card-solid);
+            border: 1px solid var(--border);
+            box-shadow: var(--soft-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
         }
 
-        .logo-box img { width: 145px; display: block; }
+        .logo-box img { width: 82px; display: block; }
 
-        h2 {
-            margin: 6px 0 16px;
-            font-size: 18px;
-            letter-spacing: .5px;
-            color: #111;
-        }
+        .login-title { text-align: center; margin-bottom: 24px; }
+        .login-title h2 { margin: 0; font-size: 21px; letter-spacing: -0.2px; }
+        .login-title p { margin: 7px 0 0; font-size: 13px; color: var(--muted); }
+
+        .form-group { margin-bottom: 15px; }
 
         label {
-            display: block;
-            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 7px;
             font-size: 12px;
-            font-weight: 700;
-            color: var(--muted);
-            margin: 12px 0 5px;
+            font-weight: 800;
+            color: #334155;
+            margin-bottom: 7px;
         }
 
-        input, select {
-            font-size: 15px;
+        .field-wrap { position: relative; }
+
+        .field-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        select, input {
             width: 100%;
-            padding: 11px 12px;
-            box-sizing: border-box;
-            border: 1px solid #9aa7af;
-            border-radius: 9px;
-            background: #f9fbfc;
-            color: #111;
+            height: 46px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: rgba(255,255,255,0.96);
+            color: var(--text);
+            padding: 0 42px 0 38px;
+            font-size: 14px;
             outline: none;
+            transition: 0.18s ease;
         }
 
-        input:focus, select:focus {
-            border-color: var(--tech-blue-dark);
-            box-shadow: 0 0 0 3px rgba(143,166,179,.28);
+        select:focus, input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.13);
+            background: #ffffff;
         }
 
-        .password-wrap { position: relative; }
+        select:disabled, input:disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
 
         .eye-btn {
             position: absolute;
-            right: 8px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
+            height: 32px;
+            width: 32px;
             border: none;
-            background: transparent;
-            cursor: pointer;
-            color: #444;
-            padding: 6px;
-        }
-
-        .btn-enviar {
-            background: linear-gradient(135deg, var(--tech-blue) 0%, #b7c8d0 100%);
-            color: #000000;
-            border: 1px solid #647681;
-            padding: 13px;
-            width: 100%;
-            cursor: pointer;
             border-radius: 10px;
-            font-weight: 800;
-            margin-top: 18px;
-            letter-spacing: .5px;
-            transition: .2s ease;
+            background: transparent;
+            color: #475569;
+            cursor: pointer;
+            transition: .18s ease;
         }
 
-        .btn-enviar:hover { background: #f39c12; transform: translateY(-1px); }
-        .btn-enviar:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+        .eye-btn:hover { background: #e2e8f0; color: var(--primary); }
 
-        .ayuda {
-            margin-top: 10px;
+        .status-box {
+            min-height: 38px;
+            margin: 7px 0 14px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            color: var(--muted);
             font-size: 12px;
-            color: #5f6b73;
-            min-height: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-box.success { background: #ecfdf5; border-color: #bbf7d0; color: #166534; }
+        .status-box.warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .status-box.error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
+        .btn-login {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), #0ea5e9);
+            color: #ffffff;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 14px 28px rgba(37,99,235,0.26);
+            transition: 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 34px rgba(37,99,235,0.32);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.70;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.45);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer-note {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 840px) {
+            body { align-items: flex-start; }
+            .page-shell { grid-template-columns: 1fr; }
+            .hero-panel { display: none; }
+            .login-card { min-height: auto; padding: 24px; }
         }
     </style>
 </head>
 <body>
-    <div id="login-container">
-        <div class="logo-box">
-            <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo UTCD">
-        </div>
+    <main class="page-shell">
+        <section class="hero-panel">
+            <div class="hero-content">
+                <div class="hero-badge"><i class="fas fa-bolt"></i> APP_SDM</div>
+                <h1>Solicitud de maniobras</h1>
+                <p>Gestión de despejes, maniobras, avisos y MECEP con control por sector, estado y circuito.</p>
+            </div>
 
-        <h2>SOLICITUD DE MANIOBRAS</h2>
+            <div class="hero-stats">
+                <div class="mini-card">
+                    <i class="fas fa-network-wired"></i>
+                    <strong>Circuitos</strong>
+                    <span>Control operativo</span>
+                </div>
+                <div class="mini-card">
+                    <i class="fas fa-clipboard-check"></i>
+                    <strong>Estados</strong>
+                    <span>Programado / cerrado</span>
+                </div>
+                <div class="mini-card">
+                    <i class="fas fa-chart-column"></i>
+                    <strong>Dashboards</strong>
+                    <span>Resumen ejecutivo</span>
+                </div>
+            </div>
+        </section>
 
-        <label for="sectorInput">Sector</label>
-        <input type="text" id="sectorInput" list="listaSectores" placeholder="Escribe o selecciona sector" autocomplete="off" oninput="filtrarUsuariosPorSector()">
-        <datalist id="listaSectores"></datalist>
+        <section class="login-card">
+            <div class="logo-box">
+                <img src="https://raw.githubusercontent.com/zelaya27/IMAGENES_AZ/main/UTCD%20Vertical.png" alt="Logo UTCD">
+            </div>
 
-        <label for="user">Usuario</label>
-        <input type="text" id="user" list="listaUsuarios" placeholder="Selecciona usuario del sector" autocomplete="off">
-        <datalist id="listaUsuarios"></datalist>
+            <div class="login-title">
+                <h2>Iniciar sesión</h2>
+                <p>Selecciona un sector y usuario validado</p>
+            </div>
 
-        <label for="pass">Contraseña</label>
-        <div class="password-wrap">
-            <input type="password" id="pass" placeholder="Contraseña">
-            <button type="button" class="eye-btn" onclick="togglePassword()"><i class="fas fa-eye"></i></button>
-        </div>
+            <div class="form-group">
+                <label for="sectorSelect"><i class="fas fa-location-dot"></i> Sector</label>
+                <div class="field-wrap">
+                    <i class="fas fa-map-location-dot field-icon"></i>
+                    <select id="sectorSelect" onchange="filtrarUsuariosPorSector()" disabled>
+                        <option value="">Cargando sectores...</option>
+                    </select>
+                </div>
+            </div>
 
-        <button class="btn-enviar" id="btnLogin" onclick="iniciarSesion()">INICIAR SESIÓN</button>
-        <div class="ayuda" id="estadoLogin">Selecciona sector para filtrar usuarios.</div>
-    </div>
+            <div class="form-group">
+                <label for="userSelect"><i class="fas fa-user"></i> Usuario</label>
+                <div class="field-wrap">
+                    <i class="fas fa-user-check field-icon"></i>
+                    <select id="userSelect" disabled>
+                        <option value="">Seleccione primero un sector</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pass"><i class="fas fa-lock"></i> Contraseña</label>
+                <div class="field-wrap">
+                    <i class="fas fa-key field-icon"></i>
+                    <input type="password" id="pass" placeholder="Ingresa tu contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter') iniciarSesion()">
+                    <button type="button" class="eye-btn" onclick="togglePassword()" title="Mostrar / ocultar contraseña">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="status-box" id="estadoLogin">
+                <i class="fas fa-circle-info"></i>
+                <span>Cargando usuarios...</span>
+            </div>
+
+            <button class="btn-login" id="btnLogin" onclick="iniciarSesion()" disabled>
+                <i class="fas fa-right-to-bracket"></i>
+                <span>INICIAR SESIÓN</span>
+            </button>
+
+            <div class="footer-note">APP_SDM · Solicitudes de despejes y maniobras</div>
+        </section>
+    </main>
 
     <script>
         let usuariosLogin = [];
@@ -165,113 +409,157 @@
             return (valor || "").toString().trim().toUpperCase();
         }
 
+        function setEstado(mensaje, tipo = "info", icono = "fa-circle-info") {
+            const box = document.getElementById('estadoLogin');
+            box.className = 'status-box';
+            if (tipo !== 'info') box.classList.add(tipo);
+            box.innerHTML = `<i class="fas ${icono}"></i><span>${mensaje}</span>`;
+        }
+
         function togglePassword() {
             const p = document.getElementById('pass');
-            p.type = p.type === 'password' ? 'text' : 'password';
+            const icon = document.getElementById('eyeIcon');
+            const mostrar = p.type === 'password';
+            p.type = mostrar ? 'text' : 'password';
+            icon.className = mostrar ? 'fas fa-eye-slash' : 'fas fa-eye';
         }
 
         async function cargarUsuariosLogin() {
-            const estado = document.getElementById('estadoLogin');
-            estado.innerText = 'Cargando sectores...';
+            const sectorSelect = document.getElementById('sectorSelect');
+            const userSelect = document.getElementById('userSelect');
+            const btn = document.getElementById('btnLogin');
+
+            sectorSelect.disabled = true;
+            userSelect.disabled = true;
+            btn.disabled = true;
+            setEstado('Cargando sectores y usuarios...', 'info', 'fa-spinner');
 
             try {
-                const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-                const res = await fetch(`${URL_APPS_SCRIPT}?action=getUsuariosLogin&_t=${Date.now()}`);
+                if (typeof CONFIG === 'undefined' || !CONFIG.URL_APPS_SCRIPT) {
+                    throw new Error('No se encontró CONFIG.URL_APPS_SCRIPT');
+                }
+
+                const res = await fetch(`${CONFIG.URL_APPS_SCRIPT}?action=getUsuariosLogin&_t=${Date.now()}`);
                 const data = await res.json();
 
                 if (!data || !Array.isArray(data.usuarios)) {
                     throw new Error(data.error || 'Respuesta inválida del servidor');
                 }
 
-                usuariosLogin = data.usuarios;
+                usuariosLogin = data.usuarios.filter(u => u.usuario && u.sector);
                 poblarSectores();
-                estado.innerText = 'Selecciona sector para filtrar usuarios.';
+
+                sectorSelect.disabled = false;
+                btn.disabled = false;
+                setEstado('Selecciona un sector validado para cargar usuarios.', 'info', 'fa-circle-info');
             } catch (error) {
                 console.error(error);
-                estado.innerText = 'No se pudieron cargar sectores. Aún puedes escribir tu usuario manualmente.';
+                sectorSelect.innerHTML = '<option value="">Error cargando sectores</option>';
+                userSelect.innerHTML = '<option value="">No disponible</option>';
+                setEstado('No se pudieron cargar los usuarios. Revisa conexión o implementación.', 'error', 'fa-triangle-exclamation');
             }
         }
 
         function poblarSectores() {
-            const dl = document.getElementById('listaSectores');
-            dl.innerHTML = '';
+            const sectorSelect = document.getElementById('sectorSelect');
+            sectorSelect.innerHTML = '<option value="">Seleccione sector...</option>';
 
             const sectores = [...new Set(
                 usuariosLogin
                     .map(u => (u.sector || '').toString().trim())
                     .filter(Boolean)
-            )].sort();
+            )].sort((a, b) => a.localeCompare(b));
 
             sectores.forEach(sec => {
                 const opt = document.createElement('option');
                 opt.value = sec;
-                dl.appendChild(opt);
+                opt.textContent = sec;
+                sectorSelect.appendChild(opt);
             });
         }
 
         function filtrarUsuariosPorSector() {
-            const sectorSeleccionado = normalizarTexto(document.getElementById('sectorInput').value);
-            const dl = document.getElementById('listaUsuarios');
-            const userInput = document.getElementById('user');
-            const estado = document.getElementById('estadoLogin');
+            const sectorSeleccionado = document.getElementById('sectorSelect').value;
+            const userSelect = document.getElementById('userSelect');
+            const btn = document.getElementById('btnLogin');
 
-            dl.innerHTML = '';
-            userInput.value = '';
+            userSelect.innerHTML = '';
+            userSelect.disabled = true;
 
             if (!sectorSeleccionado) {
-                estado.innerText = 'Selecciona sector para filtrar usuarios.';
+                userSelect.innerHTML = '<option value="">Seleccione primero un sector</option>';
+                setEstado('Selecciona un sector validado para cargar usuarios.', 'info', 'fa-circle-info');
                 return;
             }
 
-            const usuariosFiltrados = usuariosLogin.filter(u => normalizarTexto(u.sector) === sectorSeleccionado);
+            const usuariosFiltrados = usuariosLogin.filter(u => normalizarTexto(u.sector) === normalizarTexto(sectorSeleccionado));
 
-            usuariosFiltrados.forEach(u => {
-                const opt = document.createElement('option');
-                opt.value = u.usuario;
-                dl.appendChild(opt);
-            });
+            if (usuariosFiltrados.length === 0) {
+                userSelect.innerHTML = '<option value="">No hay usuarios para este sector</option>';
+                setEstado('No hay usuarios registrados para ese sector.', 'warning', 'fa-circle-exclamation');
+                return;
+            }
 
-            estado.innerText = usuariosFiltrados.length
-                ? `${usuariosFiltrados.length} usuario(s) encontrados para el sector.`
-                : 'No hay usuarios para ese sector.';
+            userSelect.innerHTML = '<option value="">Seleccione usuario...</option>';
+            usuariosFiltrados
+                .sort((a, b) => a.usuario.localeCompare(b.usuario))
+                .forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.usuario;
+                    opt.textContent = u.usuario;
+                    userSelect.appendChild(opt);
+                });
+
+            userSelect.disabled = false;
+            btn.disabled = false;
+            setEstado(`${usuariosFiltrados.length} usuario(s) validado(s) para ${sectorSeleccionado}.`, 'success', 'fa-check-circle');
         }
 
         async function iniciarSesion() {
-            const user = document.getElementById('user').value.trim();
+            const user = document.getElementById('userSelect').value.trim();
             const pass = document.getElementById('pass').value;
-            const sectorElegido = document.getElementById('sectorInput').value.trim();
+            const sectorElegido = document.getElementById('sectorSelect').value.trim();
             const btn = document.getElementById('btnLogin');
-            const estado = document.getElementById('estadoLogin');
 
-            if (!sectorElegido) return alert('Selecciona un sector.');
-            if (!user) return alert('Selecciona o escribe un usuario.');
-            if (!pass) return alert('Ingresa la contraseña.');
+            const sectorValido = usuariosLogin.some(u => normalizarTexto(u.sector) === normalizarTexto(sectorElegido));
+            const usuarioValido = usuariosLogin.some(u => normalizarTexto(u.sector) === normalizarTexto(sectorElegido) && normalizarTexto(u.usuario) === normalizarTexto(user));
+
+            if (!sectorElegido || !sectorValido) {
+                setEstado('Debes seleccionar un sector válido de la lista.', 'warning', 'fa-circle-exclamation');
+                return;
+            }
+            if (!user || !usuarioValido) {
+                setEstado('Debes seleccionar un usuario válido del sector.', 'warning', 'fa-circle-exclamation');
+                return;
+            }
+            if (!pass) {
+                setEstado('Ingresa la contraseña.', 'warning', 'fa-circle-exclamation');
+                return;
+            }
 
             btn.disabled = true;
-            btn.innerText = 'VALIDANDO...';
-            estado.innerText = 'Validando acceso...';
+            btn.innerHTML = '<span class="spinner"></span><span>VALIDANDO</span>';
+            setEstado('Validando acceso...', 'info', 'fa-spinner');
 
             try {
-                const URL_APPS_SCRIPT = CONFIG.URL_APPS_SCRIPT;
-                const res = await fetch(`${URL_APPS_SCRIPT}?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}&sector=${encodeURIComponent(sectorElegido)}`);
+                const res = await fetch(`${CONFIG.URL_APPS_SCRIPT}?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}&sector=${encodeURIComponent(sectorElegido)}&_t=${Date.now()}`);
                 const data = await res.json();
 
                 if (data.acceso) {
-                    sessionStorage.setItem("usuario", data.usuario);
-                    sessionStorage.setItem("sector", data.sector);
-                    sessionStorage.setItem("tipo", data.tipo || "");
-                    window.location.href = "dashboard.html";
+                    sessionStorage.setItem('usuario', data.usuario);
+                    sessionStorage.setItem('sector', data.sector);
+                    sessionStorage.setItem('tipo', data.tipo || '');
+                    setEstado('Acceso validado. Entrando al panel...', 'success', 'fa-check-circle');
+                    window.location.href = 'dashboard.html';
                 } else {
-                    alert("Usuario, contraseña o sector incorrecto.");
-                    estado.innerText = 'Verifica los datos e intenta nuevamente.';
+                    setEstado('Usuario, contraseña o sector incorrecto.', 'error', 'fa-triangle-exclamation');
                 }
             } catch (error) {
                 console.error(error);
-                alert("Error de conexión con Google Sheets.");
-                estado.innerText = 'Error de conexión.';
+                setEstado('Error de conexión con Google Sheets.', 'error', 'fa-triangle-exclamation');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'INICIAR SESIÓN';
+                btn.innerHTML = '<i class="fas fa-right-to-bracket"></i><span>INICIAR SESIÓN</span>';
             }
         }
     </script>
