@@ -119,7 +119,15 @@
         .btn-retirar { background-color: #27ae60; } .btn-retirar:hover { background: #f39c12; }
         .btn-retornar { background-color: #B00000; }  .btn-retornar:hover { background: #f39c12; }
         .btn-descargar { background-color: #2c3e50; } .btn-descargar:hover { background: #f39c12; }
-        .acciones-td { display: flex; justify-content: center; align-items: center; }
+        .btn-eliminar { background-color: #e91e63; } .btn-eliminar:hover { background: #f39c12; color:#000000; }
+        .acciones-td { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 4px; }
+        .estado-select { padding: 6px 8px; border-radius: 999px; border: 1px solid var(--soft-border); font-weight: 800; font-size: 12px; color: #111111; background: #ffffff; }
+        .estado-programado { background: #dbeafe; border-color: #60a5fa; color: #1d4ed8; }
+        .estado-ejecutado { background: #dcfce7; border-color: #22c55e; color: #166534; }
+        .estado-cancelado { background: #fce7f3; border-color: #f472b6; color: #be185d; }
+        .fila-bloqueada { background: #f8fafc; }
+        .fila-bloqueada td { color: #64748b; }
+        .accion-bloqueada { opacity: .45; pointer-events: none; filter: grayscale(1); }
     </style>
 </head>
 <body>
@@ -202,11 +210,12 @@
                         <th>Fecha Interrupcion</th>
                         <th>Circuito</th>
                         <th>Nombre del Despeje</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
-                    <tr><td colspan="6" style="text-align:center;">Cargando información, por favor espera...</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">Cargando información, por favor espera...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -341,14 +350,14 @@ function procesarYMostrarDatos(data) {
                 const data = await response.json();
                 
                 if (!Array.isArray(data)) {
-                    document.getElementById("tabla-body").innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Error de datos</td></tr>`;
+                    document.getElementById("tabla-body").innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error de datos</td></tr>`;
                     return;
                 }
 
                 todosLosDatos = data;
                 renderizarTabla();
             } catch (error) {
-                document.getElementById("tabla-body").innerHTML = `<tr><td colspan="6" style="text-align:center;">Error al conectar al servidor.</td></tr>`;
+                document.getElementById("tabla-body").innerHTML = `<tr><td colspan="7" style="text-align:center;">Error al conectar al servidor.</td></tr>`;
             }
         }
 
@@ -358,7 +367,7 @@ function procesarYMostrarDatos(data) {
             tbody.innerHTML = ""; 
 
             if (todosLosDatos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No hay solicitudes registradas.</td></tr>`;
                 return;
             }
 
@@ -415,36 +424,51 @@ function procesarYMostrarDatos(data) {
             }
 
             if (datosOrdenados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No se encontraron resultados con estos filtros.</td></tr>`;
                 return;
             }
 
             datosOrdenados.forEach(fila => {
                 let fechaMostrar = fila.fecha_interrupcion || fila.fecha;
+                const estado = (fila.estado || "PROGRAMADO").toString().trim().toUpperCase();
+                const bloqueado = estado === "EJECUTADO" || estado === "CANCELADO";
+                const claseEstado = estado === "EJECUTADO" ? "estado-ejecutado" : (estado === "CANCELADO" ? "estado-cancelado" : "estado-programado");
+                const claseBloqueo = bloqueado ? "accion-bloqueada" : "";
 
                 const tr = document.createElement("tr");
+                tr.className = bloqueado ? "fila-bloqueada" : "";
+                tr.setAttribute("data-id", fila.id);
                 tr.innerHTML = `
                     <td><strong>${fila.id}</strong></td>
                     <td>${fila.no_despeje || '-'}</td>
                     <td>${formatearFecha(fechaMostrar)}</td>
                     <td>${fila.circuito || '-'}</td>
                     <td>${fila.nombre || '-'}</td>
-                    
+                    <td>
+                        <select class="estado-select ${claseEstado}" onchange="cambiarEstadoSolicitud(this, '${fila.id}', '${estado}')" ${bloqueado ? 'disabled' : ''}>
+                            <option value="PROGRAMADO" ${estado === 'PROGRAMADO' ? 'selected' : ''}>PROGRAMADO</option>
+                            <option value="EJECUTADO" ${estado === 'EJECUTADO' ? 'selected' : ''}>EJECUTADO</option>
+                            <option value="CANCELADO" ${estado === 'CANCELADO' ? 'selected' : ''}>CANCELADO</option>
+                        </select>
+                    </td>
                     <td class="acciones-td">
-                        <button class="btn-accion btn-form" onclick="abrirAccion('formulario', '${fila.id}')">
-                            <i class="fas fa-file-alt"></i> Solicitud
-                        </button>
-                        <button class="btn-accion btn-retirar" onclick="abrirAccion('retirar', '${fila.id}')">
-                            <i class="fas fa-arrow-circle-down"></i> M. Retirar
-                        </button>
-                        <button class="btn-accion btn-retornar" onclick="abrirAccion('retornar', '${fila.id}')">
-                            <i class="fas fa-arrow-circle-up"></i> M. Retornar
-                        </button>
-                        <button class="btn-accion btn-mecep" onclick="abrirAccion('mecep', '${fila.id}')">
+                        <button class="btn-accion btn-mecep ${claseBloqueo}" onclick="abrirAccion('mecep', '${fila.id}')">
                             <i class="fas fa-clipboard-list"></i> Mecep
                         </button>
-                      <button class="btn-accion btn-descargar" onclick="descargarExcelSolicitud(this, '${fila.id}')">
+                        <button class="btn-accion btn-form ${claseBloqueo}" onclick="abrirAccion('formulario', '${fila.id}')">
+                            <i class="fas fa-file-alt"></i> Solicitud
+                        </button>
+                        <button class="btn-accion btn-retirar ${claseBloqueo}" onclick="abrirAccion('retirar', '${fila.id}')">
+                            <i class="fas fa-arrow-circle-down"></i> M. Retirar
+                        </button>
+                        <button class="btn-accion btn-retornar ${claseBloqueo}" onclick="abrirAccion('retornar', '${fila.id}')">
+                            <i class="fas fa-arrow-circle-up"></i> M. Retornar
+                        </button>
+                        <button class="btn-accion btn-descargar" onclick="descargarExcelSolicitud(this, '${fila.id}')">
                             <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                        <button class="btn-accion btn-eliminar ${claseBloqueo}" onclick="eliminarSolicitud(this, '${fila.id}')">
+                            <i class="fas fa-trash-alt"></i> Eliminar
                         </button>
                     </td>
                 `;
@@ -470,8 +494,8 @@ function procesarYMostrarDatos(data) {
         ID_SOLICITUD: nuevoId,
         USUARIO: usuarioSesion,
         SECTOR: sectorSesion,
-        FECHA_MECEP: new Date().toISOString().split('T')[0]
-        
+        FECHA_MECEP: new Date().toISOString().split('T')[0],
+        ESTADO: "PROGRAMADO"
     };
 
     try {
@@ -499,6 +523,89 @@ function procesarYMostrarDatos(data) {
         boton.innerHTML = textoOriginal;
     }
 }
+
+        async function cambiarEstadoSolicitud(select, idSolicitud, estadoAnterior) {
+            const nuevoEstado = select.value;
+            if (nuevoEstado === estadoAnterior) return;
+
+            let mensaje = "¿Está seguro de cambiar el estado de esta solicitud?";
+            if (nuevoEstado === "EJECUTADO") mensaje = "¿Está seguro de ejecutar esta solicitud? Al ejecutarla ya no podrá modificarla.";
+            if (nuevoEstado === "CANCELADO") mensaje = "¿Está seguro de cancelar esta solicitud? Al cancelarla ya no podrá modificarla.";
+
+            if (!confirm(mensaje)) {
+                select.value = estadoAnterior;
+                return;
+            }
+
+            try {
+                select.disabled = true;
+                const response = await fetch(URL_APPS_SCRIPT, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        action: 'actualizarEstadoSolicitud',
+                        idSolicitud: idSolicitud,
+                        estado: nuevoEstado,
+                        usuario: usuarioSesion,
+                        sector: sectorSesion
+                    })
+                });
+
+                const res = await response.json();
+                if (res.status === "ÉXITO") {
+                    alert("Estado actualizado correctamente.");
+                    await cargarSolicitudes();
+                } else {
+                    throw new Error(res.message || res.error || "No se pudo actualizar el estado.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error al actualizar estado: " + error.message);
+                select.value = estadoAnterior;
+                select.disabled = false;
+            }
+        }
+
+        async function eliminarSolicitud(boton, idSolicitud) {
+            if (!confirm("¿Deseas eliminar este registro? ¿Estás seguro?")) return;
+
+            const confirmacion = prompt("Para eliminar definitivamente escribe la palabra ELIMINAR");
+            if (confirmacion !== "ELIMINAR") {
+                alert("Eliminación cancelada. No se escribió ELIMINAR correctamente.");
+                return;
+            }
+
+            const textoOriginal = boton.innerHTML;
+            boton.disabled = true;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+
+            try {
+                const response = await fetch(URL_APPS_SCRIPT, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        action: 'eliminarSolicitudCompleta',
+                        idSolicitud: idSolicitud,
+                        usuario: usuarioSesion,
+                        sector: sectorSesion
+                    })
+                });
+
+                const res = await response.json();
+                if (res.status === "ÉXITO") {
+                    alert("Solicitud eliminada correctamente.");
+                    await cargarSolicitudes();
+                } else {
+                    throw new Error(res.message || res.error || "No se pudo eliminar la solicitud.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error al eliminar: " + error.message);
+                boton.disabled = false;
+                boton.innerHTML = textoOriginal;
+            }
+        }
+
         function limpiarFiltros() {
             document.getElementById("filtroCircuito").value = "ALL";
             document.getElementById("fechaDesde").value = "";
