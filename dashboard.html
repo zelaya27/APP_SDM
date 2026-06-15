@@ -635,7 +635,18 @@ function procesarYMostrarDatos(data) {
         }
 
         function esX(valor) {
-            return valor && valor.toString().trim().toUpperCase() === 'X';
+            if (valor === true) return true;
+            if (valor === 1) return true;
+            if (valor === null || valor === undefined) return false;
+            return valor.toString().trim().toUpperCase() === 'X';
+        }
+
+        function esSolicitudFila(fila) {
+            return esX(fila.solicitud) || esX(fila.SOLICITUD) || esX(fila.columnaC) || esX(fila.colC);
+        }
+
+        function esApegoFila(fila) {
+            return esX(fila.apego) || esX(fila.APEGO) || esX(fila.columnaD) || esX(fila.colD);
         }
 
         function renderizarDashboardCircuitos() {
@@ -646,9 +657,9 @@ function procesarYMostrarDatos(data) {
                 const circuito = (fila.circuito || 'SIN CIRCUITO').toString().trim() || 'SIN CIRCUITO';
                 if (!resumen[circuito]) resumen[circuito] = { circuito, solicitudes: 0, apegos: 0, total: 0 };
 
-                if (esX(fila.solicitud)) resumen[circuito].solicitudes++;
-                if (esX(fila.apego)) resumen[circuito].apegos++;
-                if (esX(fila.solicitud) || esX(fila.apego)) resumen[circuito].total++;
+                if (esSolicitudFila(fila)) resumen[circuito].solicitudes++;
+                if (esApegoFila(fila)) resumen[circuito].apegos++;
+                if (esSolicitudFila(fila) || esApegoFila(fila)) resumen[circuito].total++;
             });
 
             const filas = Object.values(resumen).sort((a, b) => b.total - a.total || a.circuito.localeCompare(b.circuito));
@@ -703,16 +714,25 @@ function procesarYMostrarDatos(data) {
             function sumarEquipo(nombre, tipo, fila) {
                 const equipo = (nombre || '').toString().trim();
                 if (!equipo) return;
+
+                const esSolicitud = esSolicitudFila(fila);
+                const esApego = esApegoFila(fila);
+
+                if (!esSolicitud && !esApego) return;
+
                 const clave = tipo + '|' + equipo;
                 if (!resumen[clave]) resumen[clave] = { equipo, tipo, solicitudes: 0, apegos: 0, total: 0 };
-                if (esX(fila.solicitud)) resumen[clave].solicitudes++;
-                if (esX(fila.apego)) resumen[clave].apegos++;
-                if (esX(fila.solicitud) || esX(fila.apego)) resumen[clave].total++;
+                if (esSolicitud) resumen[clave].solicitudes++;
+                if (esApego) resumen[clave].apegos++;
+                resumen[clave].total = resumen[clave].solicitudes + resumen[clave].apegos;
             }
 
             datos.forEach(fila => {
-                sumarEquipo(fila.interruptor || fila.interruptor_de_circuito || '', 'Interruptor', fila);
-                sumarEquipo(fila.restaurador || '', 'Restaurador', fila);
+                const interruptor = fila.interruptor || fila.interruptor_de_circuito || fila.INTERRUPTOR_DE_CIRCUITO || fila.columnaI || fila.colI || '';
+                const restaurador = fila.restaurador || fila.RESTAURADOR || fila.columnaJ || fila.colJ || '';
+
+                sumarEquipo(interruptor, 'Interruptor', fila);
+                sumarEquipo(restaurador, 'Restaurador', fila);
             });
 
             const filas = Object.values(resumen).sort((a, b) => b.total - a.total || a.equipo.localeCompare(b.equipo));
