@@ -478,33 +478,24 @@
         }
 
         // GUARDAR DATOS MECEP
-        async function guardarMecep() {
-            const btn = document.getElementById('btnSubmit');
-            btn.disabled = true;
-            btn.innerHTML = 'Guardando...'; 
-            
-            // Formatear Fecha MECEP para enviar a Google Sheets en formato "DD/MM/YYYY HH:MM"
-            let fechaMecepFormateada = "";
-            const fechaMecepRaw = getVal('fecha_mecep');
-            if (fechaMecepRaw) {
-                const dateObj = new Date(fechaMecepRaw);
-                const dd = String(dateObj.getDate()).padStart(2, '0');
-                const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const yyyy = dateObj.getFullYear();
-                const hh = String(dateObj.getHours()).padStart(2, '0');
-                const min = String(dateObj.getMinutes()).padStart(2, '0');
-                fechaMecepFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+  async function guardarMecep() {
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.innerHTML = 'Guardando...'; 
+    
+    let fechaMecepFormateada = "";
+    const fechaMecepRaw = getVal('fecha_mecep');
 
-    var tipoGestion = String(d.TIPO_GESTION || "SOLICITUD").trim().toUpperCase();
+    if (fechaMecepRaw) {
+        const dateObj = new Date(fechaMecepRaw);
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const yyyy = dateObj.getFullYear();
+        const hh = String(dateObj.getHours()).padStart(2, '0');
+        const min = String(dateObj.getMinutes()).padStart(2, '0');
 
-if (tipoGestion === "APEGO") {
-  filaActual[2] = "";
-  filaActual[3] = "X";
-} else {
-  filaActual[2] = "X";
-  filaActual[3] = "";
-}
-            }
+        fechaMecepFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+    }
 
             const payload = {
                 "action": "guardarMecep", // Acción que recibirá Apps Script para guardar en esas columnas
