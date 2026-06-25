@@ -162,18 +162,27 @@
                     </div>
                 </div>
 
-                <div class="form-grid-2" style="margin-top: 15px;">
-                    <div class="form-group">
-                        <label>Circuito</label>
-                        <select id="circuito" onchange="alCambiarCircuito()">
-                            <option value="">Cargando circuitos...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Subestación</label>
-                        <input type="text" id="subestacion" readonly>
-                    </div>
-                </div>
+           <div class="form-grid-3" style="margin-top: 15px;">
+    <div class="form-group">
+        <label>Circuito</label>
+        <select id="circuito" onchange="alCambiarCircuito()">
+            <option value="">Cargando circuitos...</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Subestación</label>
+        <input type="text" id="subestacion" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>Tipo Gestión</label>
+        <select id="tipo_gestion">
+            <option value="SOLICITUD">SOLICITUD</option>
+            <option value="APEGO">APEGO</option>
+        </select>
+    </div>
+</div>
 
                 <div class="section-title">Datos de Tiempos y Maniobra</div>
                 <div class="form-grid-2">
@@ -424,7 +433,13 @@
                     setVal('circuito', fila[6]);          // Col 7
                     if (typeof alCambiarCircuito === "function") alCambiarCircuito(); 
                     setVal('subestacion', fila[5]);       // Col 6
-                    
+                    if (fila[2] && fila[2].toString().trim().toUpperCase() === "X") {
+    setVal('tipo_gestion', 'SOLICITUD');
+} else if (fila[3] && fila[3].toString().trim().toUpperCase() === "X") {
+    setVal('tipo_gestion', 'APEGO');
+} else {
+    setVal('tipo_gestion', 'SOLICITUD');
+}
                     setVal('fecha_interrupcion', formatFecha(fila[13])); // Col 14
                     setVal('dia_de_semana', fila[14]);                   // Col 15
                     setVal('hora_inicio', formatHora(fila[15]));         // Col 16
@@ -432,7 +447,7 @@
                     setVal('tiempo_necesario', fila[17]);                // Col 18
                     setVal('trabajo_a_realizar', fila[18]);              // Col 19
                     setVal('observaciones', fila[37]);                   // Col 38
-
+                        
                     // Datos específicos MECEP
                     if(fila[43]) { 
                         // Tratamos de colocar la fecha guardada (DD/MM/YYYY HH:MM o similar) en el input datetime-local
@@ -479,6 +494,16 @@
                 const hh = String(dateObj.getHours()).padStart(2, '0');
                 const min = String(dateObj.getMinutes()).padStart(2, '0');
                 fechaMecepFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+
+    var tipoGestion = String(d.TIPO_GESTION || "SOLICITUD").trim().toUpperCase();
+
+if (tipoGestion === "APEGO") {
+  filaActual[2] = "";
+  filaActual[3] = "X";
+} else {
+  filaActual[2] = "X";
+  filaActual[3] = "";
+}
             }
 
             const payload = {
@@ -487,7 +512,8 @@
                 "NUMERO_DESPEJE": getVal('numero_despeje'),
                 "NOMBRE_DESPEJE": getVal('nombre_despeje'),
                 "SUBESTACION": getVal('subestacion'),
-                "CIRCUITO": getVal('circuito'), 
+                "CIRCUITO": getVal('circuito'),
+                "TIPO_GESTION": getVal('tipo_gestion'),
                 "FECHA_INTERRUPCION": getVal('fecha_interrupcion'),
                 "DIA_DE_SEMANA": getVal('dia_de_semana'), 
                 "HORA_INICIO": getVal('hora_inicio'),
